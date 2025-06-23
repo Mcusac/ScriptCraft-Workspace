@@ -1,0 +1,60 @@
+---
+
+# 📚 **\[TOOL NAME] Quality Control Tool**
+
+---
+
+## 🚀 **Purpose**
+
+This tool is designed to \[briefly describe functionality, e.g., "compare two datasets for content differences and validate expected values based on pre-defined QC rules."]
+
+---
+
+## 📂 **Folder Structure**
+
+```
+[TOOL NAME]/
+├── input/          # Place your input files here (required)
+├── output/         # Processed results will be saved here
+├── logs/           # (Optional) Execution logs (if enabled)
+├── run.exe         # Double-click this to start the tool
+└── README.txt      # You’re reading it!
+```
+
+---
+
+## 📄 **How to Use**
+
+1. Place exactly **two input files** in the `input/` folder.
+
+   * Supported formats: `.csv`, `.xlsx`, `.xls`
+   * \[Optional: Describe naming conventions or required columns if any.]
+
+2. Double-click `run.exe` to start the process.
+
+3. Processed results will appear in the `output/` folder.
+
+4. Review any logs in the `logs/` folder (if generated).
+
+---
+
+## ⚙️ **Configuration**
+
+This tool uses a pre-defined internal configuration and requires no manual setup.
+
+---
+
+## 📢 **Notes & Limitations**
+
+* Ensure files are formatted correctly before placing them in `input/`.
+* \[Add any tool-specific limitations or assumptions here, e.g., "This tool is optimized for RHQ datasets."]
+
+---
+
+## 📞 **Support**
+
+For any issues or questions, contact:
+\[Your Name or Team]
+\[Contact Info or Email]
+
+---
