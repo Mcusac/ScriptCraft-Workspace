@@ -29,9 +29,15 @@ with open(input_yaml, "r", encoding="utf-8") as f:
     config = yaml.safe_load(f)
 
 # === Determine the tool to package
-tool_to_ship = config.get("tool_to_ship")
+# Extract tool_to_ship from packaging section first, then fallback to root
+packaging_config = config.get("packaging", {})
+tool_to_ship = packaging_config.get("tool_to_ship")
 if not tool_to_ship:
-    print("❌ No 'tool_to_ship' defined in config.yaml. Aborting.")
+    # Fallback to root level for backwards compatibility
+    tool_to_ship = config.get("tool_to_ship")
+
+if not tool_to_ship:
+    print("❌ No 'tool_to_ship' defined in config.yaml (neither in packaging section nor at root). Aborting.")
     sys.exit(1)
 
 tool_config = config.get("tools", {}).get(tool_to_ship, {})
@@ -43,16 +49,17 @@ if not tool_config:
 entry_command = tool_config.get("entry_command", "main.py")
 packages = tool_config.get("packages", [])
 tool_name = tool_config.get("tool_name", tool_to_ship)
-embed_builder = config.get("embed_builder_path", defaults.get("embed_builder_path", ""))
-open_log = str(config.get("open_log_after", defaults.get("open_log_after", True))).lower()
-open_folder = str(config.get("open_folder_after", defaults.get("open_folder_after", False))).lower()
+# Extract packaging settings
+embed_builder = config.get("paths", {}).get("embed_builder_path", defaults.get("embed_builder_path", ""))
+open_log = str(packaging_config.get("open_log_after", defaults.get("open_log_after", True))).lower()
+open_folder = str(packaging_config.get("open_folder_after", defaults.get("open_folder_after", False))).lower()
 
 # === Extract common/shared paths
 tools_dir = config.get("paths", {}).get("tools_dir", "")
 common_dir = config.get("paths", {}).get("common_dir", "")
 
 # === Extract need_urls (defaults to true)
-need_urls = str(config.get("need_urls", True)).lower()
+need_urls = str(packaging_config.get("need_urls", True)).lower()
 
 # === Create .bat lines
 bat_lines = [

@@ -3,52 +3,108 @@ Main script for running pipelines and tools using the existing pipeline framewor
 """
 
 import sys
+import yaml
 from pathlib import Path
 
-from scripts.common.core import Config
-from scripts.common.logging import setup_logger, log_and_print
-from scripts.common.cli import parse_main_args
-from scripts.pipelines.pipeline_steps import PipelineFactory
-from scripts.pipelines.pipeline_utils import list_pipelines, preview_pipeline, run_pipeline
+# Add implementations/python to Python path for dynamic imports
+sys.path.insert(0, str(Path(__file__).parent / "implementations" / "python"))
+
+from implementations.python.scriptcraft.common.core import Config
+from implementations.python.scriptcraft.common.logging import setup_logger, log_and_print
+from implementations.python.scriptcraft.common.cli import parse_main_args
+from implementations.python.scriptcraft.pipelines.pipeline_steps import PipelineFactory
+from implementations.python.scriptcraft.pipelines.pipeline_utils import list_pipelines, preview_pipeline, run_pipeline
+
+
+def get_workspace_config(args):
+    """Determine which workspace config to use."""
+    
+    # If user specified a config file directly, use it
+    if args.config != "config.yaml":
+        return args.config
+    
+    # If user specified a workspace via CLI, use it
+    if hasattr(args, 'workspace') and args.workspace != "development":
+        workspace = args.workspace
+        log_and_print(f"🎯 Using CLI workspace: {workspace}", verbose=True)
+        return f"workspaces/{workspace}/config.yaml"
+    
+    # Default: check base config.yaml for active workspace (IDE run button)
+    try:
+        with open("config.yaml", 'r') as f:
+            base_config = yaml.safe_load(f)
+        
+        workspace = base_config.get('active_workspace', 'development')
+        log_and_print(f"🎯 Using workspace from config: {workspace}", verbose=True)
+        return f"workspaces/{workspace}/config.yaml"
+        
+    except Exception as e:
+        # Fallback to default workspace (this is normal for workspace-only setups)
+        return "workspaces/development/config.yaml"
 
 
 def main():
     """Main entry point."""
     args = parse_main_args("Run pipelines and tools")
     
+    # Determine config file to use
+    config_path = get_workspace_config(args)
+    
     # Load and validate configuration
     try:
-        config = Config.from_yaml(args.config)
+        config = Config.from_yaml(config_path)
+        config.discover_and_merge_tools()  # Merge framework tools and discover tools
         config.validate()
     except Exception as e:
         log_and_print(f"❌ Error loading configuration: {str(e)}", level="error")
         sys.exit(1)
     
-    # Setup logging
+    # Setup logging using PathResolver for workspace-aware paths
+    log_level = "DEBUG" if args.debug else config.logging.level
+    path_resolver = config.get_path_resolver()
     logger = setup_logger(
         name="run_all",
-        level=config.logging.level,
-        log_file=Path(config.logging.log_dir) / "run_all.log",
+        level=log_level,
+        log_file=path_resolver.get_logs_dir() / "run_all.log",
         log_format=config.logging.log_format,
-        verbose=config.logging.verbose_mode
+        verbose=config.logging.verbose_mode or args.verbose
     )
     
     # Create pipeline factory and build pipelines
     try:
-        factory = PipelineFactory()
+        logger.debug("🏗️ Creating PipelineFactory")
+        factory = PipelineFactory(config)
+        logger.debug("🔧 Building pipelines from configuration")
         pipelines = factory.create_pipelines()
+        logger.info(f"✅ Successfully created {len(pipelines)} pipelines")
     except Exception as e:
         logger.error(f"❌ Error creating pipelines: {e}")
+        import traceback
+        logger.debug(f"Exception traceback: {traceback.format_exc()}")
         sys.exit(1)
     
     # List available pipelines and tools
     if args.list:
-        list_pipelines(pipelines)
+        logger.debug("📋 Listing available pipelines")
         
-        log_and_print("\n🛠️ Available tools:")
+        # List pipelines using the logger directly to avoid duplicates
+        logger.info("\n📋 Available Pipelines:")
+        for name, pipeline in pipelines.items():
+            logger.info(f"\n🔷 {name}")
+            if pipeline.description:
+                logger.info(f"   📝 {pipeline.description}")
+            logger.info("   Steps:")
+            for step in pipeline.steps:
+                tags = f" [{', '.join(step.tags)}]" if step.tags else ""
+                logger.info(f"   - {step.name}{tags}")
+        
+        logger.debug("✅ Pipeline listing completed")
+        
+        logger.info("\n🛠️ Available tools:")
         for name, tool in config.tools.items():
             description = tool.get('description', 'No description')
-            log_and_print(f"  🔧 {name}: {description}")
+            logger.info(f"  🔧 {name}: {description}")
+        logger.debug("✅ Tool listing completed")
         return
     
     # Run pipeline
@@ -60,11 +116,20 @@ def main():
         
         pipeline = pipelines[args.pipeline]
         logger.info(f"🚀 Running pipeline: {args.pipeline}")
+        logger.info(f"🔍 Pipeline has {len(pipeline.steps)} steps: {[step.name for step in pipeline.steps]}")
         
         if args.dry_run:
             preview_pipeline(pipeline, args.tag)
         else:
-            run_pipeline(pipeline, args)
+            logger.info(f"🔍 About to call run_pipeline...")
+            try:
+                run_pipeline(pipeline, args)
+                logger.info(f"🔍 run_pipeline returned successfully")
+            except Exception as e:
+                logger.error(f"❌ Error in run_pipeline: {e}")
+                import traceback
+                logger.debug(f"Traceback: {traceback.format_exc()}")
+                raise
         
         logger.info(f"🎉 Pipeline '{args.pipeline}' completed successfully")
         return
@@ -79,12 +144,13 @@ def main():
         
         # Import and use tool dispatcher
         try:
-            from scripts.tools.tool_dispatcher import dispatch_tool
+            from implementations.python.scriptcraft.tools.tool_dispatcher import dispatch_tool
             dispatch_tool(args.tool, args)
-            logger.info(f"🎉 Tool '{args.tool}' completed successfully")
         except Exception as e:
             logger.error(f"❌ Tool execution failed: {e}")
             sys.exit(1)
+            
+        logger.info(f"🎉 Tool '{args.tool}' completed successfully")
         return
     
     # No action specified
@@ -93,4 +159,10 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception as e:
+        print(f"❌ Fatal error: {e}")
+        import traceback
+        traceback.print_exc()
+        sys.exit(1)

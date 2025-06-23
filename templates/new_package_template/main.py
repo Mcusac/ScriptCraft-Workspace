@@ -6,7 +6,7 @@ It handles [main functionality description] with dual-environment support.
 
 Usage:
     Development: python -m scripts.tools.[tool_name] [args]
-    Shippable:   python main.py [args] 
+    Distributable:   python main.py [args] 
     Pipeline:    Called via main_runner(**kwargs)
 """
 
@@ -19,29 +19,29 @@ from typing import Any, Dict, List, Optional, Union
 def setup_imports():
     """
     Detect environment and set up imports.
-    Returns True if in shippable environment, False if in development.
+    Returns True if in distributable environment, False if in development.
     """
     current_file = Path(__file__)
     
-    # Check if 'common' folder exists at same level (shippable environment)
-    is_shippable = (current_file.parent / 'common').exists()
+    # Check if 'common' folder exists at same level (distributable environment)
+    is_distributable = (current_file.parent / 'common').exists()
     
-    if is_shippable:
-        # Shippable environment: add current directory to path
+    if is_distributable:
+        # Distributable environment: add current directory to path
         current_dir = str(current_file.parent)
         if current_dir not in sys.path:
             sys.path.insert(0, current_dir)
-        print(f"🏗️ Shippable environment detected, added {current_dir} to path")
+        print(f"🏗️ Distributable environment detected, added {current_dir} to path")
     else:
         print("🛠️ Development environment detected")
     
-    return is_shippable
+    return is_distributable
 
 # Set up environment and get imports
-IS_SHIPPABLE = setup_imports()
+IS_DISTRIBUTABLE = setup_imports()
 
-# Alternative: Use BaseTool.is_shippable_environment() for consistency
-# This can replace IS_SHIPPABLE after importing BaseTool
+# Alternative: Use BaseTool.is_distributable_environment() for consistency
+# This can replace IS_DISTRIBUTABLE after importing BaseTool
 
 # Import with fallbacks for dual environment support
 try:
@@ -51,7 +51,7 @@ try:
     from scripts.common.core.config import Config
     from scripts.common.core.base import BaseTool
 except ImportError:
-    # Shippable imports (fallback)
+    # Distributable imports (fallback)
     from common.logging.core import setup_logger, log_and_print
     from common.io.data_loading import load_data
     from common.core.config import Config
@@ -74,7 +74,7 @@ class ToolName(BaseTool):
         
         # Load configuration with fallbacks
         try:
-            config_path = "config.yaml" if not IS_SHIPPABLE else "../config.yaml"
+            config_path = "config.yaml" if not IS_DISTRIBUTABLE else "../config.yaml"
             self.config = Config.from_yaml(config_path)
             tool_config = self.config.get_tool_config("[tool_name]") if hasattr(self.config, 'get_tool_config') else {}
             

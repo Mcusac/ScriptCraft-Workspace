@@ -17,5 +17,5 @@ try:
         description="[Tool description]"
     )(main_runner)
 except ImportError:
-    # Skip registration in shippable environment
+    # Skip registration in distributable environment
     pass 

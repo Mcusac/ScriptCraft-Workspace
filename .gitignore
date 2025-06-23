@@ -1,6 +1,10 @@
-# Release Workspace .gitignore
+# ScriptCraft Workspace .gitignore
 
-# === Sensitive Data Directories ===
+# === SENSITIVE DATA AND WORKSPACES ===
+# Exclude all workspace directories (contain user-specific data and configs)
+workspaces/
+!workspaces/.gitkeep
+
 # Exclude all domain-specific data (contains sensitive research data)
 domains/
 !domains/.gitkeep
@@ -19,15 +23,28 @@ domains/
 **/qc_output/
 **/qc_logs/
 
-# === Configuration Files ===
+# === CONFIGURATION FILES ===
 # Main configuration file (may contain sensitive settings)
 config.yaml
 
-# Cursor IDE rules file (contains personal preferences)
-.cursorrules
+# All user configuration files in any location
+**/config.yaml
+!**/sample_config.yaml
+!**/config_template.yaml
 
-# === Build and Distribution Files ===
-# Shippable packages (contain embedded Python and built tools)
+# Credential files
+**/credentials.txt
+**/credentials.json
+**/credentials.yaml
+**/.env
+**/.env.local
+
+# === BUILD AND DISTRIBUTION FILES ===
+# Distributable packages (contain embedded Python and built tools)
+distributables/
+!distributables/.gitkeep
+
+# Legacy shippables directory (if still exists)
 shippables/
 !shippables/.gitkeep
 
@@ -40,7 +57,13 @@ tools/py_embed_setup/build_embed.log
 tools/backups/
 templates/backups/
 
-# === Python-specific ===
+# Generated batch files and executables
+*.bat
+!packaging.bat
+!templates/**/*.bat
+!tools/**/*.bat
+
+# === PYTHON-SPECIFIC ===
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -165,7 +188,18 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-# === Office Files ===
+# === DATA FILES ===
+# Excel data files (may contain sensitive research data)
+*.xlsx
+*.xls
+*.csv
+# !**/test_*.xlsx
+# !**/test_*.csv
+!**/sample_*.xlsx
+!**/sample_*.csv
+!**/template_*.xlsx
+!**/example_*.xlsx
+
 # Excel temporary files
 ~$*.xlsx
 ~$*.xls
@@ -175,13 +209,40 @@ dmypy.json
 ~$*.docx
 ~$*.doc
 
-# === IDE and Editor Files ===
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# === GENERATED DOCUMENTATION AND OUTPUTS ===
+# Generated Word documents (except templates)
+*.docx
+!**/template*.docx
+!**/Template*.docx
+!templates/**/*.docx
+
+# Output files
+**/output/**/*
+!**/output/.gitkeep
+
+# Generated label files
+Labels.docx
+**/Labels.docx
+
+# Zip files (usually contain packaged data)
+*.zip
+!tools/py_embed_setup/*.zip
+
+# === IDE AND EDITOR FILES ===
 # VSCode
 .vscode/
 !.vscode/settings.json
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
+
+# Cursor IDE rules file (contains personal preferences)
+.cursorrules
 
 # PyCharm
 .idea/
@@ -205,7 +266,7 @@ auto-save-list
 tramp
 .\#*
 
-# === Operating System Files ===
+# === OPERATING SYSTEM FILES ===
 # Windows
 Thumbs.db
 ehthumbs.db
@@ -244,7 +305,7 @@ Temporary Items
 .Trash-*
 .nfs*
 
-# === Temporary and Cache Files ===
+# === TEMPORARY AND CACHE FILES ===
 *.tmp
 *.temp
 *.cache
@@ -252,18 +313,38 @@ Temporary Items
 *.backup
 *.old
 *.orig
+*.working
+*.processing
+*_temp.*
 
-# === Selenium WebDriver Files ===
+# === SELENIUM WEBDRIVER FILES ===
 # Chrome driver files
 chromedriver*
 geckodriver*
 msedgedriver*
 
-# === Project-specific Temporary Files ===
+# === PROJECT-SPECIFIC FILES ===
 # Packaging logs
 packaging_log.txt
 
-# Tool-specific temporary files
-*.working
-*.processing
-*_temp.* 
+# Test and debug files
+test_*.py
+debug_*.py
+scratch_*.py
+fix_imports.py
+
+# Keep test_restructure.py - it's a valuable validation tool
+
+# Personal notes and documentation
+NOTES.md
+TODO.md
+PERSONAL_*.md
+
+# Supplement data files (contain actual data)
+**/supplements/**
+!**/supplements/.gitkeep
+
+# Template files with actual content
+**/Folder\ Label\ Template.docx
+**/Template*.docx
+**/template*.xlsx 

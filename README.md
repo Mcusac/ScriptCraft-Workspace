@@ -1,15 +1,39 @@
-# Release Workspace
+# ScriptCraft Workspace
 
-A comprehensive data processing and quality control workspace for research data releases. This project provides tools for data validation, processing pipelines, form automation, and package deployment.
+A comprehensive data processing and quality control workspace for research data workflows. This project provides both a **Python package for developers** and a **complete workspace for research teams**, featuring tools for data validation, processing pipelines, form automation, and package deployment.
 
 ## 🚀 Quick Start
 
-### 1. Initial Setup
+### Option 1: Install Python Package (Recommended for Developers)
+
+```bash
+# Install from GitHub
+pip install git+https://github.com/mcusac/ScriptCraft-Workspace.git#subdirectory=implementations/python
+
+# Or if published to PyPI
+pip install scriptcraft
+```
+
+**Basic Usage:**
+```python
+from scriptcraft import setup_logger, Config, BaseTool, load_data
+
+# Quick data processing setup
+logger = setup_logger("my_project")
+data = load_data("research_data.xlsx")
+
+# Use specific tools
+from scriptcraft.tools.rhq_form_autofiller import RHQFormAutofiller
+rhq = RHQFormAutofiller()
+rhq.run(input_paths=["patient_data.xlsx"])
+```
+
+### Option 2: Full Workspace Setup (Research Teams)
 
 1. **Clone the repository:**
    ```bash
-   git clone <your-repo-url>
-   cd release-workspace
+   git clone https://github.com/mcusac/ScriptCraft-Workspace.git
+   cd ScriptCraft-Workspace
    ```
 
 2. **Create your configuration:**
@@ -23,7 +47,7 @@ A comprehensive data processing and quality control workspace for research data 
    - Update URL templates and tool-specific settings
    - Configure paths if using non-standard directory structure
 
-### 2. Data Organization
+### 3. Data Organization (Workspace Mode)
 
 Create your domain directories and data files:
 
@@ -42,53 +66,67 @@ domains/
 └── Imaging/
 ```
 
-### 3. Running Tools
+### 4. Running Tools
 
-**Individual Tools:**
-```bash
-python -m scripts.tools.data_content_comparer
-python -m scripts.checkers.dictionary_driven_checker
+**Python Package Mode:**
+```python
+import scriptcraft as sc
+
+# Core utilities (most common usage)
+logger = sc.setup_logger("analysis")
+config = sc.Config.from_yaml("config.yaml")
+data = sc.load_data("input.xlsx")
+
+# Specialized tools
+from scriptcraft.checkers import DictionaryDrivenChecker
+checker = DictionaryDrivenChecker()
+checker.run(input_paths=["data.xlsx"])
 ```
 
-**Pipeline Execution:**
+**Workspace Mode:**
 ```bash
+# Individual Tools
+python -m implementations.python.scriptcraft.tools.data_content_comparer
+python -m implementations.python.scriptcraft.checkers.dictionary_driven_checker
+
+# Pipeline Execution  
 python run_all.py --domain Clinical --pipeline data_quality
 python run_all.py --pipeline full_processing
-```
 
-**Package Tools for Distribution:**
-```bash
+# Package Tools for Distribution
 packaging.bat rhq_form_autofiller
 ```
 
 ## 🏗️ Project Architecture
 
-### Core Components
+### Python Package (`scriptcraft`)
 
-- **`scripts/common/`** - Shared utilities and common functionality
-- **`scripts/tools/`** - Standalone data processing tools
-- **`scripts/checkers/`** - Data validation and quality control tools
-- **`scripts/transformers/`** - Data transformation utilities
-- **`scripts/validators/`** - Data integrity validators
-- **`scripts/pipelines/`** - Pipeline orchestration system
+The installable Python package provides:
+
+- **`scriptcraft.common`** - Core utilities for data processing (most used)
+- **`scriptcraft.tools`** - Standalone tools (RHQ Form Autofiller, Data Comparer, etc.)
+- **`scriptcraft.checkers`** - Data validation and quality control
+- **`scriptcraft.validators`** - Data integrity validation  
+- **`scriptcraft.transformers`** - Data transformation utilities
+- **`scriptcraft.enhancements`** - Data enhancement tools
+
+### Workspace Components
+
+- **`implementations/python/`** - Python package source code
+- **`distributables/`** - Self-contained tool packages
+- **`templates/`** - Development templates and examples
+- **`tools/`** - Build and packaging utilities
+- **`workspaces/`** - Example workspace configurations
 
 ### Pipeline System
 
-The project uses a centralized pipeline system defined in `config.yaml`:
+The workspace includes a centralized pipeline system defined in `config.yaml`:
 
 - **`data_preparation`** - Prepare and standardize data
 - **`data_quality`** - Comprehensive validation and QC
 - **`release_management`** - Release consistency and change tracking
 - **`external_tools`** - Form filling and external integrations
 - **`full_processing`** - Complete end-to-end processing
-
-### Tool Packaging
-
-Tools can be packaged into self-contained distributions with embedded Python:
-
-1. Configure tool in `config.yaml`
-2. Run `packaging.bat <tool_name>`
-3. Find packaged tool in `shippables/` directory
 
 ## 📊 Available Tools
 
@@ -107,11 +145,26 @@ Tools can be packaged into self-contained distributions with embedded Python:
 - **RHQ Form Autofiller** - Automated residential history form filling
 - **Automated Labeler** - Generate labels and documentation
 
+### Research Enhancements
+- **Dictionary Supplementer** - Enhance data dictionaries
+- **Supplement Prepper** - Prepare data supplements
+- **Supplement Splitter** - Split and organize supplements
+
 ## 🔧 Configuration
 
-The `config.yaml` file controls all aspects of the system:
+### Python Package Configuration
+```python
+from scriptcraft import Config
 
-### Key Configuration Sections
+# Load from YAML
+config = Config.from_yaml("config.yaml")
+
+# Or from environment variables (for distributables)
+config = Config.from_environment()
+```
+
+### Workspace Configuration
+The `config.yaml` file controls all aspects of the workspace system:
 
 ```yaml
 # Study-specific settings
@@ -138,13 +191,28 @@ This repository is configured to **exclude all sensitive data**:
 - **`domains/`** - All domain data is gitignored
 - **`input/`, `output/`, `logs/`** - Runtime directories are gitignored
 - **`config.yaml`** - Your configuration file is gitignored
-- **`shippables/`** - Built packages are gitignored
+- **`distributables/`** - Built packages are gitignored
 
 Only the code structure and templates are tracked in git.
 
 ## 🛠️ Development
 
-### Adding New Tools
+### Using the Python Package
+
+```python
+from scriptcraft import BaseTool
+
+class MyTool(BaseTool):
+    def run(self, **kwargs):
+        self.log_start()
+        # Custom tool logic
+        self.log_completion()
+
+# Use common utilities
+from scriptcraft import setup_logger, load_data, ensure_output_dir
+```
+
+### Adding New Tools to Workspace
 
 1. Create tool directory in appropriate category (`tools/`, `checkers/`, etc.)
 2. Implement tool following the standard pattern
@@ -156,58 +224,67 @@ Only the code structure and templates are tracked in git.
 
 - Follow PEP 8 with 4-space indentation
 - Use type hints and Google-style docstrings
-- Leverage `scripts.common` utilities (DRY principle)
+- Leverage `scriptcraft.common` utilities (DRY principle)
 - Use emoji in log messages for readability
 - Include proper error handling and logging
-
-### Testing
-
-```bash
-# Run individual tool tests
-python -m pytest scripts/tests/tools/
-
-# Run integration tests
-python -m pytest scripts/tests/integration/
-
-# Test pipeline execution
-python run_all.py --pipeline test
-```
 
 ## 📁 Directory Structure
 
 ```
-Release Workspace/
-├── scripts/           # Main codebase
-│   ├── common/       # Shared utilities
-│   ├── tools/        # Data processing tools
-│   ├── checkers/     # Validation tools
-│   ├── transformers/ # Data transformation
-│   ├── validators/   # Data integrity
-│   └── pipelines/    # Pipeline system
-├── domains/          # Domain-specific data (gitignored)
-├── input/            # Input files (gitignored)
-├── output/           # Output files (gitignored)
-├── logs/             # Log files (gitignored)
-├── shippables/       # Packaged tools (gitignored)
-├── templates/        # Code and package templates
-├── tools/            # Build and development tools
-├── config.yaml       # Main configuration (gitignored)
-├── sample_config.yaml # Configuration example
-└── README.md         # This file
+ScriptCraft-Workspace/
+├── implementations/
+│   └── python/          # Python package source
+│       └── scriptcraft/ # Installable package
+├── distributables/      # Self-contained tool packages (gitignored)
+├── templates/           # Development templates
+├── tools/               # Build and packaging utilities
+├── workspaces/          # Example configurations
+├── config.yaml          # Main configuration (gitignored)
+└── README.md            # This file
+```
+
+## 📦 Installation Options
+
+### For Python Developers
+```bash
+# Basic installation
+pip install scriptcraft
+
+# With web automation tools
+pip install scriptcraft[web]
+
+# Development installation
+pip install scriptcraft[dev]
+
+# All features
+pip install scriptcraft[all]
+```
+
+### For Research Teams
+```bash
+# Clone the full workspace
+git clone https://github.com/mcusac/ScriptCraft-Workspace.git
+cd ScriptCraft-Workspace
+
+# Install Python package in development mode
+cd implementations/python
+pip install -e .
 ```
 
 ## 🤝 Contributing
 
-1. Follow the established code patterns and standards
-2. Ensure all new tools integrate with the common utilities
-3. Update configuration and documentation
-4. Test thoroughly before committing
-5. Keep sensitive data out of the repository
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Test thoroughly (both package and workspace modes)
+5. Submit a pull request
 
 ## 📄 License
 
-[Add your license information here]
+This project is licensed under the MIT License - see the LICENSE file for details.
 
----
+## 🔗 Links
 
-**Note:** This workspace is designed for research data processing. Always ensure compliance with your institution's data security and privacy policies. 
+- **Repository:** https://github.com/mcusac/ScriptCraft-Workspace
+- **Issues:** https://github.com/mcusac/ScriptCraft-Workspace/issues
+- **Documentation:** https://github.com/mcusac/ScriptCraft-Workspace/wiki 

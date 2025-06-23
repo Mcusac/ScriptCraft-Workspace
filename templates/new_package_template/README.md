@@ -14,7 +14,7 @@ This template provides the standardized structure for new tools:
 ├── main.py              # Core implementation with CLI entry point
 ├── utils.py             # Tool-specific utility functions
 ├── README_devs.md       # Developer documentation (copy from templates/ReadMe's/)
-└── README_shippable.md  # End-user documentation (copy from templates/ReadMe's/)
+└── README_distributable.md  # End-user documentation (copy from templates/ReadMe's/)
 ```
 
 **Note:** README templates are located in `templates/ReadMe's/` and should be copied and customized for each new tool.
@@ -30,7 +30,7 @@ cp -r templates/new_package_template scripts/tools/[your_tool_name]
 
 # Copy README templates
 cp templates/ReadMe's/README_devs.md scripts/tools/[your_tool_name]/
-cp templates/ReadMe's/README_shippable.md scripts/tools/[your_tool_name]/
+cp templates/ReadMe's/README_distributable.md scripts/tools/[your_tool_name]/
 ```
 
 ### 2. Customize Template Files
@@ -53,7 +53,7 @@ cp templates/ReadMe's/README_shippable.md scripts/tools/[your_tool_name]/
 
 #### D. Update README Files
 - Customize `README_devs.md` with tool-specific information
-- Customize `README_shippable.md` with user instructions
+- Customize `README_distributable.md` with user instructions
 - Update build dates and feature lists
 
 ### 3. Add to Configuration
@@ -82,7 +82,7 @@ packaging.bat [your_tool_name]
 This template follows the **consolidated main.py pattern**:
 
 ### Environment Detection
-- Automatically detects development vs shippable environments
+- Automatically detects development vs distributable environments
 - Sets up appropriate import paths
 - No manual configuration needed
 
@@ -91,7 +91,7 @@ This template follows the **consolidated main.py pattern**:
 # Development imports
 from scripts.common.logging.core import setup_logger, log_and_print
 
-# Shippable imports  
+# Distributable imports  
 from common.logging.core import setup_logger, log_and_print
 ```
 
@@ -112,8 +112,8 @@ from common.logging.core import setup_logger, log_and_print
 ### Automatic Environment Detection
 ```python
 def setup_imports():
-    """Detects dev vs shippable and sets up imports."""
-    is_shippable = (Path(__file__).parent / 'common').exists()
+    """Detects dev vs distributable and sets up imports."""
+    is_distributable = (Path(__file__).parent / 'common').exists()
     # ... handles import setup
 ```
 
@@ -188,8 +188,8 @@ def main_runner(**kwargs):
 
 ### Packaging Testing
 - [ ] Tool packages successfully with `packaging.bat`
-- [ ] Shippable version runs correctly
-- [ ] Imports work in shippable environment
+- [ ] Distributable version runs correctly
+- [ ] Imports work in distributable environment
 - [ ] All dependencies are included
 
 ---
@@ -203,7 +203,7 @@ def main_runner(**kwargs):
 
 ### README Templates
 - `templates/ReadMe's/README_devs.md` - Developer documentation template
-- `templates/ReadMe's/README_shippable.md` - End-user documentation template
+- `templates/ReadMe's/README_distributable.md` - End-user documentation template
 
 ### Configuration Examples
 - `config.yaml` - Tool configuration examples
@@ -239,7 +239,7 @@ def main_runner(**kwargs):
 
 Your tool is ready when:
 - [ ] Follows the consolidated main.py pattern
-- [ ] Works in both development and shippable environments
+- [ ] Works in both development and distributable environments
 - [ ] Integrates with the pipeline system
 - [ ] Has comprehensive error handling
 - [ ] Uses emoji-enhanced logging

@@ -1,0 +1,276 @@
+# sample_config.yaml
+# Sample configuration file for Release Workspace
+# Copy this file to config.yaml and customize with your actual settings
+
+# === General Configuration ===
+study_name: YOUR_STUDY_NAME  # Replace with your study name
+default_pipeline: "test"
+log_level: INFO
+id_columns: ["Med_ID", "Visit_ID"]  # Customize based on your data structure
+
+# === Project Configuration ===
+project_name: "Release Workspace"
+version: "1.0.0"
+
+# === Paths Configuration ===
+paths:
+  scripts_dir: scripts
+  common_dir: scripts\common
+  tools_dir: scripts\tools
+  templates_dir: "templates/distributable_template"
+export_dir: distributables
+  output_dir: output
+  input_dir: input
+  qc_output_dir: qc_output
+
+# === Domains for domain-based pipelines ===
+# Customize these domains based on your data structure
+domains:
+  - Clinical
+  - Biomarkers
+  - Genomics
+  - Imaging
+
+# === Logging Configuration ===
+logging:
+  level: "INFO"
+  verbose_mode: true
+  structured_logging: true
+  log_dir: "logs"
+  log_format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+
+# === Template System Configuration ===
+template:
+  package_structure:
+    use_import_utils: true
+    use_base_tool: true
+    default_output_dir: "output"
+    default_log_dir: "logs"
+    auto_discover_input: true
+    input_extensions: [".xlsx", ".csv", ".json"]
+  
+  cli_defaults:
+    debug: false
+    help_format: "🏥 {tool_name} - {description}"
+    
+  import_config:
+    cache_imports: true
+    fallback_timeout: 10
+    retry_attempts: 3
+
+# === Dictionary Checker Config ===
+dictionary_checker:
+  outlier_method: "IQR"
+  minmax_files:
+    beginning: "minmaxUpdated-beginning.xlsx"
+    end: "minmaxUpdated-end.xlsx"
+  text_validation:
+    rare_threshold: 3
+  date_validation:
+    default_format: "%m/%Y"
+
+# === Build and Packaging ===
+tool_to_ship: rhq_form_autofiller  # Change to the tool you want to package
+verbose_mode: False
+exclude_patterns:
+  - "__pycache__"
+  - "tests"
+  - "doc"
+  - "_vendor"
+  - "*.pyc"
+  - "*.pyo"
+  - "*.pyd"
+embed_builder_path: tools\py_embed_setup\build_embed_python.bat
+open_log_after: true
+open_folder_after: false
+need_urls: true
+
+# === Tool-Specific Configuration ===
+tools:
+  rhq_form_autofiller:
+    description: "🏠 Automatically fills RHQ residential history forms using participant data"
+    tool_name: rhq_form_autofiller
+    entry_command: main.py
+    packages: [pyyaml, pandas, python-docx, openpyxl, selenium]
+    url_template: "https://your-form-server.com/residential-history/{med_id}"  # Replace with your URL
+    # Tool-specific settings
+    auto_login: true
+    browser_timeout: 60
+    form_wait_time: 10
+    supported_languages: ["en", "es"]
+    default_language: "en"
+
+  data_content_comparer:
+    description: "📊 Compares data content between releases to identify changes and differences"
+    tool_name: data_content_comparer
+    entry_command: main.py --mode rhq_mode
+    packages: [pyyaml, pandas, numpy, pytz, python-dateutil, openpyxl]
+
+  release_consistency_checker:
+    description: "🔍 Validates data consistency across different release versions"
+    tool_name: release_consistency_checker
+    entry_command: main.py --input input/R5.csv input/R6.csv
+    entry_command_domain: main.py
+    packages: [pyyaml, pandas, numpy, python-dateutil, openpyxl]
+
+  automated_labeler:
+    description: "🏷️ Automatically generates labels and documentation from data schemas"
+    tool_name: automated_labeler
+    entry_command: main.py
+    packages: [pyyaml, pandas, python-docx, openpyxl]
+
+# === Pipeline Steps Definitions ===
+pipelines:
+  # Data Preparation Pipeline - Gets data ready for analysis
+  data_preparation:
+    description: "🔧 Prepare and standardize data for analysis"
+    steps:
+      - name: "Dictionary Cleaner"
+        func: "scripts.transformers.dictionary_cleaner.tool.run_dictionary_cleaner"
+        log: "dictionary_cleaner.log"
+        input_key: "dictionary"
+        check_exists: true
+      - name: "Date Format Standardizer"
+        func: "scripts.transformers.date_format_standardizer.tool.run_date_format_standardizer"
+        log: "date_standardizer.log"
+        input_key: "processed_data"
+        output_filename: "date_format_standardized.csv"
+
+  # Data Quality Pipeline - Comprehensive data validation
+  data_quality:
+    description: "✅ Comprehensive data validation and quality checks"
+    steps:
+      - name: "Dictionary Validator"
+        func: "scripts.validators.dictionary_validator.tool.run_dictionary_validator"
+        log: "dictionary_validator.log"
+        input_key: "dictionary"
+      - name: "Dictionary Checker"
+        func: "scripts.checkers.dictionary_driven_checker.tool.run_dictionary_driven_checker"
+        log: "dictionary_checker.log"
+        input_key: "raw_data"
+      - name: "MedVisit Integrity Validator"
+        func: "scripts.validators.medvisit_integrity_validator.tool.run_medvisit_integrity_validator"
+        log: "medvisit_integrity.log"
+        input_key: "raw_data"
+        output_filename: "med_visit_comparison.xlsx"
+        check_exists: false
+      - name: "Score Totals Validator"
+        func: "scripts.checkers.score_totals_checker.tool.run_score_totals_checker"
+        log: "score_totals.log"
+        input_key: "merged_data"
+        output_filename: "score_totals_validator.csv"
+        check_exists: true
+
+  # Release Management Pipeline - For managing data releases
+  release_management:
+    description: "📦 Release consistency and change tracking"
+    steps:
+      - name: "Release Consistency Checker"
+        func: "scripts.checkers.release_consistency_checker.tool.run_release_consistency_checker"
+        log: "release_consistency.log"
+        input_key: "raw_data"
+      - name: "Feature Progression Tracker"
+        func: "scripts.checkers.feature_change_checker.tool.run_feature_change_tracker"
+        log: "feature_changes.log"
+        input_key: "raw_data"
+        output_filename: "Chosen_Feature_Changes_Visits"
+      - name: "Data Content Comparer"
+        func: "scripts.tools.data_content_comparer.tool.run_content_comparer"
+        log: "data_comparer.log"
+        input_key: "old_data"
+        run_mode: "global"
+
+  # Forms and External Tools Pipeline
+  external_tools:
+    description: "🔗 External form filling and data submission tools"
+    steps:
+      - name: "RHQ Form Autofiller"
+        func: "scripts.tools.rhq_form_autofiller.main.main_runner"
+        log: "rhq_autofiller.log"
+        input_key: "rhq_inputs"
+        run_mode: "global"
+
+  # Full Processing Pipeline - Complete end-to-end processing
+  full_processing:
+    description: "🚀 Complete end-to-end data processing and validation"
+    steps:
+      - name: "Dictionary Cleaner"
+        func: "scripts.transformers.dictionary_cleaner.tool.run_dictionary_cleaner"
+        log: "dictionary_cleaner.log"
+        input_key: "dictionary"
+        check_exists: true
+      - name: "Date Format Standardizer"
+        func: "scripts.transformers.date_format_standardizer.tool.run_date_format_standardizer"
+        log: "date_standardizer.log"
+        input_key: "processed_data"
+        output_filename: "date_format_standardized.csv"
+      - name: "Dictionary Validator"
+        func: "scripts.validators.dictionary_validator.tool.run_dictionary_validator"
+        log: "dictionary_validator.log"
+        input_key: "dictionary"
+      - name: "Dictionary Checker"
+        func: "scripts.checkers.dictionary_driven_checker.tool.run_dictionary_driven_checker"
+        log: "dictionary_checker.log"
+        input_key: "raw_data"
+      - name: "MedVisit Integrity Validator"
+        func: "scripts.validators.medvisit_integrity_validator.tool.run_medvisit_integrity_validator"
+        log: "medvisit_integrity.log"
+        input_key: "raw_data"
+        output_filename: "med_visit_comparison.xlsx"
+        check_exists: false
+      - name: "Score Totals Validator"
+        func: "scripts.checkers.score_totals_checker.tool.run_score_totals_checker"
+        log: "score_totals.log"
+        input_key: "merged_data"
+        output_filename: "score_totals_validator.csv"
+        check_exists: true
+      - name: "Release Consistency Checker"
+        func: "scripts.checkers.release_consistency_checker.tool.run_release_consistency_checker"
+        log: "release_consistency.log"
+        input_key: "raw_data"
+      - name: "Data Content Comparer"
+        func: "scripts.tools.data_content_comparer.tool.run_content_comparer"
+        log: "data_comparer.log"
+        input_key: "old_data"
+        run_mode: "global"
+
+  # Quick Test Pipeline - For testing and development
+  test:
+    description: "🧪 Quick test pipeline for development and debugging"
+    steps:
+      - name: "RHQ Form Autofiller"
+        func: "scripts.tools.rhq_form_autofiller.main.main_runner"
+        log: "rhq_autofiller.log"
+        input_key: "rhq_inputs"
+        run_mode: "global"
+
+  # Individual pipelines for when you need just one specific tool
+  # (Keep these for flexibility, but most users should use the grouped ones above)
+
+  dictionary_only:
+    description: "📖 Dictionary validation only"
+    steps:
+      - name: "Dictionary Checker"
+        func: "scripts.checkers.dictionary_driven_checker.tool.run_dictionary_driven_checker"
+        log: "dictionary_checker.log"
+        input_key: "raw_data"
+
+  integrity_only:
+    description: "🔍 Data integrity validation only"
+    steps:
+      - name: "MedVisit Integrity Validator"
+        func: "scripts.validators.medvisit_integrity_validator.tool.run_medvisit_integrity_validator"
+        log: "medvisit_integrity.log"
+        input_key: "raw_data"
+        output_filename: "med_visit_comparison.xlsx"
+        check_exists: false
+
+  score_only:
+    description: "📊 Score validation only"
+    steps:
+      - name: "Score Totals Validator"
+        func: "scripts.checkers.score_totals_checker.tool.run_score_totals_checker"
+        log: "score_totals.log"
+        input_key: "merged_data"
+        output_filename: "score_totals_validator.csv"
+        check_exists: true 

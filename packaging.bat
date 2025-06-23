@@ -28,6 +28,7 @@ echo 🚀 Packaging started: %DATE% %TIME% > "%LOG_FILE%"
 for /f "tokens=2 delims=:" %%A in ('findstr /i "tool_to_ship:" "%SOURCE_CONFIG%"') do (
     set "TOOL_NAME=%%A"
     set "TOOL_NAME=!TOOL_NAME: =!"
+    set "TOOL_NAME=!TOOL_NAME:"=!"
 )
 
 :: Extract TOOLS_DIR and COMMON_DIR from config.yaml's `paths` block
@@ -60,9 +61,9 @@ for /f "tokens=2 delims=:" %%A in ('findstr /i "packages:" "%SOURCE_CONFIG%"') d
 :: Now that TOOL_NAME is known, compute export path
 set "PACKAGE_DIR=%ROOT_DIR%%TOOLS_DIR%\%TOOL_NAME%"
 set "COMMON_DIR=%ROOT_DIR%%COMMON_DIR%"
-set "TEMPLATE_DIR=%ROOT_DIR%templates\shippable_package_template"
-set "EXPORT_DIR=%ROOT_DIR%shippables\%TOOL_NAME%_shippable"
-set "FINAL_ZIP=%ROOT_DIR%shippables\%TOOL_NAME%_shippable_%DATE:/=-%_%TIME::=-%.zip"
+set "TEMPLATE_DIR=%ROOT_DIR%templates\distributable_template"
+set "EXPORT_DIR=%ROOT_DIR%distributables\%TOOL_NAME%_distributable"
+set "FINAL_ZIP=%ROOT_DIR%distributables\%TOOL_NAME%_distributable_%DATE:/=-%_%TIME::=-%.zip"
 
 :: ==========================
 :: Debugging config extraction
@@ -101,9 +102,9 @@ xcopy /e /i /y "%TEMPLATE_DIR%\*" "%EXPORT_DIR%" >> "%LOG_FILE%" 2>&1
 echo ✅ Template files copied to: %EXPORT_DIR% >> "%LOG_FILE%"
 
 :: ==========================
-:: 📋 Generate config.bat in shippable folder
+:: 📋 Generate config.bat in distributable folder
 :: ==========================
-echo 📋 Creating config.bat in shippable... >> "%LOG_FILE%"
+echo 📋 Creating config.bat in distributable... >> "%LOG_FILE%"
 python "%ROOT_DIR%tools\yaml_to_bat_converter.py" "%SOURCE_CONFIG%" "%EXPORT_DIR%\config.bat"
 if not exist "%EXPORT_DIR%\config.bat" (
     echo ❌ config.bat generation failed. Aborting. >> "%LOG_FILE%"
@@ -127,7 +128,7 @@ echo ✅ Common files copied to: %EXPORT_DIR%\scripts\common >> "%LOG_FILE%"
 :: ==========================
 echo 📄 Updating ReadMe files with build date... >> "%LOG_FILE%"
 
-for %%R in (README.md README_shippable.md) do (
+for %%R in (README.md README_distributable.md) do (
     set "README_PATH=%EXPORT_DIR%\scripts\%%R"
     if exist "!README_PATH!" (
         powershell -Command ^
@@ -145,15 +146,15 @@ for %%R in (README.md README_shippable.md) do (
 echo ✅ ReadMe Files updated with build date: %TIMESTAMP% >> "%LOG_FILE%"
 
 :: ==========================
-:: 📄 Move ReadMe_shippable to root of shippable as ReadMe
+:: 📄 Move ReadMe_distributable to root of distributable as ReadMe
 :: ==========================
-echo 📄 Moving README_shippable.md to root of shippable... >> "%LOG_FILE%"
-if exist "%EXPORT_DIR%\scripts\README_shippable.md" (
-    move /y "%EXPORT_DIR%\scripts\README_shippable.md" "%EXPORT_DIR%\README.md" >> "%LOG_FILE%" 2>&1
+echo 📄 Moving README_distributable.md to root of distributable... >> "%LOG_FILE%"
+if exist "%EXPORT_DIR%\scripts\README_distributable.md" (
+    move /y "%EXPORT_DIR%\scripts\README_distributable.md" "%EXPORT_DIR%\README.md" >> "%LOG_FILE%" 2>&1
 ) else (
-    echo ⚠️ README_shippable.md not found in scripts folder. >> "%LOG_FILE%"
+    echo ⚠️ README_distributable.md not found in scripts folder. >> "%LOG_FILE%"
 )
-echo ✅ README_shippable.md moved to: %EXPORT_DIR%\README.md >> "%LOG_FILE%"
+echo ✅ README_distributable.md moved to: %EXPORT_DIR%\README.md >> "%LOG_FILE%"
 
 :: ==========================
 :: 🐍 Build Python environment
@@ -169,7 +170,7 @@ echo ✅ Embedded Python built successfully. >> "%LOG_FILE%"
 :: ==========================
 :: 📥 Import embedded Python
 :: ==========================
-echo 📥 Importing embedded Python to shippable... >> "%LOG_FILE%"
+echo 📥 Importing embedded Python to distributable... >> "%LOG_FILE%"
 pushd "%EXPORT_DIR%"
 call import_embed.bat >> "%LOG_FILE%" 2>&1
 popd
