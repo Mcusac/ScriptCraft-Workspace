@@ -8,7 +8,7 @@ from scriptcraft.common import (
     load_data, find_matching_file,
     FILE_PATTERNS
 )
-from scriptcraft.checkers.feature_change_checker.utils import (
+from scriptcraft.tools.feature_change_checker.utils import (
     run_categorized_changes,
     run_between_visit_changes,
 )

@@ -1,75 +1,110 @@
 # ScriptCraft Tools
 
 ## Overview
-Complete standalone applications that can be run independently or as part of workflows. These tools provide end-to-end functionality for specific research data processing needs.
+This package contains all tools for data processing, validation, transformation, and automation in the ScriptCraft ecosystem. All tools follow consistent patterns and can be used independently or as part of larger workflows.
 
-## 🔧 Available Tools
+## 🎯 Tool Categories
 
-### 🏷️ Automated Labeler
-**Purpose**: Generates professional labels and documentation for research data packages.
+### 📊 Analysis Tools
+**Purpose**: Data analysis, comparison, schema detection
 
-**Key Features**:
-- Excel-based label data input
-- Word document template generation  
-- Batch processing capabilities
-- Professional formatting
+#### Data Content Comparer
+- **Purpose**: Compare data content between different releases, domains, or datasets
+- **Key Features**: Multiple comparison modes, detailed difference reporting, statistical metrics
+- **Plugin Modes**: Domain old vs new, RHQ mode, standard mode
+- **Distribution**: ✅ Available as standalone distributable
 
-**Usage**:
-```python
-from scriptcraft.tools.automated_labeler import AutomatedLabeler
+#### Schema Detector 🆕
+- **Purpose**: Automatically detect and generate database schemas from datasets
+- **Key Features**: Healthcare pattern recognition, privacy-safe analysis, multiple output formats, HIPAA compliance
+- **Outputs**: SQL DDL, JSON schema, YAML schema, comprehensive documentation
+- **Distribution**: ✅ Available as part of package
 
-labeler = AutomatedLabeler()
-labeler.run(input_paths=["label_data.xlsx"])
-```
+### ✅ Validation Tools  
+**Purpose**: Data quality control, consistency checks, and integrity validation
 
-**Distribution**: ✅ Available as standalone distributable
+#### Dictionary Driven Checker
+- **Purpose**: Comprehensive data validation against dictionary rules
+- **Key Features**: Plugin-based validation system, detailed QC reporting, configurable plugins
+- **Plugins**: Numeric, text, date validators
+- **Distribution**: Available as part of package
 
-### 📊 Data Content Comparer
-**Purpose**: Compare data content between different releases, domains, or datasets.
+#### Release Consistency Checker
+- **Purpose**: Ensures consistency across different data releases and versions
+- **Key Features**: Cross-release comparison, participant tracking, change tracking
+- **Distribution**: ✅ Available as standalone distributable
 
-**Key Features**:
-- Multiple comparison modes (domain old vs new, RHQ mode, standard mode)
-- Detailed difference reporting
-- Statistical comparison metrics
-- Plugin-based architecture for different comparison types
+#### Score Totals Checker
+- **Purpose**: Validates calculated scores and totals against expected values
+- **Key Features**: Score calculation validation, mathematical consistency checks
+- **Distribution**: Available as part of package
 
-**Usage**:
-```python
-from scriptcraft.tools.data_content_comparer import DataContentComparer
+#### Feature Change Checker
+- **Purpose**: Tracks and validates feature changes across study visits and timepoints
+- **Key Features**: Feature evolution tracking, cross-visit consistency, temporal validation
+- **Distribution**: Available as part of package
 
-comparer = DataContentComparer()
-comparer.run(mode="domain_old_vs_new", domain="Clinical")
-```
+#### Dictionary Validator
+- **Purpose**: Validates dictionary data structure and format
+- **Key Features**: Key uniqueness validation, value constraints, reference validation
+- **Distribution**: Available as part of package
 
-**Distribution**: ✅ Available as standalone distributable
+#### MedVisit Integrity Validator
+- **Purpose**: Validates medical visit data integrity
+- **Key Features**: Temporal consistency, cross-reference validation, medical data patterns
+- **Distribution**: Available as part of package
 
-### ⚡ RHQ Form Autofiller  
-**Purpose**: Automated filling of Residential History Questionnaire (RHQ) forms using patient data.
+### 🔄 Transformation Tools
+**Purpose**: Data cleaning, formatting, and standardization
 
-**Key Features**:
-- Excel data input processing
-- Web form automation using Selenium
-- Batch processing for multiple patients
-- Error handling and logging
-- Credential management
+#### Dictionary Cleaner
+- **Purpose**: Cleans and standardizes dictionary data
+- **Key Features**: Duplicate removal, format standardization, consistency checks
+- **Distribution**: Available as part of package
 
-**Usage**:
-```python
-from scriptcraft.tools.rhq_form_autofiller import RHQFormAutofiller
+#### Date Format Standardizer
+- **Purpose**: Standardizes date formats across datasets
+- **Key Features**: Multiple input format support, configurable output formats, validation
+- **Distribution**: Available as part of package
 
-rhq = RHQFormAutofiller()
-rhq.run(input_paths=["patient_data.xlsx"])
-```
+### ⚡ Automation Tools
+**Purpose**: Automated workflows and form processing
 
-**Distribution**: ✅ Available as standalone distributable
+#### RHQ Form Autofiller
+- **Purpose**: Automated filling of Residential History Questionnaire (RHQ) forms
+- **Key Features**: Excel data processing, web automation, batch processing, credential management
+- **Distribution**: ✅ Available as standalone distributable
 
-## 🏗️ Tool Architecture
+#### Automated Labeler
+- **Purpose**: Generates professional labels and documentation for research data packages
+- **Key Features**: Excel-based input, Word template generation, batch processing
+- **Distribution**: ✅ Available as standalone distributable
 
-### Common Pattern
+## 🏗️ Architecture
+
+### Unified Tool Interface
 All tools follow the ScriptCraft tool pattern:
 
 ```python
-from scriptcraft import BaseTool
+from scriptcraft.tools import DataContentComparer, DictionaryDrivenChecker
+
+# Direct tool usage
+comparer = DataContentComparer()
+comparer.run(mode="domain_old_vs_new", domain="Clinical")
+
+# Discovery interface  
+from scriptcraft.tools import get_available_tools, list_tools_by_category
+
+# Get all tools
+tools = get_available_tools()
+
+# Get tools by category
+validation_tools = list_tools_by_category("validation")
+```
+
+### Base Tool Pattern
+```python
+from scriptcraft.common.core import BaseTool
 
 class MyTool(BaseTool):
     def __init__(self):
@@ -88,41 +123,41 @@ class MyTool(BaseTool):
 ```
 
 ### Plugin Support
-Tools can support plugin architectures for extensibility:
+Advanced tools support plugin architectures:
 
 ```python
-# Data Content Comparer plugins
+# Dictionary Driven Checker plugins
+from scriptcraft.tools.dictionary_driven_checker.plugins import (
+    NumericPlugin,
+    TextPlugin, 
+    DatePlugin
+)
+
+# Data Content Comparer plugins  
 from scriptcraft.tools.data_content_comparer.plugins import (
     DomainOldVsNewMode,
-    RHQMode, 
+    RHQMode,
     StandardMode
 )
-```
-
-### Configuration
-Tools support flexible configuration through:
-
-```python
-from scriptcraft import Config
-
-# YAML configuration
-config = Config.from_yaml("config.yaml")
-
-# Environment variables (for distributables)
-config = Config.from_environment()
 ```
 
 ## 📦 Distribution
 
 ### Standalone Packages
-Selected tools are available as standalone distributable packages that include:
+Selected tools are available as standalone distributable packages:
+- **Data Content Comparer**: Complete comparison toolkit
+- **Release Consistency Checker**: Cross-release validation
+- **RHQ Form Autofiller**: Form automation suite
+- **Automated Labeler**: Label generation toolkit
+
+Each distributable includes:
 - Embedded Python runtime
-- All dependencies
+- All dependencies  
 - Batch scripts for easy execution
 - User-friendly documentation
 
 ### Python Package Integration
-All tools are also available through the main `scriptcraft` package:
+All tools are available through the main `scriptcraft` package:
 
 ```bash
 pip install scriptcraft
@@ -140,12 +175,13 @@ pip install scriptcraft
    ├── tool.py              # Main logic
    ├── utils.py             # Tool-specific utilities  
    ├── README.md            # Documentation
-   └── tests/               # Tool tests
+   ├── tests/               # Tool tests
+   └── plugins/             # Optional plugin system
    ```
 
 2. **Implement tool class**:
    ```python
-   from scriptcraft import BaseTool
+   from scriptcraft.common.core import BaseTool
    
    class MyNewTool(BaseTool):
        def run(self, **kwargs):
@@ -154,13 +190,12 @@ pip install scriptcraft
            self.log_completion()
    ```
 
-3. **Add configuration** (if distributable):
-   ```yaml
-   # config.yaml
-   tools:
-     my_new_tool:
-       description: "🚀 My new tool description"
-       packages: [required, packages]
+3. **Update tool categories** (in `tools/__init__.py`):
+   ```python
+   TOOL_CATEGORIES = {
+       "analysis": ["data_content_comparer", "my_new_tool"],
+       # ... other categories
+   }
    ```
 
 4. **Test thoroughly**:
@@ -170,10 +205,66 @@ pip install scriptcraft
 
 ### Code Standards
 - Follow the `BaseTool` pattern for consistency
-- Use emoji in descriptions and log messages
+- Use emoji in descriptions and log messages  
 - Include comprehensive error handling
 - Support both programmatic and CLI usage
 - Add tests for all functionality
+- Document with examples
+
+## 🔮 Future Organization
+
+As the tools package grows, we plan to implement the following organizational strategy:
+
+### Phase 1: Current Flat Structure (✅ Current)
+- All tools directly in `tools/` directory
+- Simple discovery and imports
+- Category metadata for organization
+
+### Phase 2: Categorized Structure (15+ tools)
+When the tools package reaches ~15+ tools, we will reorganize into functional subdirectories:
+
+```
+tools/
+├── analysis/          # Data analysis and comparison tools
+│   ├── data_content_comparer/
+│   ├── schema_detector/
+│   └── data_profiler/
+├── validation/        # Quality control and validation tools  
+│   ├── dictionary_driven_checker/
+│   ├── release_consistency_checker/
+│   └── integrity_validators/
+├── transformation/    # Data cleaning and transformation tools
+│   ├── dictionary_cleaner/
+│   ├── date_format_standardizer/
+│   └── data_normalizer/
+├── automation/        # Workflow and form automation tools
+│   ├── rhq_form_autofiller/
+│   ├── automated_labeler/
+│   └── batch_processors/
+└── __init__.py       # Unified interface (backward compatible)
+```
+
+### Phase 3: Metadata-Driven Discovery (Future)
+Advanced filtering and discovery using tool metadata:
+
+```python
+from scriptcraft.tools import find_tools
+
+# Find tools by criteria
+tools = find_tools(
+    category="validation",
+    complexity="beginner", 
+    data_types=["clinical", "genomics"]
+)
+```
+
+**Suggested Future Categories**:
+- **analysis**: Data analysis, comparison, profiling, schema detection
+- **validation**: Quality control, consistency checks, integrity validation  
+- **transformation**: Data cleaning, formatting, standardization, normalization
+- **automation**: Form processing, workflow automation, batch operations
+- **reporting**: Report generation, visualization, documentation
+- **integration**: Data import/export, API connectors, database tools
 
 ## 🧪 Testing
 
@@ -181,17 +272,49 @@ pip install scriptcraft
 # Test all tools
 python -m pytest implementations/python/scriptcraft/tests/tools/
 
+# Test specific tool category
+python -m pytest implementations/python/scriptcraft/tests/tools/validation/
+
 # Test specific tool
-python -m pytest implementations/python/scriptcraft/tests/tools/test_automated_labeler.py
+python -m pytest implementations/python/scriptcraft/tests/tools/test_data_content_comparer.py
 ```
 
 ## 🔗 Related Components
 
 - **`scriptcraft.common`** - Shared utilities and base classes
-- **`scriptcraft.checkers`** - Data quality checking components  
-- **`scriptcraft.validators`** - Data validation components
-- **`scriptcraft.transformers`** - Data transformation components
+- **`scriptcraft.pipelines`** - Workflow orchestration
+- **`scriptcraft.enhancements`** - Dictionary enhancement tools
+- **`scriptcraft.cli`** - Command-line interfaces
+
+## 🛠️ Quality Control Workflow Example
+
+```python
+from scriptcraft.tools import (
+    DictionaryDrivenChecker,
+    ScoreTotalsChecker,
+    ReleaseConsistencyChecker,
+    DataContentComparer
+)
+
+# Comprehensive QC pipeline
+checkers = [
+    DictionaryDrivenChecker(),
+    ScoreTotalsChecker(), 
+    ReleaseConsistencyChecker()
+]
+
+for checker in checkers:
+    results = checker.run(input_paths=["data.xlsx"])
+    if not results.passed:
+        print(f"❌ {checker.tool_name} failed validation")
+    else:
+        print(f"✅ {checker.tool_name} passed validation")
+
+# Compare with previous release
+comparer = DataContentComparer()
+comparer.run(mode="domain_old_vs_new", domain="Clinical")
+```
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the LICENSE file for details. 
+This project is licensed under the MIT License - see the LICENSE file for details.

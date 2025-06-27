@@ -2,8 +2,8 @@
 
 # === SENSITIVE DATA AND WORKSPACES ===
 # Exclude all workspace directories (contain user-specific data and configs)
-workspaces/
-!workspaces/.gitkeep
+dev&test/
+!dev&test/.gitkeep
 
 # Exclude all domain-specific data (contains sensitive research data)
 domains/
