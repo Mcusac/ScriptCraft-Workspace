@@ -14,6 +14,9 @@ import pandas as pd
 from dataclasses import dataclass
 from abc import ABC, abstractmethod
 
+# Import the unified plugin system
+from ..registry import plugin_registry, PluginBase, register_validator
+
 
 # ==== 🏷️ Validation Result Types ====
 
@@ -37,11 +40,16 @@ class FlaggedValue:
 
 # ==== 🔍 Validation Base Classes ====
 
-class ColumnValidator(ABC):
+class ColumnValidator(PluginBase):
     """Base class for all validator plugins."""
 
     def __init__(self, outlier_method: Optional[Any] = None):
+        super().__init__()
         self.outlier_method = outlier_method
+
+    def get_plugin_type(self) -> str:
+        """Return the type of this plugin."""
+        return 'validator'
 
     @abstractmethod
     def validate_value(self, value: any, expected_values: str) -> Optional[str]:
@@ -58,6 +66,8 @@ class PluginRegistry:
     def register(self, type_name: str) -> callable:
         def decorator(validator_class) -> type:
             self._validators[type_name] = validator_class
+            # Also register with the unified registry for backward compatibility
+            plugin_registry.register_plugin('validator', type_name, validator_class)
             return validator_class
         return decorator
 

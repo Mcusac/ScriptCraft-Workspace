@@ -9,12 +9,12 @@ from pathlib import Path
 from typing import List, Union, Dict
 import pandas as pd
 
-from scriptcraft.common.core import BaseEnhancement
+from scriptcraft.common.core import BaseTool
 from scriptcraft.common import get_project_root
 from .utils import merge_and_clean_supplement
 
 
-class SupplementPrepper(BaseEnhancement):
+class SupplementPrepper(BaseTool):
     """Enhancement for merging and cleaning supplement files."""
     
     def __init__(self):

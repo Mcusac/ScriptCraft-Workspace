@@ -1,9 +1,29 @@
-"""Feature change checker for tracking and categorizing changes in feature values between visits."""
+"""
+🔄 Feature Change Checker Tool
 
-__version__ = "1.0.0"
-__author__ = "UNT Data Team"
-__description__ = "A checker that tracks and categorizes changes in feature values between visits"
+Tracks and categorizes changes in feature values between visits or timepoints.
+Provides longitudinal analysis and change detection capabilities.
 
-from .tool import run_feature_change_tracker, checker
+Features:
+- 🔄 Visit-to-visit change tracking
+- 📊 Change categorization and analysis
+- 📈 Longitudinal trend analysis
+- 📋 Change summary reporting
+- 🎯 Feature-specific analysis
 
-__all__ = ['run_feature_change_tracker', 'checker']
+Author: ScriptCraft Team
+"""
+
+from .tool import FeatureChangeChecker
+
+# Tool metadata
+__description__ = "🔄 Tracks and categorizes changes in feature values between visits"
+__tags__ = ["tracking", "changes", "longitudinal", "features", "analysis"]
+__data_types__ = ["csv", "xlsx", "xls"]
+__domains__ = ["clinical", "biomarkers", "genomics"]
+__complexity__ = "moderate"
+__maturity__ = "stable"
+__distribution__ = "pipeline"
+
+# Export the main tool
+__all__ = ['FeatureChangeChecker']

@@ -1,51 +1,48 @@
 """
-Common utilities package for the project.
+ScriptCraft Common Utilities Package
 
-This package provides shared functionality organized into:
-- core: Base classes and core functionality
-- logging: Logging utilities and configuration
-- io: Input/output operations and path management
-- data: Data processing and validation utilities
-- time: Time and date handling utilities
-- tools: Tool utilities and runners
+This package provides all shared utilities for ScriptCraft tools and pipelines.
+Use wildcard imports for internal utilities: `import scriptcraft.common as cu`
+
+For public APIs/distributables, use explicit imports for clear interfaces.
 """
 
-# Import everything from all sub-packages
+# ===== CORE UTILITIES =====
 from .core import *
+
+# ===== REGISTRY SYSTEM =====
+from .registry import *
+
+# ===== LOGGING =====
 from .logging import *
-from .io import *
+
+# ===== DATA PROCESSING =====
 from .data import *
+
+# ===== I/O OPERATIONS =====
+from .io import *
+
+# ===== CLI UTILITIES =====
+from .cli import *
+
+# ===== TIME UTILITIES =====
 from .time import *
+
+# ===== PIPELINE UTILITIES =====
+from .pipeline import *
+
+# ===== TOOLS UTILITIES =====
 from .tools import *
 
-# Build __all__ dynamically by collecting from all sub-modules
-import importlib
-import pkgutil
+# ===== SHORTCUTS =====
+from .shortcuts import *
 
-def _build_all():
-    """Build __all__ list dynamically from all sub-packages."""
-    all_exports = []
-    
-    # Get all sub-package names
-    sub_packages = ['core', 'logging', 'io', 'data', 'time', 'tools']
-    
-    for package_name in sub_packages:
-        try:
-            # Import the sub-package
-            package = importlib.import_module(f'.{package_name}', __name__)
-            
-            # Get its __all__ if it exists, otherwise get all public names
-            if hasattr(package, '__all__'):
-                all_exports.extend(package.__all__)
-            else:
-                # Get all public attributes (not starting with _)
-                all_exports.extend([name for name in dir(package) if not name.startswith('_')])
-        except ImportError:
-            # Skip if package doesn't exist
-            continue
-    
-    # Remove duplicates while preserving order
-    seen = set()
-    return [x for x in all_exports if not (x in seen or seen.add(x))]
-
-__all__ = _build_all()
+# ===== BACKWARD COMPATIBILITY =====
+# Legacy imports for migration period
+from .core import BaseTool as BaseComponent
+from .core import BaseTool as BaseProcessor  
+from .core import BaseTool as BasePipelineStep
+from .core import BaseTool as BaseEnhancement
+from .core import BaseTool as DataAnalysisTool
+from .core import BaseTool as DataComparisonTool
+from .core import BaseTool as DataProcessorTool

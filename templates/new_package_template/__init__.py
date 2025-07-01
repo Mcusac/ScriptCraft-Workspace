@@ -1,21 +1,39 @@
 """
-[Tool Name] Package
+🔧 Tool Name Tool
 
-This package provides functionality for [description].
+Brief description of what this tool does and its primary purpose.
+Provide a clear, concise explanation of the tool's functionality.
+
+Features:
+- 📊 Feature 1 description
+- 🔍 Feature 2 description
+- 📋 Feature 3 description
+- ⚡ Feature 4 description
+- 🎯 Feature 5 description
+
+Author: ScriptCraft Team
 """
 
-from .main import ToolName, main_runner
+from .main import ToolName
 
-__version__ = "1.0.0"
-__all__ = ["ToolName", "main_runner"]
+# Tool metadata
+__description__ = "🔧 Brief description of the tool's main function"
+__tags__ = ["category1", "category2", "type", "function", "purpose"]
+__data_types__ = ["csv", "xlsx", "json"]  # Supported file formats
+__domains__ = ["clinical", "biomarkers", "genomics", "imaging"]  # Applicable domains
+__complexity__ = "simple"  # simple | moderate | complex
+__maturity__ = "beta"  # experimental | beta | stable | mature | deprecated
+__distribution__ = "hybrid"  # standalone | pipeline | hybrid
 
-# Register with registry if in development environment
+# Export the main tool
+__all__ = ['ToolName']
+
+# Register with the unified plugin system (development and distributable)
 try:
-    from scripts.common.core import registry
-    registry.register_tool(
-        name="[tool_name]",
-        description="[Tool description]"
-    )(main_runner)
+    from scriptcraft.common.plugins import register_tool
+    @register_tool(name="[tool_name]", description="[Tool description]")
+    class ToolPlugin(ToolName):
+        pass
 except ImportError:
-    # Skip registration in distributable environment
+    # Skip registration if plugin system is unavailable
     pass 

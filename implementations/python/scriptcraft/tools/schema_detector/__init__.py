@@ -13,17 +13,18 @@ Features:
 - 📋 Index and constraint recommendations
 
 Author: ScriptCraft Team
-Version: 1.0.0
 """
 
 from .tool import SchemaDetector
 
-__version__ = "1.0.0"
+# Tool metadata
 __description__ = "🔍 Analyzes datasets and generates database schemas"
 __tags__ = ["analysis", "schema", "detection", "database", "sql"]
 __data_types__ = ["csv", "xlsx", "json"]
 __domains__ = ["clinical", "biomarkers", "genomics", "imaging"]
-__complexity__ = "intermediate"
+__complexity__ = "complex"
+__maturity__ = "stable"
+__distribution__ = "standalone"
 
 # Export the main tool
 __all__ = ['SchemaDetector'] 

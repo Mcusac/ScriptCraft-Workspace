@@ -1,320 +1,254 @@
 """
-[Tool Name] - Main Implementation
+Tool Template
 
-This module provides the main implementation of the [Tool Name] tool.
-It handles [main functionality description] with dual-environment support.
+This template demonstrates the simplified, DRY approach for ScriptCraft tools.
+ALL tools inherit from BaseTool and use its standardized methods.
 
-Usage:
-    Development: python -m scripts.tools.[tool_name] [args]
-    Distributable:   python main.py [args] 
-    Pipeline:    Called via main_runner(**kwargs)
+Key Principle: Load → Process → Save
+- Use BaseTool.load_data_file() for loading
+- Implement your custom logic
+- Use BaseTool.save_data_file() for saving
 """
 
 import sys
-import argparse
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Union
 
 # === Environment Detection & Import Setup ===
-def setup_imports():
-    """
-    Detect environment and set up imports.
-    Returns True if in distributable environment, False if in development.
-    """
-    current_file = Path(__file__)
-    
-    # Check if 'common' folder exists at same level (distributable environment)
-    is_distributable = (current_file.parent / 'common').exists()
-    
-    if is_distributable:
-        # Distributable environment: add current directory to path
-        current_dir = str(current_file.parent)
-        if current_dir not in sys.path:
-            sys.path.insert(0, current_dir)
-        print(f"🏗️ Distributable environment detected, added {current_dir} to path")
-    else:
-        print("🛠️ Development environment detected")
-    
-    return is_distributable
+# Import the environment detection module (copy env.py into your tool)
+from env import setup_environment, import_dual_env
 
 # Set up environment and get imports
-IS_DISTRIBUTABLE = setup_imports()
-
-# Alternative: Use BaseTool.is_distributable_environment() for consistency
-# This can replace IS_DISTRIBUTABLE after importing BaseTool
+IS_DISTRIBUTABLE = setup_environment()
 
 # Import with fallbacks for dual environment support
 try:
     # Development imports (try first)
-    from scripts.common.logging.core import setup_logger, log_and_print
-    from scripts.common.io.data_loading import load_data
-    from scripts.common.core.config import Config
-    from scripts.common.core.base import BaseTool
+    from scriptcraft.common.logging import log_and_print
+    from scriptcraft.common.core import BaseTool
+    from scriptcraft.common.cli import parse_tool_args
 except ImportError:
     # Distributable imports (fallback)
-    from common.logging.core import setup_logger, log_and_print
-    from common.io.data_loading import load_data
-    from common.core.config import Config
-    from common.core.base import BaseTool
+    from common.logging import log_and_print
+    from common.core import BaseTool
+    from common.cli import parse_tool_args
 
 # Import utilities
 from .utils import ToolNameUtils
 
 
-class ToolName(BaseTool):
-    """Tool for [description of what the tool does]."""
+# SIMPLIFIED ARCHITECTURE: Only BaseTool needed!
+# Choose your tool pattern:
+
+# 1. SINGLE FILE ANALYSIS (most common)
+class SingleFileAnalyzer(BaseTool):
+    """Tool that analyzes one file at a time."""
     
     def __init__(self):
-        """Initialize the tool."""
         super().__init__(
-            name="[Tool Name]",
-            description="[Tool description]"
+            name="Single File Analyzer",
+            description="🔍 Analyzes individual data files"
         )
-        self.utils = ToolNameUtils()
-        
-        # Load configuration with fallbacks
-        try:
-            config_path = "config.yaml" if not IS_DISTRIBUTABLE else "../config.yaml"
-            self.config = Config.from_yaml(config_path)
-            tool_config = self.config.get_tool_config("[tool_name]") if hasattr(self.config, 'get_tool_config') else {}
-            
-            # Store configurable values
-            self.default_output_dir = tool_config.get("default_output_dir", "output")
-            
-            # ADD TOOL-SPECIFIC CONFIG VALUES HERE
-            # self.custom_option = tool_config.get("custom_option", "default_value")
-            
-        except Exception as e:
-            log_and_print(f"⚠️ Config loading failed, using defaults: {e}")
-            # Fallback to defaults if config loading fails
-            self.default_output_dir = "output"
-            
-            # ADD TOOL-SPECIFIC DEFAULTS HERE
-            # self.custom_option = "default_value"
     
-    def run(self,
-            input_path: Optional[Union[str, Path]] = None,
-            output_dir: Optional[Union[str, Path]] = None,
-            mode: Optional[str] = None,
-            debug: bool = False,
-            **kwargs) -> None:
+    def run(self, input_paths, output_dir=None, **kwargs):
+        """Run analysis on input files."""
+        # Validate inputs using DRY method
+        if not self.validate_input_files(input_paths):
+            return False
+        
+        output_path = self.resolve_output_directory(output_dir)
+        
+        for input_path in input_paths:
+            # Load using DRY method
+            data = self.load_data_file(input_path)
+            
+            # Your custom analysis logic here
+            results = self._analyze_data(data)
+            
+            # Save using DRY method  
+            output_filename = self.get_output_filename(input_path, suffix="analysis")
+            self.save_data_file(results, output_path / output_filename)
+    
+    def _analyze_data(self, data):
+        """Your custom analysis logic."""
+        # Example: basic data profiling
+        import pandas as pd
+        
+        profile = pd.DataFrame({
+            'column': data.columns,
+            'dtype': data.dtypes,
+            'non_null_count': data.count(),
+            'null_percentage': (data.isnull().sum() / len(data) * 100).round(2)
+        })
+        
+        return profile
+
+
+# 2. DATA COMPARISON (for comparing datasets)
+class DataComparer(BaseTool):
+    """Tool that compares two datasets."""
+    
+    def __init__(self):
+        super().__init__(
+            name="Data Comparer",
+            description="🔍 Compares two datasets for differences"
+        )
+    
+    def run(self, input_paths, output_dir=None, **kwargs):
+        """Compare datasets."""
+        # Validate we have exactly 2 files
+        if not self.validate_input_files(input_paths, required_count=2):
+            return False
+        
+        output_path = self.resolve_output_directory(output_dir)
+            
+        # Load both files using DRY method
+        df1 = self.load_data_file(input_paths[0])
+        df2 = self.load_data_file(input_paths[1])
+        
+        # Use built-in comparison method
+        basic_comparison = self.compare_dataframes(df1, df2)
+        
+        # Add your custom comparison logic
+        detailed_comparison = self._detailed_compare(df1, df2)
+        
+        # Combine and save results
+        results = {**basic_comparison, 'detailed': detailed_comparison}
+        # Save as JSON or convert to DataFrame as needed
+        
+    def _detailed_compare(self, df1, df2):
+        """Your custom comparison logic."""
+        return {"custom_analysis": "results"}
+
+
+# 3. DATA TRANSFORMATION (legacy transform() pattern)
+class DataTransformer(BaseTool):
+    """Tool that transforms data (supports legacy transform pattern)."""
+    
+    def __init__(self):
+        super().__init__(
+            name="Data Transformer", 
+            description="🔄 Transforms data files"
+        )
+    
+    def run(self, input_paths, output_dir=None, **kwargs):
+        """Run transformation."""
+        if not self.validate_input_files(input_paths):
+            return False
+        
+        output_path = self.resolve_output_directory(output_dir)
+        
+        for input_path in input_paths:
+            # Load → Process → Save pattern
+            data = self.load_data_file(input_path)
+            processed_data = self._process_data(data)
+            
+            output_filename = self.get_output_filename(input_path, suffix="processed")
+            self.save_data_file(processed_data, output_path / output_filename)
+    
+    # Legacy support: can also be called via transform()
+    def transform(self, domain, input_path, output_path, paths=None):
+        """Legacy transform method for backward compatibility."""
+        data = self.load_data_file(input_path)
+        processed_data = self._process_data(data)
+        self.save_data_file(processed_data, output_path)
+    
+    def _process_data(self, data):
+        """Your custom processing logic."""
+        # Example: basic data cleaning
+        cleaned = data.copy()
+        cleaned = cleaned.dropna(how='all')  # Remove empty rows
+        cleaned = cleaned.drop_duplicates()   # Remove duplicates
+        return cleaned
+
+
+# 4. YOUR ACTUAL TOOL (replace with your implementation)
+class ToolName(BaseTool):
+    """Replace this with your actual tool implementation."""
+    
+    def __init__(self):
+        super().__init__(
+            name="Tool Name",
+            description="🔧 Brief description of what this tool does"
+        )
+        self.utils = ToolNameUtils()  # Your utility class
+    
+    def run(self, input_paths=None, output_dir=None, mode=None, **kwargs):
         """
-        Run the tool's main functionality.
+        Main execution method for the tool.
         
         Args:
-            input_path: Path to input file/directory
-            output_dir: Directory to save outputs
+            input_paths: List of input file paths
+            output_dir: Output directory path
             mode: Operating mode (if applicable)
-            debug: Enable debug logging
             **kwargs: Additional tool-specific arguments
-        
-        Raises:
-            ValueError: If required parameters are missing or invalid
         """
-        log_and_print("🚀 Starting [Tool Name]...")
-        
-        try:
-            # Setup directories
-            output_dir = Path(output_dir or self.default_output_dir)
-            output_dir.mkdir(parents=True, exist_ok=True)
-            
-            # Setup logging
-            logger = setup_logger(
-                name="[tool_name]",
-                level="DEBUG" if debug else "INFO",
-                log_file="logs/[tool_name].log"
-            )
-            
-            # Resolve input file(s)
-            input_files = self._resolve_input_files(input_path, **kwargs)
-            
-            # Process each input file
-            for input_file in input_files:
-                self._process_file(input_file, output_dir, mode, logger, **kwargs)
-            
-            log_and_print("✅ [Tool Name] completed successfully")
-            
-        except Exception as e:
-            log_and_print(f"❌ Error in [Tool Name]: {str(e)}", level="error")
-            raise
-    
-    def _resolve_input_files(self, input_path: Optional[Union[str, Path]], **kwargs) -> List[Path]:
-        """Resolve input files from various sources."""
-        input_files = []
-        
-        if input_path:
-            # Direct input path provided
-            input_files = [Path(input_path)]
-        elif kwargs.get('auto_discover', True):
-            # Auto-discover input files using DRY method from BaseTool
-            # Add config to kwargs if not already present
-            if 'config' not in kwargs:
-                kwargs['config'] = self.config
-            input_dir = self.resolve_input_directory(**kwargs)
-            
-            if not input_dir.exists():
-                raise ValueError(f"Input directory not found: {input_dir}")
-            
-            # ADD FILE DISCOVERY LOGIC HERE
-            # Example for Excel files:
-            # excel_files = list(input_dir.glob("*.xlsx"))
-            # if not excel_files:
-            #     raise ValueError("No Excel files found in input directory")
-            # input_files = excel_files
-            
-            # For template example, get all data files
-            all_files = list(input_dir.iterdir())
-            data_files = [f for f in all_files if f.is_file() and not f.name.startswith('.')]
-            if not data_files:
-                raise ValueError("No data files found in input directory")
-            
-            input_files = data_files[:1]  # Take first file as example
-            log_and_print(f"📁 Auto-discovered input file: {input_files[0]}")
-        else:
-            raise ValueError("No input path provided and auto-discovery disabled")
-        
-        # Validate all files exist
-        for input_file in input_files:
-            if not input_file.exists():
-                raise ValueError(f"Input file does not exist: {input_file}")
-        
-        return input_files
-    
-    def _process_file(self, input_file: Path, output_dir: Path, mode: Optional[str], logger, **kwargs) -> None:
-        """Process a single input file."""
-        log_and_print(f"🔄 Processing file: {input_file}")
-        
-        try:
-            # Validate input
-            if not self.utils.validate_input_file(input_file):
-                raise ValueError(f"Input validation failed for: {input_file}")
-            
-            # Load data
-            log_and_print(f"📂 Loading data from: {input_file}")
-            data = load_data(input_file)
-            
-            # Process data using utility methods
-            log_and_print("⚙️ Processing data...")
-            processed_data = self.utils.process_data(data, mode, **kwargs)
-            
-            # Save results
-            output_file = output_dir / f"processed_{input_file.name}"
-            log_and_print(f"💾 Saving results to: {output_file}")
-            self.utils.save_results(processed_data, output_file)
-            
-            log_and_print(f"✅ Completed processing: {input_file}")
-            
-        except Exception as e:
-            log_and_print(f"❌ Error processing {input_file}: {str(e)}", level="error")
-            raise
-    
-    def run_from_cli(self, args) -> None:
-        """
-        Run the tool from command line arguments.
-        
-        Args:
-            args: Parsed command line arguments
-        """
-        kwargs = vars(args).copy()
-        
-        # Extract known arguments
-        input_path = kwargs.pop('input_path', None)
-        output_dir = kwargs.pop('output_dir', self.default_output_dir)
-        debug = kwargs.pop('debug', False)
-        mode = kwargs.pop('mode', None)
-        
-        # Run the tool
-        self.run(
-            input_path=input_path,
-            output_dir=output_dir,
-            mode=mode,
-            debug=debug,
+        # Use standardized error handling
+        return self.run_with_error_handling(
+            self._execute_tool, 
+            input_paths=input_paths, 
+            output_dir=output_dir, 
+            mode=mode, 
             **kwargs
         )
-
-
-# === CLI Interface ===
-def parse_cli_args():
-    """Parse command line arguments."""
-    parser = argparse.ArgumentParser(
-        description="🛠️ [Tool Name] - [Tool description for CLI help]"
-    )
     
-    # Standard arguments
-    parser.add_argument(
-        "input_path",
-        type=str,
-        nargs='?',  # Make optional for tools that auto-discover
-        help="Path to input file/directory"
-    )
-    
-    parser.add_argument(
-        "--output-dir",
-        type=str,
-        default="output",
-        help="Directory to save outputs (default: output)"
-    )
-    
-    parser.add_argument(
-        "--mode",
-        type=str,
-        choices=["basic", "advanced"],  # ADD YOUR MODES HERE
-        help="Operating mode"
-    )
-    
-    parser.add_argument(
-        "--debug",
-        action="store_true",
-        help="Enable debug logging"
-    )
-    
-    # ADD TOOL-SPECIFIC ARGUMENTS HERE
-    # parser.add_argument("--custom-option", help="Custom option description")
-    # parser.add_argument("--filter", help="Filter criteria")
-    # parser.add_argument("--format", choices=["json", "csv"], help="Output format")
-    
-    return parser.parse_args()
-
-
-def run_from_args(args):
-    """Run the tool with parsed arguments."""
-    tool = ToolName()
-    tool.run_from_cli(args)
-
-
-def main_runner(**kwargs):
-    """Main entry point for the tool when run from the pipeline."""
-    log_and_print("🚀 Starting [Tool Name] from pipeline...")
-    
-    try:
-        tool = ToolName()
+    def _execute_tool(self, input_paths=None, output_dir=None, mode=None, **kwargs):
+        """Internal execution logic."""
+        # 1. Validate inputs using DRY method
+        if not self.validate_input_files(input_paths or []):
+            raise ValueError("Input validation failed")
         
-        # Extract arguments from kwargs
-        input_path = kwargs.get('input_path')
-        output_dir = kwargs.get('output_dir', 'output')
-        mode = kwargs.get('mode')
-        debug = kwargs.get('debug', False)
+        # 2. Resolve paths using DRY methods
+        output_path = self.resolve_output_directory(output_dir)
         
-        # Run the tool
-        tool.run(
-            input_path=input_path,
-            output_dir=output_dir,
-            mode=mode,
-            debug=debug,
-            **{k: v for k, v in kwargs.items() if k not in ['input_path', 'output_dir', 'mode', 'debug']}
-        )
+        # 3. Process each file
+        for input_path in input_paths:
+            self._process_file(Path(input_path), output_path, mode, **kwargs)
+    
+    def _process_file(self, input_file: Path, output_dir: Path, mode, **kwargs):
+        """Process a single input file."""
+        self.log_message(f"🔄 Processing file: {input_file}")
         
-    except Exception as e:
-        log_and_print(f"❌ Pipeline execution failed: {str(e)}", level="error")
-        raise
-
+        try:
+            # Load data using DRY method
+            data = self.load_data_file(input_file)
+            
+            # Apply your custom processing
+            processed_data = self.utils.process_data(data, mode, **kwargs)
+            
+            # Save results using DRY method
+            output_filename = self.get_output_filename(input_file, suffix="processed")
+            output_path = self.save_data_file(processed_data, output_dir / output_filename)
+            
+            self.log_message(f"✅ Completed processing: {input_file}")
+            
+        except Exception as e:
+            self.log_message(f"❌ Error processing {input_file}: {e}", level="error")
+            raise
+    
 
 def main():
-    """Main CLI entry point."""
-    args = parse_cli_args()
-    run_from_args(args)
+    """Main entry point for the tool."""
+    # Parse command line arguments
+    args = parse_tool_args("Tool Name - Brief description")
+    
+    # Create tool instance  
+    tool = ToolName()
+        
+        # Run the tool
+    try:
+        tool.run(
+            input_paths=args.input_paths,
+            output_dir=getattr(args, 'output_dir', None),
+            mode=getattr(args, 'mode', None),
+            debug=getattr(args, 'debug', False)
+        )
+        
+        log_and_print("🎉 Tool execution completed successfully!")
+        
+    except Exception as e:
+        log_and_print(f"❌ Tool execution failed: {e}", level="error")
+        sys.exit(1)
 
 
-# === CLI Entry Point (replaces __main__.py) ===
 if __name__ == "__main__":
     main() 

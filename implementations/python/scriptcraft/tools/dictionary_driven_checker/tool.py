@@ -15,20 +15,21 @@ from scriptcraft.common import (
     OutlierMethod, normalize_column_names
 )
 from .utils import run_dictionary_checker
-from .plugins import registry
-from scriptcraft.common.core import BaseProcessor
+from scriptcraft.common.plugins import registry
+from scriptcraft.common.core import BaseTool
 
 def initialize_plugins(config: Dict[str, Any]) -> None:
     """Initialize plugin system with configuration."""
     # Register any additional plugins from config
     plugin_settings = config.get('plugins', {})
+    validators = registry.get_all_plugins('validator')
     for plugin_type, settings in plugin_settings.items():
-        if plugin_type in registry.get_all_validators():
-            validator = registry.get_all_validators()[plugin_type]
+        if plugin_type in validators:
+            validator = validators[plugin_type]
             for key, value in settings.items():
                 setattr(validator, key, value)
 
-class DictionaryDrivenChecker(BaseProcessor):
+class DictionaryDrivenChecker(BaseTool):
     """Checker for validating data against a data dictionary using plugins."""
     
     def __init__(self):
@@ -43,6 +44,30 @@ class DictionaryDrivenChecker(BaseProcessor):
         """Validate input data for the checker."""
         # For this checker, we don't use input_data directly
         # The validation is done internally using filenames
+        return True
+    
+    def process(self, data: pd.DataFrame) -> pd.DataFrame:
+        """
+        Process method for BaseProcessor compatibility.
+        
+        Args:
+            data: Input DataFrame to validate
+            
+        Returns:
+            pd.DataFrame: Validation results
+        """
+        # This is a validation tool, not a data transformer
+        # Return the original data unchanged
+        return data
+    
+    def run(self, *args, **kwargs):
+        """
+        Run method for BaseComponent compatibility.
+        
+        This method satisfies the abstract method requirement.
+        For this tool, the primary interface is through check() method.
+        """
+        self.log_message("🔍 Dictionary Driven Checker run method called")
         return True
     
     def check(self, domain: str, input_path: str, output_path: str, paths: dict) -> None:

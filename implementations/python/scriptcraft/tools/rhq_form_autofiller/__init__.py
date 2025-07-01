@@ -1,21 +1,29 @@
 """
-RHQ Form Autofiller Package
+🌐 RHQ Form Autofiller Tool
 
-This package provides functionality for automating the filling of RHQ forms using pre-processed data.
+Automates filling of web forms for Residence History Questionnaire (RHQ) data.
+Uses Selenium WebDriver to interact with web interfaces and submit form data.
+
+Features:
+- 🌐 Web form automation
+- 🔄 Batch processing support
+- 🏠 Address data handling
+- 🔐 Authentication support
+- 📊 Excel data integration
+
+Author: ScriptCraft Team
 """
 
-from .main import RHQFormAutofiller, main_runner
+from .main import RHQFormAutofiller
 
-__version__ = "1.0.0"
-__all__ = ["RHQFormAutofiller", "main_runner"]
+# Tool metadata
+__description__ = "🌐 Automates filling of RHQ web forms with data"
+__tags__ = ["automation", "web-forms", "rhq", "selenium", "data-entry"]
+__data_types__ = ["csv", "xlsx", "xls"]
+__domains__ = ["clinical"]
+__complexity__ = "complex"
+__maturity__ = "stable"
+__distribution__ = "standalone"
 
-# Register with registry if in development environment
-try:
-    from scriptcraft.common.core import registry
-    registry.register_tool(
-        name="rhq_form_autofiller",
-        description="Automates filling of RHQ forms using pre-processed data from Excel files."
-    )(main_runner)
-except ImportError:
-    # Skip registration in distributable environment
-    pass
+# Export the main tool
+__all__ = ['RHQFormAutofiller']

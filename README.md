@@ -99,6 +99,8 @@ packaging.bat rhq_form_autofiller
 
 ## 🏗️ Project Architecture
 
+ScriptCraft provides both a **Python package** for developers and a **complete workspace** for research teams.
+
 ### Python Package (`scriptcraft`)
 
 The installable Python package provides:
@@ -127,6 +129,8 @@ The workspace includes a centralized pipeline system defined in `config.yaml`:
 - **`release_management`** - Release consistency and change tracking
 - **`external_tools`** - Form filling and external integrations
 - **`full_processing`** - Complete end-to-end processing
+
+📖 **For Developers**: See [`docs/package_architecture.md`](docs/package_architecture.md) for detailed technical architecture, package boundaries, and development guidelines.
 
 ## 📊 Available Tools
 
@@ -227,6 +231,8 @@ from scriptcraft import setup_logger, load_data, ensure_output_dir
 - Leverage `scriptcraft.common` utilities (DRY principle)
 - Use emoji in log messages for readability
 - Include proper error handling and logging
+
+📖 **For Developers**: See [`docs/package_architecture.md`](docs/package_architecture.md) for detailed development guidelines, package structure, and architectural patterns.
 
 ## 📁 Directory Structure
 

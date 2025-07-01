@@ -12,9 +12,9 @@ from scriptcraft.tools.feature_change_checker.utils import (
     run_categorized_changes,
     run_between_visit_changes,
 )
-from scriptcraft.common.core import BaseProcessor
+from scriptcraft.common.core import BaseTool
 
-class FeatureChangeChecker(BaseProcessor):
+class FeatureChangeChecker(BaseTool):
     """Checker for tracking changes in feature values between visits."""
     
     def __init__(self, feature_name: str = "CDX_Cog", categorize: bool = True):
@@ -37,6 +37,12 @@ class FeatureChangeChecker(BaseProcessor):
         # For this checker, we don't use input_data directly
         # The validation is done internally using filenames
         return True
+    
+    def run(self, *args, **kwargs):
+        """Run method for BaseTool compatibility."""
+        # This tool uses the legacy check() method pattern
+        # The run method is provided for BaseTool compatibility
+        pass
     
     def check(self, domain: str, input_path: str, output_path: str, paths: Dict[str, str]) -> None:
         """

@@ -4,6 +4,12 @@ Setup script for ScriptCraft Python implementation.
 
 from setuptools import setup, find_packages
 from pathlib import Path
+import sys
+import os
+
+# Add the package directory to the path so we can import version
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'scriptcraft'))
+from _version import __version__, __author__
 
 # Read README
 readme_path = Path(__file__).parent.parent.parent / "README.md"
@@ -15,11 +21,11 @@ else:
 
 setup(
     name="scriptcraft",
-    version="1.0.0",
+    version=__version__,
     description="Data processing and quality control tools for research workflows",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    author="ScriptCraft Team",
+    author=__author__,
     author_email="scriptcraft@example.com",
     url="https://github.com/mcusac/ScriptCraft-Workspace",
     project_urls={

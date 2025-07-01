@@ -1,10 +1,29 @@
 """
-Dictionary Validator
+✅ Dictionary Validator Tool
 
-This validator checks consistency between dataset columns and dictionary columns.
+Validates data dictionary structure and content against expected standards.
+Ensures dictionary completeness and consistency across domains.
+
+Features:
+- 📋 Structure validation
+- 🔍 Content completeness checking
+- 📊 Cross-domain consistency
+- ⚠️ Missing field detection
+- 📄 Validation reporting
+
+Author: ScriptCraft Team
 """
 
-from .tool import DictionaryValidator, validator, run_dictionary_validator
+from .tool import DictionaryValidator
 
-__version__ = "1.0.0"
-__all__ = ["DictionaryValidator", "validator", "run_dictionary_validator"]
+# Tool metadata
+__description__ = "✅ Validates data dictionary structure and content"
+__tags__ = ["validation", "dictionaries", "structure", "completeness", "quality"]
+__data_types__ = ["csv", "xlsx", "xls"]
+__domains__ = ["clinical", "biomarkers", "genomics", "imaging"]
+__complexity__ = "simple"
+__maturity__ = "stable"
+__distribution__ = "pipeline"
+
+# Export the main tool
+__all__ = ['DictionaryValidator']

@@ -5,10 +5,10 @@ import traceback
 from typing import Dict, Optional, Any
 
 from ...common import shortcuts as cu
-from scriptcraft.common.core import BaseProcessor
+from scriptcraft.common.core import BaseTool
 from .utils import monitor_changes, DATASETS
 
-class ReleaseConsistencyChecker(BaseProcessor):
+class ReleaseConsistencyChecker(BaseTool):
     """Checker for validating consistency between different data releases."""
     
     def __init__(self):
@@ -22,6 +22,30 @@ class ReleaseConsistencyChecker(BaseProcessor):
         """Validate input data for the checker."""
         # For this checker, we don't use input_data directly
         # The validation is done internally using filenames
+        return True
+    
+    def process(self, data: Any) -> Any:
+        """
+        Process method for BaseProcessor compatibility.
+        
+        Args:
+            data: Input data to validate
+            
+        Returns:
+            Processed data (unchanged for validation tools)
+        """
+        # This is a validation tool, not a data transformer
+        # Return the original data unchanged
+        return data
+    
+    def run(self, *args, **kwargs):
+        """
+        Run method for BaseComponent compatibility.
+        
+        This method satisfies the abstract method requirement.
+        For this tool, the primary interface is through check() method.
+        """
+        self.log_message("🔍 Release Consistency Checker run method called")
         return True
     
     def check(self, domain: str, input_path: str, output_path: str, paths: Dict[str, str]) -> None:

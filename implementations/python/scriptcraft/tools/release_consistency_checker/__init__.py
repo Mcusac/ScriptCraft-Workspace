@@ -1,9 +1,29 @@
-"""Release consistency checker for validating data consistency between different releases."""
+"""
+🔄 Release Consistency Checker Tool
 
-__version__ = "1.0.0"
-__author__ = "UNT Data Team"
-__description__ = "A checker that validates data consistency between different releases"
+Validates data consistency between different releases of the same dataset.
+Identifies changes, missing data, and potential issues across releases.
 
-from .tool import run_release_consistency_checker, checker
+Features:
+- 🔄 Cross-release comparison
+- 📊 Change detection and analysis
+- ⚠️ Missing data identification
+- 📋 Comprehensive reporting
+- 🔍 Detailed difference tracking
 
-__all__ = ['run_release_consistency_checker', 'checker']
+Author: ScriptCraft Team
+"""
+
+from .tool import ReleaseConsistencyChecker
+
+# Tool metadata
+__description__ = "🔄 Validates data consistency between different releases"
+__tags__ = ["validation", "releases", "consistency", "comparison", "versioning"]
+__data_types__ = ["csv", "xlsx", "xls"]
+__domains__ = ["clinical", "biomarkers", "genomics", "imaging"]
+__complexity__ = "moderate"
+__maturity__ = "stable"
+__distribution__ = "hybrid"
+
+# Export the main tool
+__all__ = ['ReleaseConsistencyChecker']

@@ -1,10 +1,29 @@
 """
-Date Format Standardizer
+📅 Date Format Standardizer Tool
 
-This transformer standardizes date formats across all date columns in datasets.
+Standardizes date formats across datasets by detecting and converting various
+date representations to consistent formats.
+
+Features:
+- 🔍 Automatic date column detection
+- 📅 Multiple input format recognition
+- 🎯 Configurable output formats
+- ⚡ Batch processing support
+- 📊 Format validation and reporting
+
+Author: ScriptCraft Team
 """
 
-from .tool import DateFormatStandardizer, transformer, run_date_format_standardizer
+from .tool import DateFormatStandardizer
 
-__version__ = "1.0.0"
-__all__ = ["DateFormatStandardizer", "transformer", "run_date_format_standardizer"]
+# Tool metadata
+__description__ = "📅 Standardizes date formats across datasets"
+__tags__ = ["dates", "standardization", "formatting", "validation", "cleaning"]
+__data_types__ = ["csv", "xlsx", "xls"]
+__domains__ = ["clinical", "biomarkers", "genomics", "imaging"]
+__complexity__ = "simple"
+__maturity__ = "stable"
+__distribution__ = "pipeline"
+
+# Export the main tool
+__all__ = ['DateFormatStandardizer']

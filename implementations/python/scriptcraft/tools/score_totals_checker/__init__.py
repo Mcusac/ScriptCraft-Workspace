@@ -1,9 +1,29 @@
-"""Score totals checker for validating calculated score totals against their component values."""
+"""
+🧮 Score Totals Checker Tool
 
-__version__ = "1.0.0"
-__author__ = "UNT Data Team"
-__description__ = "A checker that validates calculated score totals against their component values"
+Validates calculated score totals against their component values to ensure
+mathematical accuracy and data integrity in scoring systems.
 
-from .tool import run_score_totals_checker, checker
+Features:
+- 🧮 Total score validation
+- 📊 Component value checking
+- ⚠️ Discrepancy detection
+- 📋 Accuracy reporting
+- 🔍 Score integrity analysis
 
-__all__ = ['run_score_totals_checker', 'checker']
+Author: ScriptCraft Team
+"""
+
+from .tool import ScoreTotalsChecker
+
+# Tool metadata
+__description__ = "🧮 Validates calculated score totals against component values"
+__tags__ = ["validation", "scores", "totals", "calculation", "integrity"]
+__data_types__ = ["csv", "xlsx", "xls"]
+__domains__ = ["clinical", "biomarkers"]
+__complexity__ = "simple"
+__maturity__ = "stable"
+__distribution__ = "pipeline"
+
+# Export the main tool
+__all__ = ['ScoreTotalsChecker']

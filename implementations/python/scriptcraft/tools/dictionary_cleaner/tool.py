@@ -8,7 +8,7 @@ standardizing expected values, and ensuring consistent formatting across all dic
 from pathlib import Path
 from typing import Optional, Dict, Any
 import pandas as pd
-from scriptcraft.common.core import BaseProcessor
+from scriptcraft.common.core import BaseTool
 from scriptcraft.common.logging import log_and_print
 
 
@@ -29,56 +29,60 @@ VALUE_TYPE_MAP = {
 }
 
 
-class DictionaryCleaner(BaseProcessor):
+class DictionaryCleaner(BaseTool):
     """Transformer for cleaning and standardizing data dictionary entries."""
     
     def __init__(self):
         super().__init__(
             name="Dictionary Cleaner",
-            description="Cleans and standardizes data dictionary entries including value types and expected values"
+            description="Cleans and standardizes data dictionary entries including value types and expected values",
+            supported_formats=['.csv', '.xlsx', '.xls']
         )
     
-    def validate_input(self, input_data: Any) -> bool:
-        """Validate input data for the transformer."""
-        # For this transformer, we don't use input_data directly
-        # The validation is done internally using filenames
-        return True
+    def process(self, data: pd.DataFrame) -> pd.DataFrame:
+        """
+        Process dictionary DataFrame by cleaning and standardizing entries.
+        
+        Args:
+            data: Input dictionary DataFrame
+            
+        Returns:
+            pd.DataFrame: Cleaned dictionary
+        """
+        return self._clean_dictionary(data)
+    
+    def run(self, *args, **kwargs):
+        """Run method for BaseTool compatibility."""
+        # This tool uses the legacy transform/process pattern
+        # The run method is provided for BaseTool compatibility
+        pass
     
     def transform(self, domain: str, input_path: str, output_path: str, paths: dict) -> None:
         """
         Transform dictionary entries by cleaning and standardizing them.
+        Uses the base class implementation with custom processing.
         
         Args:
             domain: The domain to process (e.g., "Biomarkers", "Clinical")
             input_path: Path to the input dictionary file
             output_path: Path to save the cleaned dictionary
             paths: Dictionary containing path configurations
-        
-        Returns:
-            None
         """
         try:
             input_path = Path(input_path)
             output_path = Path(output_path)
             
             if not input_path.exists():
-                log_and_print(f"⚠️ Dictionary file not found: {input_path}")
+                self.log_message(f"⚠️ Dictionary file not found: {input_path}")
                 return
 
-            # Read dictionary
-            df = pd.read_csv(input_path)
+            # Use base class transform method
+            super().transform(domain, input_path, output_path, paths)
             
-            # Clean and standardize the dictionary
-            df = self._clean_dictionary(df)
-            
-            # Save cleaned dictionary
-            output_path.parent.mkdir(parents=True, exist_ok=True)
-            df.to_csv(output_path, index=False)
-            
-            log_and_print(f"✅ Cleaned dictionary saved to: {output_path}")
+            self.log_message(f"✅ Cleaned dictionary saved to: {output_path}")
             
         except Exception as e:
-            log_and_print(f"❌ Error cleaning dictionary: {str(e)}")
+            self.log_error(f"Error cleaning dictionary: {e}")
             raise
     
     def _clean_dictionary(self, df: pd.DataFrame) -> pd.DataFrame:

@@ -1,68 +1,47 @@
-"""Score totals checker for validating calculated score totals against their component values."""
+"""
+Score Totals Checker
+
+This checker validates that calculated totals match expected totals in datasets.
+"""
 
 from scriptcraft.common import (
-    log_and_print, load_data, 
-    find_first_data_file,
+    log_and_print, load_dataset_columns, load_dictionary_columns,
+    create_standard_tool, create_runner_function
 )
-from scriptcraft.common.core import BaseProcessor
 from .utils import calculate_totals_and_compare
-from typing import Any
+import pandas as pd
 
-class ScoreTotalsChecker(BaseProcessor):
-    """Checker for validating score totals against their component values."""
-    
-    def __init__(self):
-        super().__init__(
-            name="Score Totals Checker",
-            description="Validates score totals against their component values"
-        )
-    
-    def validate_input(self, input_data: Any) -> bool:
-        """Validate input data for the checker."""
-        # For this checker, we don't use input_data directly
-        # The validation is done internally using filenames
-        return True
-    
-    def check(self, domain: str, input_path: str, output_path: str, paths: dict) -> None:
-        """
-        Check score totals against their component values.
-        
-        Args:
-            domain: The domain to check (e.g., "Biomarkers", "Clinical")
-            input_path: Path to the input data file
-            output_path: Path to save the check results
-            paths: Dictionary containing path configurations
-        
-        Returns:
-            None
-        """
-        data_file = find_first_data_file(input_path)
 
-        if not data_file:
-            log_and_print(f"❌ No data file found in {input_path}")
-            return
-
-        df = load_data(data_file)
-        result_df = calculate_totals_and_compare(df, domain)
-
-        output_path.parent.mkdir(parents=True, exist_ok=True)
-        result_df.to_csv(output_path, index=False)
-        log_and_print(f"✅ Totals comparison saved to: {output_path}")
-
-# Create singleton instance
-checker = ScoreTotalsChecker()
-
-def run_score_totals_checker(domain, input_path, output_path, paths):
+def check_score_totals(dataset_file, dictionary_file, domain: str) -> pd.DataFrame:
     """
-    Entry point function for the Score Totals Checker.
+    Check calculated totals against expected totals.
     
     Args:
+        dataset_file: Path to dataset file
+        dictionary_file: Path to dictionary file
         domain: The domain to check
-        input_path: Path to the input data file
-        output_path: Path to save the check results
-        paths: Dictionary containing path configurations
-    
+        
     Returns:
-        None
+        DataFrame with comparison results
     """
-    return checker.check(domain, input_path, output_path, paths) 
+    log_and_print(f"🔍 Checking totals in {dataset_file.name} against {dictionary_file.name}...\n")
+
+    # Load and process data
+    dataset_columns = load_dataset_columns(dataset_file)
+    dictionary_columns = load_dictionary_columns(dictionary_file)
+    results = calculate_totals_and_compare(dataset_columns, dictionary_columns, domain)
+    
+    return results
+
+
+# Create tool using consolidated pattern
+ScoreTotalsChecker = create_standard_tool(
+    'checker',
+    'Score Totals Checker',
+    'Validates that calculated totals match expected totals in datasets',
+    check_score_totals,
+    requires_dictionary=True
+)
+
+# Create runner function
+run_score_totals_checker = create_runner_function(ScoreTotalsChecker) 

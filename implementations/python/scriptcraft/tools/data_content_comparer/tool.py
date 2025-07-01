@@ -47,8 +47,12 @@ class DataContentComparer(BaseTool):
         """
         self.log_start()
         
-        # Validate inputs
-        if not input_paths or len(input_paths) < 2:
+        # Validate inputs using base class method
+        if not self.validate_input_files(input_paths or [], self.supported_formats):
+            raise ValueError("❌ Input validation failed")
+        
+        if len(input_paths) < 2:
+            self.log_error("Need at least two input files to compare")
             raise ValueError("❌ Need at least two input files to compare")
         
         # Get comparison settings
@@ -56,40 +60,52 @@ class DataContentComparer(BaseTool):
         output_format = kwargs.get('output_format', 'excel')
         
         try:
-            # Load datasets
-            datasets = load_datasets(input_paths)
-            if not datasets:
-                raise ValueError("❌ Failed to load datasets")
+            # Load datasets using base class method
+            df1 = self.load_data_file(input_paths[0])
+            df2 = self.load_data_file(input_paths[1])
             
-            # Compare datasets
-            comparison_results = compare_datasets(
-                datasets[0],
-                datasets[1],
+            # Use base class comparison method for basic analysis
+            basic_comparison = self.compare_dataframes(df1, df2)
+            
+            # Perform detailed comparison using tool-specific logic
+            detailed_comparison = compare_datasets(
+                df1,
+                df2,
                 comparison_type=comparison_type,
                 domain=domain
             )
             
+            # Combine results
+            comparison_results = {
+                **basic_comparison,
+                'detailed_analysis': detailed_comparison
+            }
+            
+            # Resolve output directory using base class method
+            output_path = self.resolve_output_directory(output_dir)
+            
+            # Generate output filename using base class method
+            if not output_filename:
+                output_filename = self.get_output_filename(
+                    input_paths[0], 
+                    suffix=f"vs_{Path(input_paths[1]).stem}_comparison"
+                )
+                # Override extension for report format
+                output_filename = output_filename.replace('.csv', f'.{output_format}')
+            
+            report_path = output_path / output_filename
+            
             # Generate report
-            if output_dir:
-                output_path = Path(output_dir)
-            else:
-                output_path = Path("output")
-            
-            if output_filename:
-                report_path = output_path / output_filename
-            else:
-                report_path = output_path / f"content_comparison.{output_format}"
-            
             generate_report(
                 comparison_results,
                 report_path,
                 format=output_format
             )
             
-            self.log_completion()
+            self.log_completion(report_path)
             
         except Exception as e:
-            self.log_and_print(f"❌ Error: {str(e)}")
+            self.log_error(f"Comparison failed: {e}")
             raise
 
 

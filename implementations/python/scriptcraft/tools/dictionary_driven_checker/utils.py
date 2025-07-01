@@ -16,7 +16,7 @@ from scriptcraft.common import (
 )
 
 # Import registry from the plugins module (which now gets it from common)
-from .plugins import registry
+from scriptcraft.common.plugins import registry
 
 @dataclass
 class ValidationResult:
@@ -113,7 +113,7 @@ def run_dictionary_checker(
         # Initialize plugin validators as fallbacks
         validators = {
             plugin_type: plugin_class(outlier_method) if plugin_type == "numeric" else plugin_class()
-            for plugin_type, plugin_class in registry.get_all_validators().items()
+            for plugin_type, plugin_class in registry.get_all_plugins('validator').items()
         }
 
         # Process each column in the dictionary

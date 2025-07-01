@@ -12,7 +12,7 @@ from scriptcraft.common import (
     ensure_output_dir,
     compare_dataframes,
 )
-from scriptcraft.common.core import BaseProcessor
+from scriptcraft.common.core import BaseTool
 from typing import Any
 
 
@@ -29,7 +29,7 @@ FILENAME_MAP = {
 }
 
 
-class MedVisitIntegrityValidator(BaseProcessor):
+class MedVisitIntegrityValidator(BaseTool):
     """Validator for checking Med_ID and Visit_ID integrity between old and new datasets."""
     
     def __init__(self):
@@ -43,7 +43,13 @@ class MedVisitIntegrityValidator(BaseProcessor):
         # For this validator, we don't use input_data directly
         # The validation is done internally using filenames
         return True
-    
+
+    def run(self, *args, **kwargs):
+        """Run method for BaseTool compatibility."""
+        # This tool uses the legacy validate() method pattern
+        # The run method is provided for BaseTool compatibility
+        pass
+
     def validate(self, domain: str, input_path: str, output_path: str, paths: dict) -> None:
         """
         Validate Med_ID and Visit_ID integrity between old and new datasets.

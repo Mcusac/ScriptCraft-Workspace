@@ -287,27 +287,7 @@ def add_file_handler(
     logger.info(f"Added file handler: {log_file}")
 
 
-def setup_logger(
-    name: str = "root",
-    level: str = "INFO",
-    log_file: Optional[Union[str, Path]] = None,
-    log_format: str = "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-    verbose: bool = True
-) -> logging.Logger:
-    """
-    Set up a logger with the specified configuration.
-    
-    Args:
-        name: Name of the logger
-        level: Logging level
-        log_file: Optional path to log file
-        log_format: Format string for log messages
-        verbose: Whether to enable verbose logging
-        
-    Returns:
-        Configured logger instance
-    """
-    return core_setup_logger(log_file=log_file, level=level, clear_handlers=False)
+# REMOVED: Duplicate setup_logger function - use core.setup_logger instead
 
 
 def setup_secondary_log(
@@ -330,12 +310,13 @@ def setup_secondary_log(
     Returns:
         Configured logger instance
     """
-    return setup_logger(
+    return core_setup_logger(
         name=name,
         level=level,
         log_file=log_file,
         log_format=log_format,
-        verbose=verbose
+        verbose=verbose,
+        clear_handlers=False
     )
 
 

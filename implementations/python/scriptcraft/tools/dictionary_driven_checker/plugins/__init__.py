@@ -2,10 +2,7 @@
 
 """Plugin system for dictionary-driven validation."""
 
-from scriptcraft.common.data.validation import PluginRegistry
-
-# Singleton registry instance
-registry = PluginRegistry()
+from scriptcraft.common.plugins import registry
 
 # Import plugins after registry is created to avoid circular dependency
 def _load_plugins():

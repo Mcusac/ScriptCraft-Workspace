@@ -18,51 +18,23 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 
 # === Environment Detection & Import Setup ===
-def setup_imports():
-    """
-    Detect environment and set up imports.
-    Returns True if in distributable environment, False if in development.
-    """
-    current_file = Path(__file__)
-    
-    # Check if 'common' folder exists at same level (distributable environment)
-    is_distributable = (current_file.parent / 'common').exists()
-    
-    if is_distributable:
-        # Distributable environment: add current directory to path
-        current_dir = str(current_file.parent)
-        if current_dir not in sys.path:
-            sys.path.insert(0, current_dir)
-        print(f"🏗️ Distributable environment detected, added {current_dir} to path")
-    else:
-        print("🛠️ Development environment detected")
-    
-    return is_distributable
+# Import the environment detection module
+from .env import setup_environment, import_dual_env
 
 # Set up environment and get imports
-IS_DISTRIBUTABLE = setup_imports()
+IS_DISTRIBUTABLE = setup_environment()
 
 # Import based on environment
 if IS_DISTRIBUTABLE:
-    # Distributable imports
-    from common.core.base import BaseTool
-    from common.core.config import Config  
-    from common.logging.core import setup_logger, log_and_print
-    from common.io.directory_ops import ensure_output_dir
-    from common.io.paths import get_project_root
-    from common.io.data_loading import load_data
+    # Distributable imports - use cu pattern for consistency
+    import common as cu
 else:
-    # Development imports
-    from scriptcraft.common.core.base import BaseTool
-    from scriptcraft.common.core.config import Config
-    from scriptcraft.common.logging.core import setup_logger, log_and_print
-    from scriptcraft.common.io.directory_ops import ensure_output_dir
-    from scriptcraft.common.io.paths import get_project_root  
-    from scriptcraft.common.io.data_loading import load_data
+    # Development imports - use cu pattern for consistency
+    import scriptcraft.common as cu
 
 # Import utils (same in both environments since it's local)
 try:
-    from utils import (
+    from .utils import (
         build_address_data, launch_browser, fill_panel
     )
 except ImportError:
@@ -78,7 +50,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
 
-class RHQFormAutofiller(BaseTool):
+class RHQFormAutofiller(cu.BaseTool):
     """Tool for automatically filling RHQ forms with address data."""
     
     def __init__(self):
@@ -94,7 +66,7 @@ class RHQFormAutofiller(BaseTool):
         # Load configuration with fallbacks
         try:
             config_path = "config.yaml" if not IS_DISTRIBUTABLE else "../config.yaml"
-            self.config = Config.from_yaml(config_path)
+            self.config = cu.Config.from_yaml(config_path)
             tool_config = self.config.get_tool_config("rhq_form_autofiller")
             template_config = self.config.get_template_config()
             
@@ -141,11 +113,11 @@ class RHQFormAutofiller(BaseTool):
         
         try:
             # Setup directories
-            output_dir = ensure_output_dir(Path(output_dir or self.default_output_dir))
-            log_dir = ensure_output_dir(Path(kwargs.get('log_dir', 'logs')))
+            output_dir = cu.ensure_output_dir(Path(output_dir or self.default_output_dir))
+            log_dir = cu.ensure_output_dir(Path(kwargs.get('log_dir', 'logs')))
             
             # Setup logging
-            self.logger = setup_logger(
+            self.logger = cu.setup_logger(
                 name=self.name,
                 level="DEBUG" if kwargs.get('debug') else "INFO",
                 log_file=log_dir / "rhq_form_autofiller.log"
@@ -155,9 +127,9 @@ class RHQFormAutofiller(BaseTool):
             input_file = self._resolve_input_file(input_paths, kwargs)
             
             # Load and process data
-            self.log_message("🔄 Loading address data...")
+            cu.log_and_print("🔄 Loading address data...")
             data = build_address_data(input_file, kwargs.get('med_id'))
-            self.log_message(f"✅ Loaded data for {len(data)} Med_IDs")
+            cu.log_and_print(f"✅ Loaded data for {len(data)} Med_IDs")
             
             # Launch browser and process forms
             self._process_forms(data)
@@ -165,12 +137,12 @@ class RHQFormAutofiller(BaseTool):
             self.log_completion()
             
         except Exception as e:
-            self.log_message(f"❌ Error: {str(e)}", level="error")
+            cu.log_and_print(f"❌ Error: {str(e)}", level="error")
             raise
         finally:
             if self.driver:
                 self.driver.quit()
-                self.log_message("🔄 Browser closed")
+                cu.log_and_print("🔄 Browser closed")
     
     def _resolve_input_file(self, input_paths: Optional[List[Union[str, Path]]], kwargs: dict) -> Path:
         """Resolve the input file from various sources."""
@@ -198,7 +170,7 @@ class RHQFormAutofiller(BaseTool):
                 raise ValueError("No Excel files found in input directory")
             
             input_file = excel_files[0]
-            self.log_message(f"📁 Auto-discovered input file: {input_file}")
+            cu.log_and_print(f"📁 Auto-discovered input file: {input_file}")
         
         if not input_file.exists():
             raise ValueError(f"Input file does not exist: {input_file}")
@@ -208,7 +180,7 @@ class RHQFormAutofiller(BaseTool):
     def _process_forms(self, data: dict) -> None:
         """Process all forms with the loaded data."""
         # Launch browser
-        self.log_message("🌐 Launching browser...")
+        cu.log_and_print("🌐 Launching browser...")
         self.driver = launch_browser()
         
         try:
@@ -220,7 +192,7 @@ class RHQFormAutofiller(BaseTool):
                 self._process_single_form(med_id, panels_data)
                 
         except Exception as e:
-            self.log_message(f"❌ Form processing failed: {str(e)}", level="error")
+            cu.log_and_print(f"❌ Form processing failed: {str(e)}", level="error")
             raise
     
     def _handle_login(self, data: dict) -> None:
@@ -229,13 +201,13 @@ class RHQFormAutofiller(BaseTool):
         url = self.config.tools["rhq_form_autofiller"]["url_template"].format(
             med_id=first_med_id
         )
-        self.log_message("🔑 Attempting automatic login")
+        cu.log_and_print("🔑 Attempting automatic login")
         self.driver.get(url)
         self.driver.refresh()
-        self.log_message("🔄 Refreshed to ensure login screen.")
+        cu.log_and_print("🔄 Refreshed to ensure login screen.")
 
         time.sleep(self.form_wait_time)  # Wait for page to load
-        self.log_message(f"⏱️ Waiting {self.form_wait_time} seconds for page to fully load...")
+        cu.log_and_print(f"⏱️ Waiting {self.form_wait_time} seconds for page to fully load...")
 
         # First: Click the initial "Login" button to show the login form
         try:
@@ -243,24 +215,24 @@ class RHQFormAutofiller(BaseTool):
                 EC.element_to_be_clickable((By.XPATH, "//button[contains(text(), 'Login')]"))
             )
             login_btn.click()
-            self.log_message("🔐 Login button clicked - login form should now be visible.")
+            cu.log_and_print("🔐 Login button clicked - login form should now be visible.")
             time.sleep(2)  # Wait for login form to appear
         except Exception as e:
-            self.log_message(f"⚠️ Could not click initial Login button: {e}", level="warning")
+            cu.log_and_print(f"⚠️ Could not click initial Login button: {e}", level="warning")
 
         # Second: Try automatic login (now that login form is visible)
         login_attempted = attempt_automatic_login(self.driver, self.logger)
 
         if not login_attempted:
-            self.log_message("ℹ️ Automatic login not attempted - manual login required.")
+            cu.log_and_print("ℹ️ Automatic login not attempted - manual login required.")
         else:
-            self.log_message("🤖 Automatic login attempted - waiting for authentication...")
+            cu.log_and_print("🤖 Automatic login attempted - waiting for authentication...")
         
         # Wait for login to complete
         start = time.time()
         while "login" in self.driver.current_url.lower() and time.time() - start < self.browser_timeout:
             time.sleep(1)
-        self.log_message("✅ Login confirmed. Starting data entry...")
+        cu.log_and_print("✅ Login confirmed. Starting data entry...")
         
         # Wait for the page to be fully loaded after login
         time.sleep(5)
@@ -269,27 +241,27 @@ class RHQFormAutofiller(BaseTool):
         """Process a single form for one Med_ID."""
         try:
             # Navigate to form
-            self.log_message(f"\n🔄 Processing Med_ID: {med_id}")
+            cu.log_and_print(f"\n🔄 Processing Med_ID: {med_id}")
             url = self.config.tools["rhq_form_autofiller"]["url_template"].format(
                 med_id=med_id
             )
             self.driver.get(url)
-            self.log_message(f"🌐 Opened page for Med_ID {med_id}")
+            cu.log_and_print(f"🌐 Opened page for Med_ID {med_id}")
             
             # Wait for form load - look for expansion panels
             try:
                 WebDriverWait(self.driver, self.form_wait_time).until(
                     EC.presence_of_element_located((By.TAG_NAME, "mat-expansion-panel"))
                 )
-                self.log_message("✅ Form loaded successfully")
+                cu.log_and_print("✅ Form loaded successfully")
             except Exception as e:
-                self.log_message(f"❌ Form did not load for {med_id}: {e}", level="error")
+                cu.log_and_print(f"❌ Form did not load for {med_id}: {e}", level="error")
                 return
             
             # Fill each panel
             for panel_idx, address_blocks in enumerate(panels_data):
                 if address_blocks:  # Only process panels with data
-                    self.log_message(f"📝 Processing panel {panel_idx} with {len(address_blocks)} blocks")
+                    cu.log_and_print(f"📝 Processing panel {panel_idx} with {len(address_blocks)} blocks")
                     fill_panel(self.driver, panel_idx, address_blocks, logger=self.logger)
             
             # Submit form
@@ -299,12 +271,12 @@ class RHQFormAutofiller(BaseTool):
             time.sleep(2)
             
         except Exception as e:
-            self.log_message(f"❌ Error processing record {med_id}: {e}", level="error")
+            cu.log_and_print(f"❌ Error processing record {med_id}: {e}", level="error")
     
     def _submit_form(self, med_id: str) -> None:
         """Submit the form for a Med_ID."""
         try:
-            self.log_message(f"💾 Submitting form for {med_id}...")
+            cu.log_and_print(f"💾 Submitting form for {med_id}...")
             
             # Look for submit button
             submit_btn = WebDriverWait(self.driver, 10).until(
@@ -314,10 +286,10 @@ class RHQFormAutofiller(BaseTool):
             
             # Wait for submission to complete
             time.sleep(3)
-            self.log_message(f"✅ Form submitted for {med_id}")
+            cu.log_and_print(f"✅ Form submitted for {med_id}")
             
         except Exception as e:
-            self.log_message(f"⚠️ Could not submit form for {med_id}: {e}", level="warning")
+            cu.log_and_print(f"⚠️ Could not submit form for {med_id}: {e}", level="warning")
     
     def run_from_cli(self, args) -> None:
         """

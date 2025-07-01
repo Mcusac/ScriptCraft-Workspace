@@ -1,11 +1,29 @@
 """
-Dictionary Cleaner
+🧹 Dictionary Cleaner Tool
 
-This transformer standardizes and validates dictionary entries, including normalizing value types,
-standardizing expected values, and ensuring consistent formatting across all dictionary fields.
+Cleans and standardizes data dictionary files by normalizing value formats,
+fixing encoding issues, and ensuring consistent structure.
+
+Features:
+- 🧹 Value format cleaning and normalization
+- 🔧 Encoding issue resolution
+- 📋 Structure standardization
+- ✨ Brace formatting fixes
+- 📊 Quality validation
+
+Author: ScriptCraft Team
 """
 
-from .tool import DictionaryCleaner, cleaner, run_dictionary_cleaner
+from .tool import DictionaryCleaner
 
-__version__ = "1.0.0"
-__all__ = ["DictionaryCleaner", "cleaner", "run_dictionary_cleaner"]
+# Tool metadata
+__description__ = "🧹 Cleans and standardizes data dictionary files"
+__tags__ = ["cleaning", "dictionaries", "standardization", "preprocessing", "quality"]
+__data_types__ = ["csv", "xlsx", "xls"]
+__domains__ = ["clinical", "biomarkers", "genomics", "imaging"]
+__complexity__ = "moderate"
+__maturity__ = "stable"
+__distribution__ = "pipeline"
+
+# Export the main tool
+__all__ = ['DictionaryCleaner']

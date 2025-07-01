@@ -29,18 +29,28 @@ def get_workspace_config(args):
         log_and_print(f"🎯 Using CLI workspace: {workspace}", verbose=True)
         return f"workspaces/{workspace}/config.yaml"
     
-    # Default: check base config.yaml for active workspace (IDE run button)
-    try:
-        with open("config.yaml", 'r') as f:
-            base_config = yaml.safe_load(f)
-        
-        workspace = base_config.get('active_workspace', 'development')
-        log_and_print(f"🎯 Using workspace from config: {workspace}", verbose=True)
-        return f"workspaces/{workspace}/config.yaml"
-        
-    except Exception as e:
-        # Fallback to default workspace (this is normal for workspace-only setups)
-        return "workspaces/development/config.yaml"
+    # Check if root config.yaml exists and has pipelines (framework config)
+    root_config_path = Path("config.yaml")
+    if root_config_path.exists():
+        try:
+            with open(root_config_path, 'r') as f:
+                base_config = yaml.safe_load(f)
+            
+            # If it has pipelines, it's a framework config we can use directly
+            if 'pipelines' in base_config:
+                log_and_print(f"🎯 Using framework config from root config.yaml", verbose=True)
+                return "config.yaml"
+            
+            # Otherwise, check for active workspace
+            workspace = base_config.get('active_workspace', 'development')
+            log_and_print(f"🎯 Using workspace from config: {workspace}", verbose=True)
+            return f"workspaces/{workspace}/config.yaml"
+            
+        except Exception as e:
+            log_and_print(f"⚠️ Error reading config.yaml: {e}", level="warning")
+    
+    # Fallback to default workspace
+    return "workspaces/development/config.yaml"
 
 
 def main():

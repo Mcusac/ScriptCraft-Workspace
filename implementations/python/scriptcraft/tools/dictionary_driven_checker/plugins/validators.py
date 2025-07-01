@@ -11,10 +11,11 @@ import re
 from datetime import datetime
 import pandas as pd
 import numpy as np
-from .common_imports import ColumnValidator, OutlierMethod
-from . import registry
+from scriptcraft.common.data.validation import ColumnValidator
+from scriptcraft.common.io.paths import OutlierMethod
+from scriptcraft.common.plugins import register_validator
 
-@registry.register("date")
+@register_validator("date")
 class DateValidator(ColumnValidator):
     """Validates date formats and ranges."""
     
@@ -51,7 +52,7 @@ class DateValidator(ColumnValidator):
             
         return None
 
-@registry.register("pattern")
+@register_validator("pattern")
 class PatternValidator(ColumnValidator):
     """Validates values against regex patterns."""
     
@@ -68,7 +69,7 @@ class PatternValidator(ColumnValidator):
             
         return None
 
-@registry.register("numeric")
+@register_validator("numeric")
 class NumericOutlierValidator(ColumnValidator):
     """Validates numeric values and detects outliers."""
     
@@ -109,7 +110,7 @@ class NumericOutlierValidator(ColumnValidator):
             
         return None
 
-@registry.register("categorical_multi")
+@register_validator("categorical_multi")
 class MultiCategoricalValidator(ColumnValidator):
     """Validates multi-select categorical values."""
     
@@ -131,7 +132,7 @@ class MultiCategoricalValidator(ColumnValidator):
             
         return None
 
-@registry.register("coded")
+@register_validator("coded")
 class CodedValueValidator(ColumnValidator):
     """Validates coded values like ICD codes."""
     
@@ -154,7 +155,7 @@ class CodedValueValidator(ColumnValidator):
             
         return None
 
-@registry.register("calculated")
+@register_validator("calculated")
 class CalculatedFieldValidator(ColumnValidator):
     """Validates calculated fields against expected formulas."""
     

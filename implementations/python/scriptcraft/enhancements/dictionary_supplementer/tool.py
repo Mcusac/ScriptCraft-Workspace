@@ -9,7 +9,7 @@ from pathlib import Path
 from typing import Dict, Union
 import pandas as pd
 
-from scriptcraft.common.core import BaseEnhancement
+from scriptcraft.common.core import BaseTool
 from scriptcraft.common import (
     find_matching_file,
     load_data,
@@ -20,7 +20,7 @@ from scriptcraft.common import (
 from .utils import supplement_dictionary
 
 
-class DictionarySupplementer(BaseEnhancement):
+class DictionarySupplementer(BaseTool):
     """Enhancement for supplementing dictionaries with additional data."""
     
     def __init__(self):

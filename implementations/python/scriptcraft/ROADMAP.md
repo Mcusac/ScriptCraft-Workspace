@@ -1,6 +1,28 @@
 # 🗺️ Project Roadmap
 
-This document outlines future improvements, ideas, and planned changes for the codebase.
+This document outlines long-term improvements, ideas, and planned changes for the codebase.
+
+> **For focused development**: See version-specific roadmaps:
+> - **[v2.0.0 Roadmap](ROADMAP_v2.0.0.md)** - Current focus: Structure & DRY principles
+> - **Future versions** - Will have dedicated roadmaps as they approach
+
+---
+
+## 📌 **Version-Specific Roadmaps**
+
+### 🚧 **Active Development**
+- **[v2.0.0](ROADMAP_v2.0.0.md)** - Structural improvements, DRY principles, professional package organization
+
+### 🔮 **Planned Future Versions**
+- **v2.1.x** - Performance optimizations & incremental improvements
+- **v2.2.x** - Developer experience & tooling enhancements  
+- **v3.0.x** - Feature expansion & plugin system
+
+---
+
+## 🌟 **Long-term Vision & Ideas**
+
+The items below represent the overall direction and long-term goals for ScriptCraft. These will be organized into version-specific roadmaps as development progresses.
 
 ## 🎯 Immediate Priorities (0-3 months)
 

@@ -21,27 +21,11 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.keys import Keys
 
 # === Environment Detection & Import Setup ===
-def setup_imports():
-    """
-    Detect environment and set up imports.
-    Returns True if in distributable environment, False if in development.
-    """
-    current_file = Path(__file__)
-    
-    # Check if 'common' folder exists at same level (distributable environment)
-    is_distributable = (current_file.parent / 'common').exists()
-    
-    if is_distributable:
-        # Distributable environment: add current directory to path
-        import sys
-        current_dir = str(current_file.parent)
-        if current_dir not in sys.path:
-            sys.path.insert(0, current_dir)
-    
-    return is_distributable
+# Import the environment detection module
+from .env import setup_environment
 
 # Set up environment and get imports
-IS_DISTRIBUTABLE = setup_imports()
+IS_DISTRIBUTABLE = setup_environment()
 
 # Import based on environment
 if IS_DISTRIBUTABLE:

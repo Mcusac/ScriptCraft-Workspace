@@ -9,7 +9,7 @@ from pathlib import Path
 from typing import Dict, Union
 import pandas as pd
 
-from scriptcraft.common.core import BaseEnhancement
+from scriptcraft.common.core import BaseTool
 from scriptcraft.common import (
     get_project_root,
     get_domain_paths,
@@ -20,7 +20,7 @@ from scriptcraft.common import (
 from .utils import split_supplement_into_domains
 
 
-class SupplementSplitter(BaseEnhancement):
+class SupplementSplitter(BaseTool):
     """Enhancement for splitting supplements into domain-specific files."""
     
     def __init__(self):

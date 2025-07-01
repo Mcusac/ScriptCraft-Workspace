@@ -1,34 +1,17 @@
 """
-Core package for the project.
+Core package for ScriptCraft common utilities.
 
-This package provides core functionality organized into:
-- base: Base classes for components
-- config: Configuration management
-- registry: Plugin registration and discovery
+This package contains base classes and configuration management.
+Registry functionality has been moved to the registry package.
 """
 
-from .base import (
-    BaseComponent,
-    BaseProcessor,
-    BasePipelineStep,
-    BaseEnhancement,
-    BaseTool
-)
-from .config import Config
-from .registry import PluginRegistry, registry
+from .base import BaseTool, BaseMainRunner
+from .config import Config, get_config, load_config
 
 __all__ = [
-    # Base Classes
-    'BaseComponent',
-    'BaseProcessor',
-    'BasePipelineStep',
-    'BaseEnhancement',
-    'BaseTool',
+    # Base classes
+    'BaseTool', 'BaseMainRunner',
     
     # Configuration
-    'Config',
-    
-    # Plugin Registry
-    'PluginRegistry',
-    'registry'
-] 
+    'Config', 'get_config', 'load_config'
+]

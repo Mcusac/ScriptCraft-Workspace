@@ -12,6 +12,21 @@ from dataclasses import dataclass, field
 
 from ..logging import log_and_print
 from ..io.path_resolver import PathResolver, WorkspacePathResolver, create_path_resolver
+from ..._version import get_version
+
+
+# ===== CONVENIENCE FUNCTIONS =====
+
+def load_config(path: Union[str, Path] = "config.yaml") -> 'Config':
+    """Load configuration from YAML file."""
+    return Config.from_yaml(path)
+
+def get_config() -> 'Config':
+    """Get configuration with default path."""
+    return load_config()
+
+
+# ===== CONFIGURATION CLASSES =====
 
 @dataclass
 class PathConfig:
@@ -65,7 +80,7 @@ class Config:
     
     # Project configuration
     project_name: str = "Release Workspace"
-    version: str = "1.0.0"
+    version: str = field(default_factory=get_version)
     
     # Logging configuration
     logging: LogConfig = field(default_factory=LogConfig)
@@ -88,7 +103,31 @@ class Config:
             # Load from YAML file
             with open(config_path, 'r', encoding='utf-8') as f:
                 config_data = yaml.safe_load(f)
+            
+            # Handle framework-level config (has active_workspace, packaging, etc.)
+            if 'active_workspace' in config_data:
+                # This is a framework config, not a workspace config
+                # Extract only the parts we need for workspace config
+                workspace_config = {}
                 
+                # Copy tools configuration
+                if 'tools' in config_data:
+                    workspace_config['tools'] = config_data['tools']
+                
+                # Copy pipelines configuration
+                if 'pipelines' in config_data:
+                    workspace_config['pipelines'] = config_data['pipelines']
+                
+                # Set default domains if not present
+                if 'domains' not in workspace_config:
+                    workspace_config['domains'] = ['Clinical', 'Biomarkers', 'Genomics', 'Imaging']
+                
+                # Set default study name
+                if 'study_name' not in workspace_config:
+                    workspace_config['study_name'] = 'HABS'
+                
+                config_data = workspace_config
+            
             # Convert paths to PathConfig
             if 'paths' in config_data:
                 paths_data = config_data.pop('paths')
@@ -209,23 +248,23 @@ class Config:
                         if tool_name not in self.tools:
                             self.tools[tool_name] = tool_config
             
-            # Import tool registry for discovery
-            from ...tools.tool_dispatcher import registry
+            # Import tool discovery from tools package
+            from ...tools import get_available_tools, discover_tool_metadata
             
             # Get discovered tools
-            discovered_tools = registry.list_tools()
+            discovered_tools = get_available_tools()
             
             # Create tool entries for discovered tools not in config
-            for tool_name, import_path in discovered_tools.items():
+            for tool_name, tool_instance in discovered_tools.items():
                 if tool_name not in self.tools:
-                    # Try to get tool instance for description
-                    tool_instance = registry.get_tool(tool_name)
-                    description = getattr(tool_instance, 'description', f"🔧 {tool_name.replace('_', ' ').title()}")
+                    # Get tool metadata for description
+                    metadata = discover_tool_metadata(tool_name)
+                    description = metadata.get('description', f"🔧 {tool_name.replace('_', ' ').title()}")
                     
                     self.tools[tool_name] = {
                         'description': description,
                         'tool_name': tool_name,
-                        'import_path': import_path
+                        'import_path': f"scriptcraft.tools.{tool_name}"
                     }
                     
         except Exception as e:
