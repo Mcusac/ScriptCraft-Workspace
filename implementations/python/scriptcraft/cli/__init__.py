@@ -4,16 +4,22 @@ Command Line Interface for ScriptCraft.
 Provides command-line access to all ScriptCraft tools and utilities.
 """
 
-# Import argument parsers if available
+# Import from common CLI module
 try:
-    from .argument_parsers import *
+    from ..common.cli import (
+        parse_tool_args,
+        parse_pipeline_args,
+        parse_main_args,
+        ArgumentGroups,
+        ParserFactory
+    )
 except ImportError:
     # CLI dependencies not available, provide basic functionality
     pass
 
-__all__ = ["main"]
+__all__ = ["main", "parse_tool_args", "parse_pipeline_args", "parse_main_args"]
 
-def main():
+def main() -> None:
     """Main entry point for scriptcraft CLI."""
     print("🚀 ScriptCraft CLI")
     print("Available commands:")

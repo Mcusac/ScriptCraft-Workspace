@@ -7,7 +7,7 @@ including ISO strings, datetime objects, and plain dates.
 """
 
 from enum import Enum
-from typing import Optional, Union, List
+from typing import Optional, Union, List, Dict
 import pandas as pd
 from dateutil.parser import parse
 from ..logging import log_and_print
@@ -21,11 +21,11 @@ class DateOutputType(Enum):
     DATETIME = "datetime"
     ISO_STRING = "iso_string"
 
-DEFAULT_SAMPLE_SIZE = 10
-DEFAULT_DATE_FORMAT = "%Y-%m-%d"
-MIN_SAMPLE_SIZE = 1
+DEFAULT_SAMPLE_SIZE: int = 10
+DEFAULT_DATE_FORMAT: str = "%Y-%m-%d"
+MIN_SAMPLE_SIZE: int = 1
 
-DATE_FORMATS = {
+DATE_FORMATS: Dict[str, str] = {
     "iso": "%Y-%m-%d",
     "us": "%m/%d/%Y",
     "eu": "%d/%m/%Y",

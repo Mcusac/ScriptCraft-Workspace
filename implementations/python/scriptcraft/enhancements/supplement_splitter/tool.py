@@ -6,7 +6,7 @@ based on cleaned dictionary files.
 """
 
 from pathlib import Path
-from typing import Dict, Union
+from typing import Dict, Union, Optional, Any
 import pandas as pd
 
 from scriptcraft.common.core import BaseTool
@@ -23,7 +23,7 @@ from .utils import split_supplement_into_domains
 class SupplementSplitter(BaseTool):
     """Enhancement for splitting supplements into domain-specific files."""
     
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__(
             name="Supplement Splitter",
             description="Splits merged supplement into domain-specific supplements."
@@ -35,8 +35,8 @@ class SupplementSplitter(BaseTool):
         self.default_output_dir = self.root / "scripts/enhancements/dictionary_supplementer/supplements"
     
     def enhance(self,
-                input_data: Union[pd.DataFrame, Dict[str, pd.DataFrame]] = None,
-                **kwargs) -> Dict[str, pd.DataFrame]:
+                input_data: Optional[Union[pd.DataFrame, Dict[str, pd.DataFrame]]] = None,
+                **kwargs: Any) -> Dict[str, pd.DataFrame]:
         """
         Split supplement into domain-specific files.
         

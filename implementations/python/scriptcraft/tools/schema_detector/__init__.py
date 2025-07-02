@@ -15,7 +15,7 @@ Features:
 Author: ScriptCraft Team
 """
 
-from .tool import SchemaDetector
+from .main import SchemaDetectorTool
 
 # Tool metadata
 __description__ = "🔍 Analyzes datasets and generates database schemas"
@@ -24,7 +24,4 @@ __data_types__ = ["csv", "xlsx", "json"]
 __domains__ = ["clinical", "biomarkers", "genomics", "imaging"]
 __complexity__ = "complex"
 __maturity__ = "stable"
-__distribution__ = "standalone"
-
-# Export the main tool
-__all__ = ['SchemaDetector'] 
+__distribution__ = "standalone" 

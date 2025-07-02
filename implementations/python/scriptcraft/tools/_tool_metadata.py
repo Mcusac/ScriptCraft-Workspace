@@ -37,14 +37,14 @@ class ToolMetadata:
     name: str
     version: str
     description: str
-    tags: List[str] = None
-    data_types: List[str] = None
-    domains: List[str] = None
+    tags: List[str]
+    data_types: List[str]
+    domains: List[str]
     complexity: str = "simple"
     maturity: str = "stable"
     distribution: str = "hybrid"
     
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         """Initialize mutable defaults."""
         if self.tags is None:
             self.tags = []
@@ -114,7 +114,7 @@ def get_tools_by_category() -> Dict[str, List[str]]:
         Dictionary mapping categories to lists of tool names
     """
     all_metadata = discover_all_tool_metadata()
-    categories = {}
+    categories: Dict[str, List[str]] = {}
     
     for tool_name, metadata in all_metadata.items():
         for tag in metadata.tags:

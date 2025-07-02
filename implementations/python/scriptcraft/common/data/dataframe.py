@@ -5,7 +5,7 @@ scripts/common/dataframe_utils.py
 including column renaming, normalization, and diagnostics.
 """
 
-from typing import Dict, List, Optional, Union, Callable, Set
+from typing import Dict, List, Optional, Union, Callable, Set, Any
 from pathlib import Path
 import pandas as pd
 from ..logging import log_and_print
@@ -89,8 +89,8 @@ def normalize_column_names(
 def apply_safe_transform(
     df: pd.DataFrame,
     columns: List[str],
-    transform_fn: Callable,
-    error_value: Optional[any] = None
+    transform_fn: Callable[[Any], Any],
+    error_value: Optional[Any] = None
 ) -> pd.DataFrame:
     """
     Safely applies a transformation function to specified columns.
@@ -274,8 +274,7 @@ def find_non_numeric(series: pd.Series) -> pd.Series:
     numeric = pd.to_numeric(series, errors='coerce')
     return series[numeric.isna() & series.notna()].unique()
 
-def describe_numeric(df: pd.DataFrame, 
-                    include_nulls: bool = True) -> pd.DataFrame:
+def describe_numeric(df: pd.DataFrame, include_nulls: bool = True) -> pd.DataFrame:
     """
     Get descriptive statistics for numeric columns.
     

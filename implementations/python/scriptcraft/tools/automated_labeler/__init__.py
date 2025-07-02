@@ -1,29 +1,27 @@
 """
 🏷️ Automated Labeler Tool
 
-Automatically generates labels and fills document templates with data from Excel files.
-Supports form automation and document generation for research workflows.
+Automatically generates labels and documentation for datasets and data dictionaries.
+Provides intelligent labeling based on content analysis and healthcare patterns.
 
 Features:
-- 📄 Document template filling
 - 🏷️ Automatic label generation
-- 📊 Excel data processing
-- 🔄 Batch processing support
-- 📋 Multiple output formats
+- 📋 Documentation creation
+- 🎯 Healthcare-specific patterns
+- 📊 Content analysis
+- 🔍 Pattern recognition
+- 📝 Template-based output
 
 Author: ScriptCraft Team
 """
 
-from .tool import AutomatedLabeler
+from .main import AutomatedLabeler
 
 # Tool metadata
-__description__ = "🏷️ Automatically generates labels and fills document templates"
-__tags__ = ["automation", "documents", "forms", "labels", "templates"]
-__data_types__ = ["csv", "xlsx", "docx"]
+__description__ = "🏷️ Automatically generates labels and documentation for datasets"
+__tags__ = ["automation", "labeling", "documentation", "templates", "healthcare"]
+__data_types__ = ["csv", "xlsx", "xls", "docx"]
 __domains__ = ["clinical", "biomarkers", "genomics", "imaging"]
-__complexity__ = "simple"
+__complexity__ = "moderate"
 __maturity__ = "stable"
-__distribution__ = "hybrid"
-
-# Export the main tool
-__all__ = ['AutomatedLabeler']
+__distribution__ = "standalone"

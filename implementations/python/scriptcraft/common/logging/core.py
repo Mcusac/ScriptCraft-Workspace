@@ -8,11 +8,12 @@ It is designed to be imported by other modules that need logging capabilities.
 import logging
 import sys
 from pathlib import Path
-from typing import Optional, Dict, Any, Union
+from typing import Optional, Dict, Any, Union, List
 
 # Configure stdout for UTF-8 encoding to handle emojis in Windows PowerShell
 try:
-    sys.stdout.reconfigure(encoding='utf-8')
+    if hasattr(sys.stdout, 'reconfigure'):
+        sys.stdout.reconfigure(encoding='utf-8')
 except AttributeError:
     # Python < 3.7 or non-Windows systems
     pass
@@ -35,7 +36,7 @@ def log_and_print(
     logger = logging.getLogger(logger_name)
     
     # Add emoji prefixes based on level if not already present
-    emoji_prefixes = {
+    emoji_prefixes: Dict[str, str] = {
         'debug': '🔍 ',
         'info': '📝 ',
         'warning': '⚠️ ',
@@ -151,7 +152,7 @@ def setup_logger(
     
     # Create formatter with UTF-8 encoding
     class Utf8Formatter(logging.Formatter):
-        def format(self, record):
+        def format(self, record: logging.LogRecord) -> str:
             try:
                 return super().format(record)
             except UnicodeEncodeError:
@@ -178,15 +179,15 @@ def setup_logger(
                 print(f"⚠️ Could not rotate log file: {e}")
         
         try:
-            file_handler = logging.FileHandler(log_file, encoding='utf-8', errors='replace')
+            file_handler = logging.FileHandler(str(log_file), encoding='utf-8')
             file_handler.setFormatter(formatter)
             logger.addHandler(file_handler)
         except Exception as e:
             print(f"⚠️ Could not create file handler with UTF-8 encoding: {e}")
             # Fallback to default encoding
-            file_handler = logging.FileHandler(log_file, errors='replace')
-        file_handler.setFormatter(formatter)
-        logger.addHandler(file_handler)
+            file_handler = logging.FileHandler(str(log_file))
+            file_handler.setFormatter(formatter)
+            logger.addHandler(file_handler)
     
     # Add stream handler for console output if verbose and not already present
     if verbose and not has_stream_handler:
@@ -216,7 +217,7 @@ def setup_logger(
             logger.info(f"Logger '{name}' initialized with level {logging.getLevelName(level)}")
             if log_file:
                 logger.info(f"Log file: {log_file}")
-        logger._initialized = True
+        setattr(logger, '_initialized', True)
     
     return logger
 
@@ -227,7 +228,7 @@ def clear_handlers(logger_name: str = "root") -> None:
     logger.handlers.clear()
 
 
-def get_handler_paths(logger_name: str = "root") -> list:
+def get_handler_paths(logger_name: str = "root") -> List[str]:
     """Get paths of all file handlers for the specified logger."""
     logger = logging.getLogger(logger_name)
     return [

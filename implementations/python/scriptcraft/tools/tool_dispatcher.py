@@ -11,7 +11,8 @@ from the tools package.
 from pathlib import Path
 from typing import Dict, Optional, Any
 from . import get_available_tools, run_tool, discover_tool_metadata
-from ..common import shortcuts as cu
+from ..common import *
+import scriptcraft.common as cu
 
 class ToolRegistry:
     """
@@ -21,7 +22,7 @@ class ToolRegistry:
     to maintain backward compatibility.
     """
     
-    def __init__(self):
+    def __init__(self) -> None:
         # Use the unified tool discovery system
         pass
     

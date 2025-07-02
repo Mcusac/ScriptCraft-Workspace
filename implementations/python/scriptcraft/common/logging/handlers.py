@@ -48,22 +48,8 @@ def create_console_handler(
         handler.setFormatter(formatter)
     return handler
 
-def add_file_handler(
-    logger: logging.Logger,
-    log_file: Union[str, Path],
-    level: int = logging.INFO,
-    formatter: Optional[logging.Formatter] = None
-) -> None:
-    """Add a file handler to an existing logger.
-    
-    Args:
-        logger: Logger to add the handler to
-        log_file: Path to the log file
-        level: Logging level
-        formatter: Custom formatter for the handler
-    """
-    handler = create_file_handler(log_file, level, formatter)
-    logger.addHandler(handler)
+# Note: add_file_handler moved to utils.py for better functionality
+# Use utils.add_file_handler instead
 
 def setup_secondary_log(
     logger: logging.Logger,
@@ -90,6 +76,7 @@ def setup_secondary_log(
     log_file = Path(log_dir) / f"{name}_{timestamp}.log"
     
     # Add file handler
-    add_file_handler(secondary_logger, log_file, level)
+    from .utils import add_file_handler
+    add_file_handler(secondary_logger.name, log_file, level)
     
     return secondary_logger 

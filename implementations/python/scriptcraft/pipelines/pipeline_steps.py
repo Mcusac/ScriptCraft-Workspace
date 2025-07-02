@@ -8,11 +8,12 @@ import importlib
 from typing import Dict, List, Callable, Any, Optional
 from pathlib import Path
 
-from ..common import shortcuts as cu
+from ..common import *
+import scriptcraft.common as cu
 from .base_pipeline import BasePipeline, PipelineStep
 
 
-def import_function(import_path: str) -> Callable:
+def import_function(import_path: str) -> Callable[..., Any]:
     """
     Dynamically imports a function from its string path.
     
@@ -24,10 +25,11 @@ def import_function(import_path: str) -> Callable:
     """
     module_path, func_name = import_path.rsplit(".", 1)
     module = importlib.import_module(module_path)
-    return getattr(module, func_name)
+    func = getattr(module, func_name)
+    return func
 
 
-def build_step(step_def: dict) -> PipelineStep:
+def build_step(step_def: Dict[str, Any]) -> PipelineStep:
     """
     Builds a pipeline step from a config dictionary.
     
@@ -62,7 +64,7 @@ def build_step(step_def: dict) -> PipelineStep:
 class PipelineFactory:
     """Factory class for creating pipelines from configuration."""
     
-    def __init__(self, config_obj=None):
+    def __init__(self, config_obj: Optional[Any] = None) -> None:
         """Initialize the pipeline factory.
         
         Args:
@@ -95,11 +97,11 @@ class PipelineFactory:
         
         # Extract description and steps from new config format
         if isinstance(pipeline_config, dict) and "steps" in pipeline_config:
-            description = pipeline_config.get("description")
+            description = pipeline_config.get("description", "")
             steps_or_refs = pipeline_config["steps"]
         else:
             # Legacy format - just a list of steps
-            description = None
+            description = ""
             steps_or_refs = pipeline_config
         
         pipeline = BasePipeline(config_obj, name=name, description=description)

@@ -6,7 +6,7 @@ These plugins handle validation that goes beyond simple dictionary lookups,
 such as date formatting, pattern matching, and numeric outlier detection.
 """
 
-from typing import Optional, List
+from typing import Optional, List, Any
 import re
 from datetime import datetime
 import pandas as pd
@@ -19,7 +19,7 @@ from scriptcraft.common.plugins import register_validator
 class DateValidator(ColumnValidator):
     """Validates date formats and ranges."""
     
-    def validate_value(self, value: any, expected_values: str) -> Optional[str]:
+    def validate_value(self, value: Any, expected_values: str) -> Optional[str]:
         if pd.isna(value):
             return None
             
@@ -56,7 +56,7 @@ class DateValidator(ColumnValidator):
 class PatternValidator(ColumnValidator):
     """Validates values against regex patterns."""
     
-    def validate_value(self, value: any, expected_values: str) -> Optional[str]:
+    def validate_value(self, value: Any, expected_values: str) -> Optional[str]:
         if pd.isna(value):
             return None
             
@@ -73,7 +73,7 @@ class PatternValidator(ColumnValidator):
 class NumericOutlierValidator(ColumnValidator):
     """Validates numeric values and detects outliers."""
     
-    def validate_value(self, value: any, expected_values: str) -> Optional[str]:
+    def validate_value(self, value: Any, expected_values: str) -> Optional[str]:
         """Validate numeric values and check for outliers.
         
         This is a fallback validator that runs after the main dictionary validation.
@@ -114,7 +114,7 @@ class NumericOutlierValidator(ColumnValidator):
 class MultiCategoricalValidator(ColumnValidator):
     """Validates multi-select categorical values."""
     
-    def validate_value(self, value: any, expected_values: str) -> Optional[str]:
+    def validate_value(self, value: Any, expected_values: str) -> Optional[str]:
         if pd.isna(value):
             return None
             
@@ -136,7 +136,7 @@ class MultiCategoricalValidator(ColumnValidator):
 class CodedValueValidator(ColumnValidator):
     """Validates coded values like ICD codes."""
     
-    def validate_value(self, value: any, expected_values: str) -> Optional[str]:
+    def validate_value(self, value: Any, expected_values: str) -> Optional[str]:
         if pd.isna(value):
             return None
             
@@ -159,7 +159,7 @@ class CodedValueValidator(ColumnValidator):
 class CalculatedFieldValidator(ColumnValidator):
     """Validates calculated fields against expected formulas."""
     
-    def validate_value(self, value: any, expected_values: str) -> Optional[str]:
+    def validate_value(self, value: Any, expected_values: str) -> Optional[str]:
         if pd.isna(value):
             return None
             

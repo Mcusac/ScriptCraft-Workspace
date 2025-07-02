@@ -5,10 +5,10 @@ import importlib.util
 from typing import List, Union, Optional, Dict, Any
 import pandas as pd
 from ...common import shortcuts as cu
-from scriptcraft.common.io import load_data, load_datasets
+from scriptcraft.common.io import load_data
 from scriptcraft.common.data import compare_dataframes
 
-def load_mode(mode_name: str):
+def load_mode(mode_name: str) -> None:
     """Dynamically load a mode plugin from the plugins/ directory relative to this script."""
     try:
         # Resolve the actual plugins path based on this file's location
@@ -21,7 +21,15 @@ def load_mode(mode_name: str):
 
         # Dynamically import using importlib
         spec = importlib.util.spec_from_file_location(mode_name, plugin_file)
+        if spec is None:
+            cu.log_and_print(f"❌ Failed to create spec for '{plugin_file}'")
+            return None
+            
         module = importlib.util.module_from_spec(spec)
+        if spec.loader is None:
+            cu.log_and_print(f"❌ Failed to get loader for '{plugin_file}'")
+            return None
+            
         spec.loader.exec_module(module)
 
         if hasattr(module, "run_mode"):
@@ -35,7 +43,7 @@ def load_mode(mode_name: str):
         return None
 
 
-def resolve_input_files(mode, input_dir: Path, input_paths=None):
+def resolve_input_files(mode, input_dir: Path, input_paths=None) -> None:
     """Handles logic for resolving input files based on mode and paths provided."""
     if input_paths:
         return input_paths
@@ -62,7 +70,7 @@ def resolve_input_files(mode, input_dir: Path, input_paths=None):
     return input_files
 
 
-def load_datasets(input_paths: List[Union[str, Path]]) -> List[pd.DataFrame]:
+def load_datasets_as_list(input_paths: List[Union[str, Path]]) -> List[pd.DataFrame]:
     """
     Load multiple datasets from the provided paths.
     
@@ -70,7 +78,7 @@ def load_datasets(input_paths: List[Union[str, Path]]) -> List[pd.DataFrame]:
         input_paths: List of paths to the datasets to load
         
     Returns:
-        List of loaded DataFrames
+        List of loaded DataFrames in the same order as input paths
     """
     datasets = []
     for path in input_paths:

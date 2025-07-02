@@ -8,7 +8,7 @@ min/max supplements from external files.
 
 from enum import Enum
 from pathlib import Path
-from typing import Union, Set, Tuple, List
+from typing import Union, Set, Tuple, List, Dict, Any
 import re
 import pandas as pd
 from ..logging import log_and_print
@@ -25,10 +25,10 @@ class ValueType(Enum):
     MIXED_SET = "mixed_set"
     UNKNOWN = "unknown"
 
-NOTES_COLUMN_NAMES = ["notes(numeric, integer only, text-don't want \"\", etc)", 'notes']
-DATE_KEYWORDS = ['date', 'mm/yyyy', 'month/year']
-RANGE_KEYWORDS = ['range']
-VALUE_PATTERNS = {
+NOTES_COLUMN_NAMES: List[str] = ["notes(numeric, integer only, text-don't want \"\", etc)", 'notes']
+DATE_KEYWORDS: List[str] = ['date', 'mm/yyyy', 'month/year']
+RANGE_KEYWORDS: List[str] = ['range']
+VALUE_PATTERNS: Dict[str, str] = {
     'range': r'^\d+(\.\d+)?\s*-\s*\d+(\.\d+)?$',
     'set_entry': r'\{(.*?)\}'
 }
@@ -71,8 +71,8 @@ def extract_expected_values(
                 raise ValueError(f"No valid set entries found in: {text}")
             return ValueType.UNKNOWN.value, set()
 
-        parsed = set()
-        ranges = []
+        parsed: Set[str] = set()
+        ranges: List[Tuple[float, float]] = []
 
         for entry in matches:
             parts = [p.strip() for p in entry.split(",")]
@@ -120,7 +120,7 @@ def load_minmax_updated(file_paths: List[str]) -> pd.DataFrame:
     Returns:
         DataFrame with columns: Main Variable, Value, Source.
     """
-    all_dict_rows = []
+    all_dict_rows: List[Dict[str, str]] = []
 
     for file_path in file_paths:
         path = Path(file_path)

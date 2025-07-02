@@ -41,6 +41,7 @@ class LogConfig:
         verbose_mode (bool): Whether logs should also print to console.
         use_structured_logging (bool): Whether to use JSON structured logging.
         default_log_dir (Path): Default directory for log files.
+        formatter (logging.Formatter): Current formatter instance.
     """
 
     def __init__(self):
@@ -49,6 +50,7 @@ class LogConfig:
         self.verbose_mode = True  # Default to True for better visibility
         self.use_structured_logging = False
         self.default_log_dir = Path("logs")
+        self.formatter: logging.Formatter = logging.Formatter()
         self._update_formatter()
 
     def _update_formatter(self) -> None:
@@ -375,7 +377,7 @@ def setup_logging_with_config(
 def qc_log_context(
     log_file: Union[str, Path],
     level: str = "INFO"
-):
+) -> None:
     """
     Context manager for QC logging operations.
     

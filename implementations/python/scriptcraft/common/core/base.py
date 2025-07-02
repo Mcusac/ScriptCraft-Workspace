@@ -16,6 +16,7 @@ import pandas as pd
 
 from ..io import ensure_output_dir
 from ..logging import log_and_print
+from ..core.config import Config
 
 
 class BaseTool(ABC):
@@ -26,7 +27,8 @@ class BaseTool(ABC):
     No artificial distinctions between "processors", "analyzers", "comparers".
     """
     
-    def __init__(self, name: str, description: str, supported_formats: Optional[List[str]] = None):
+    def __init__(self, name: str, description: str, supported_formats: Optional[List[str]] = None,
+                 tool_name: Optional[str] = None, requires_dictionary: bool = False):
         """
         Initialize tool.
         
@@ -34,11 +36,62 @@ class BaseTool(ABC):
             name: Tool name
             description: Tool description  
             supported_formats: List of supported file formats (e.g., ['.csv', '.xlsx'])
+            tool_name: Tool name for configuration (defaults to name.lower().replace(' ', '_'))
+            requires_dictionary: Whether this tool requires a dictionary file
         """
         self.name = name
         self.description = description
         self.logger = logging.getLogger(name)
         self.supported_formats = supported_formats or ['.csv', '.xlsx', '.xls']
+        self.requires_dictionary = requires_dictionary
+        
+        # Use provided tool_name or generate from name
+        self.tool_name = tool_name or name.lower().replace(' ', '_')
+        
+        # Load configuration with standardized pattern
+        self.config = self._load_configuration()
+        self.default_output_dir = self._get_default_output_dir()
+    
+    def _load_configuration(self) -> Optional[Config]:
+        """
+        Load configuration with standardized fallback pattern.
+        
+        Returns:
+            Config object or None if loading fails
+        """
+        try:
+            # Determine config path based on environment
+            if self.is_distributable_environment():
+                config_path = "../config.yaml"
+            else:
+                config_path = "config.yaml"
+            
+            config = Config.from_yaml(config_path)
+            self.log_message(f"📋 Configuration loaded from: {config_path}")
+            return config
+            
+        except Exception as e:
+            self.log_message(f"⚠️ Config loading failed, using defaults: {e}", level="warning")
+            return None
+    
+    def _get_default_output_dir(self) -> str:
+        """Get default output directory from config or use fallback."""
+        if self.config:
+            try:
+                template_config = self.config.get_template_config()
+                return template_config.get("package_structure", {}).get("default_output_dir", "output")
+            except Exception:
+                pass
+        return "output"
+    
+    def get_tool_config(self) -> Dict[str, Any]:
+        """Get tool-specific configuration."""
+        if self.config:
+            try:
+                return self.config.get_tool_config(self.tool_name)
+            except Exception:
+                pass
+        return {}
     
     # ===== LOGGING (DRY) =====
     
@@ -202,71 +255,54 @@ class BaseTool(ABC):
             self.log_completion()
             return result
         except Exception as e:
-            self.log_error(f"Execution failed: {e}")
+            self.log_error(e)
             raise
-    
-    # ===== COMMON ANALYSIS PATTERNS (DRY) =====
     
     def compare_dataframes(self, df1: pd.DataFrame, df2: pd.DataFrame, 
                           compare_columns: Optional[List[str]] = None) -> Dict[str, Any]:
-        """Standard DataFrame comparison for all comparison tools."""
+        """Compare two dataframes and return comparison results."""
         comparison = {
-            'shape_comparison': {
-                'df1_shape': df1.shape,
-                'df2_shape': df2.shape,
-                'shape_match': df1.shape == df2.shape
-            },
-            'column_comparison': {
-                'df1_columns': list(df1.columns),
-                'df2_columns': list(df2.columns),
-                'common_columns': list(set(df1.columns) & set(df2.columns)),
-                'df1_only': list(set(df1.columns) - set(df2.columns)),
-                'df2_only': list(set(df2.columns) - set(df1.columns))
-            }
+            'shape_difference': (df1.shape != df2.shape),
+            'df1_shape': df1.shape,
+            'df2_shape': df2.shape,
+            'column_differences': set(df1.columns) ^ set(df2.columns),
+            'common_columns': set(df1.columns) & set(df2.columns)
         }
         
-        self.log_message(f"📊 Comparison: DF1 {df1.shape} vs DF2 {df2.shape}")
-        if not comparison['shape_comparison']['shape_match']:
-            self.log_message(f"⚠️ Shape mismatch detected")
+        if compare_columns:
+            comparison['column_differences'] = set(compare_columns) ^ set(df1.columns) ^ set(df2.columns)
         
         return comparison
     
-    # ===== LEGACY SUPPORT METHODS =====
-    
     def validate_input(self, input_data: Any) -> bool:
-        """Legacy validation method for backward compatibility."""
+        """Validate input data for the tool."""
         return True
     
     def process(self, data: Any) -> Any:
-        """Legacy process method for backward compatibility."""
+        """Process data (to be implemented by subclasses)."""
         return data
     
     def transform(self, domain: str, input_path: Union[str, Path], 
                  output_path: Union[str, Path], paths: Optional[Dict[str, Any]] = None) -> None:
-        """Legacy transform method for backward compatibility."""
-        try:
-            # Load → Process → Save pattern
-            data = self.load_data_file(input_path)
-            processed_data = self.process(data)
-            self.save_data_file(processed_data, output_path)
-            
-        except Exception as e:
-            self.log_error(f"Transform failed for domain {domain}: {e}")
-            raise
-    
-    # ===== ABSTRACT METHOD FOR TOOL-SPECIFIC LOGIC =====
+        """Transform data from input to output."""
+        data = self.load_data_file(input_path)
+        processed_data = self.process(data)
+        self.save_data_file(processed_data, output_path)
     
     @abstractmethod
     def run(self, *args: Any, **kwargs: Any) -> Any:
-        """
-        Run the tool. Implement your specific logic here.
-        Use the DRY methods above for common operations.
-        """
+        """Run the tool (to be implemented by subclasses)."""
         pass
     
     def __str__(self) -> str:
-        """String representation."""
+        """String representation of the tool."""
         return f"{self.name}: {self.description}"
+    
+    def __repr__(self) -> str:
+        """Detailed string representation of the tool."""
+        return (f"{self.__class__.__name__}(name='{self.name}', "
+                f"description='{self.description}', "
+                f"supported_formats={self.supported_formats})")
 
 
 # ===== LEGACY ALIASES FOR BACKWARD COMPATIBILITY =====
@@ -284,37 +320,32 @@ DataProcessorTool = BaseTool
 # ===== UTILITY CLASSES (NOT BASE CLASSES) =====
 
 class BaseMainRunner:
-    """Utility class for standardized tool execution patterns."""
+    """Base class for main runner functionality."""
     
     @staticmethod
     def setup_environment() -> None:
-        """Setup execution environment."""
+        """Set up the environment for running tools."""
         pass
     
     @staticmethod
     def import_tool(tool_name: str) -> Any:
-        """Import a tool class dynamically."""
+        """Import a tool by name."""
         try:
-            module = __import__(f"scriptcraft.tools.{tool_name}.tool", fromlist=[tool_name])
-            return getattr(module, tool_name.title().replace('_', ''))
-        except (ImportError, AttributeError) as e:
+            module = __import__(f"scriptcraft.tools.{tool_name}", fromlist=[tool_name])
+            return getattr(module, tool_name)
+        except ImportError as e:
             raise ImportError(f"Could not import tool {tool_name}: {e}")
     
     @classmethod
     def run(cls, tool_name: str, parse_args_func: Optional[Callable] = None) -> None:
-        """Standard main runner for tools."""
+        """Run a tool by name."""
         cls.setup_environment()
+        tool_class = cls.import_tool(tool_name)
         
-        try:
-            tool_class = cls.import_tool(tool_name)
+        if parse_args_func:
+            args = parse_args_func()
             tool = tool_class()
-            
-            if parse_args_func:
-                args = parse_args_func()
-                tool.run(**vars(args))
-            else:
-                tool.run()
-                
-        except Exception as e:
-            log_and_print(f"❌ Tool execution failed: {e}", level="error")
-            sys.exit(1) 
+            tool.run(**vars(args))
+        else:
+            tool = tool_class()
+            tool.run() 

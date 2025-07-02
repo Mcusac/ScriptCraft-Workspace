@@ -25,7 +25,7 @@ class DataFrameComparer:
         new_df: pd.DataFrame,
         key_columns: List[str],
         compare_columns: Optional[List[str]] = None
-    ):
+    ) -> None:
         """Initialize the comparer.
         
         Args:

@@ -6,7 +6,7 @@ such as visit sequences or longitudinal identifiers.
 """
 
 from pathlib import Path
-from typing import Union
+from typing import Union, List
 import pandas as pd
 from ..logging import log_and_print
 from ..io import get_project_root
@@ -58,7 +58,7 @@ def compare_entity_changes_over_sequence(
     df_sorted = df.sort_values(by=[entity_id_col, sequence_col])
     df_pivot = df_sorted.pivot(index=entity_id_col, columns=sequence_col, values=feature_col)
 
-    sequence_values = sorted(df[sequence_col].dropna().unique())
+    sequence_values: List[Union[int, float, str]] = sorted(df[sequence_col].dropna().unique())
     df_pivot = df_pivot.fillna(missing_placeholder)
 
     # Count changes between consecutive timepoints

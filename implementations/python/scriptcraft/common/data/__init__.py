@@ -21,7 +21,6 @@ Usage:
 from .cleaning import *
 from .comparison import *
 from .comparison_core import *
-from .comparison_utils import *
 from .dataframe import *
 from .validation import *
 from .processing import *

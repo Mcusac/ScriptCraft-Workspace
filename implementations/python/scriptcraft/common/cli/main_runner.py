@@ -16,7 +16,7 @@ Usage:
 import sys
 import argparse
 from pathlib import Path
-from typing import Optional, Callable, Any, Dict, List, Union
+from typing import Optional, Callable, Any, Dict, List, Union, Type
 from abc import ABC, abstractmethod
 
 from ..logging import setup_logger, log_and_print
@@ -41,7 +41,7 @@ class ToolRunner(ABC):
 class StandardToolRunner(ToolRunner):
     """Standard tool runner that works with BaseTool subclasses."""
     
-    def __init__(self, tool_class: type, tool_name: str, description: str):
+    def __init__(self, tool_class: Type[BaseTool], tool_name: str, description: str) -> None:
         self.tool_class = tool_class
         self.tool_name = tool_name
         self.description = description
@@ -63,7 +63,7 @@ class StandardToolRunner(ToolRunner):
             tool = self.tool_class()
             
             # Convert args to kwargs for tool.run()
-            kwargs = vars(args)
+            kwargs: Dict[str, Any] = vars(args)
             
             # Handle special cases
             if hasattr(args, 'input_paths') and args.input_paths:
@@ -81,7 +81,8 @@ class StandardToolRunner(ToolRunner):
 class CustomToolRunner(ToolRunner):
     """Custom tool runner for tools that need special handling."""
     
-    def __init__(self, create_parser_func: Callable, run_func: Callable):
+    def __init__(self, create_parser_func: Callable[[], argparse.ArgumentParser], 
+                 run_func: Callable[[argparse.Namespace], bool]) -> None:
         self.create_parser_func = create_parser_func
         self.run_func = run_func
     
@@ -99,9 +100,9 @@ class CustomToolRunner(ToolRunner):
 
 
 def run_tool_main(tool_name: str, description: str, 
-                  tool_class: Optional[type] = None,
-                  create_parser_func: Optional[Callable] = None,
-                  run_func: Optional[Callable] = None) -> int:
+                  tool_class: Optional[Type[BaseTool]] = None,
+                  create_parser_func: Optional[Callable[[], argparse.ArgumentParser]] = None,
+                  run_func: Optional[Callable[[argparse.Namespace], bool]] = None) -> int:
     """
     Main entry point for tool execution.
     
@@ -118,7 +119,7 @@ def run_tool_main(tool_name: str, description: str,
     try:
         # Create appropriate runner
         if tool_class and issubclass(tool_class, BaseTool):
-            runner = StandardToolRunner(tool_class, tool_name, description)
+            runner: ToolRunner = StandardToolRunner(tool_class, tool_name, description)
         elif create_parser_func and run_func:
             runner = CustomToolRunner(create_parser_func, run_func)
         else:
@@ -151,8 +152,8 @@ def run_tool_main(tool_name: str, description: str,
 
 
 def run_tool_from_cli(tool_name: str, description: str, 
-                     tool_class: Optional[type] = None,
-                     **kwargs) -> None:
+                     tool_class: Optional[Type[BaseTool]] = None,
+                     **kwargs: Any) -> None:
     """
     Convenience function for running tools from CLI.
     Exits with appropriate code.
@@ -168,6 +169,6 @@ def create_standard_parser(tool_name: str, description: str) -> argparse.Argumen
     return ParserFactory.create_tool_parser(tool_name, description)
 
 
-def run_with_standard_args(tool_class: type, tool_name: str, description: str) -> int:
+def run_with_standard_args(tool_class: Type[BaseTool], tool_name: str, description: str) -> int:
     """Run a tool with standard argument parsing for backward compatibility."""
     return run_tool_main(tool_name, description, tool_class=tool_class) 

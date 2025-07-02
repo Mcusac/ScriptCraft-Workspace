@@ -144,4 +144,4 @@ def move_file(
     if destination.exists() and not overwrite:
         raise FileExistsError(f"Destination file exists: {destination}")
     
-    shutil.move(source, destination) 
+    shutil.move(str(source), str(destination)) 

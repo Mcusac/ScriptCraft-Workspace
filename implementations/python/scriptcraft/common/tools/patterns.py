@@ -4,7 +4,7 @@ Common tool patterns and utilities.
 This module provides simple functions to create tools with standard patterns.
 """
 
-from typing import Any, Dict, Optional, Union, Callable
+from typing import Any, Dict, Optional, Union, Callable, Type, Tuple
 from pathlib import Path
 import pandas as pd
 
@@ -19,8 +19,8 @@ def create_standard_tool(
     name: str,
     description: str,
     func: Callable,
-    **kwargs
-) -> type:
+    **kwargs: Any
+) -> Type[BaseTool]:
     """
     Create a standard tool with common patterns.
     
@@ -34,21 +34,21 @@ def create_standard_tool(
     Returns:
         Tool class with standard patterns
     """
-    requires_dictionary = kwargs.get('requires_dictionary', True)
+    requires_dictionary: bool = kwargs.get('requires_dictionary', True)
     
     class StandardTool(BaseTool):
-        def __init__(self):
+        def __init__(self) -> None:
             super().__init__(name=name, description=description)
         
         def validate_input(self, input_data: Any) -> bool:
             """Standard validation - always returns True for file-based tools."""
             return True
         
-        def run(self, *args, **kwargs):
+        def run(self, *args: Any, **kwargs: Any) -> None:
             """Run method for BaseTool compatibility."""
             pass
         
-        def validate(self, domain: str, input_path: str, output_path: str, paths: dict) -> None:
+        def validate(self, domain: str, input_path: str, output_path: str, paths: Dict[str, Any]) -> None:
             """Standard validation pattern."""
             if tool_type == 'validation':
                 if requires_dictionary:
@@ -63,7 +63,7 @@ def create_standard_tool(
                         return
                     func(domain, dataset_file, output_path, paths)
         
-        def transform(self, domain: str, input_path: str, output_path: str, paths: dict) -> None:
+        def transform(self, domain: str, input_path: str, output_path: str, paths: Dict[str, Any]) -> None:
             """Standard transformation pattern."""
             if tool_type == 'transformation':
                 try:
@@ -81,7 +81,7 @@ def create_standard_tool(
                 except Exception as e:
                     log_and_print(f"❌ Error processing {domain}: {e}")
         
-        def check(self, domain: str, input_path: str, output_path: str, paths: dict) -> None:
+        def check(self, domain: str, input_path: str, output_path: str, paths: Dict[str, Any]) -> None:
             """Standard checking pattern."""
             if tool_type == 'checker':
                 if requires_dictionary:
@@ -102,7 +102,7 @@ def create_standard_tool(
     return StandardTool
 
 
-def create_runner_function(tool_class, **default_kwargs):
+def create_runner_function(tool_class: Type[BaseTool], **default_kwargs: Any) -> Callable[[str, str, str, Dict[str, Any]], None]:
     """
     Create a standardized runner function for a tool.
     
@@ -113,7 +113,7 @@ def create_runner_function(tool_class, **default_kwargs):
     Returns:
         Function that can be used as a tool runner
     """
-    def runner(domain: str, input_path: str, output_path: str, paths: dict, **kwargs):
+    def runner(domain: str, input_path: str, output_path: str, paths: Dict[str, Any], **kwargs: Any) -> None:
         """Standardized tool runner function."""
         try:
             # Create tool instance
@@ -146,8 +146,8 @@ def create_simple_tool(
     description: str,
     process_func: Callable,
     tool_type: str = 'validation',
-    **kwargs
-) -> tuple:
+    **kwargs: Any
+) -> Tuple[Type[BaseTool], Callable[[str, str, str, Dict[str, Any]], None]]:
     """
     Create a simple tool with standard patterns and runner function.
     

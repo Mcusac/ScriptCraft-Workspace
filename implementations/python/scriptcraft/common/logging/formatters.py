@@ -20,8 +20,8 @@ class TimestampFormatter(logging.Formatter):
     
     def format(self, record: logging.LogRecord) -> str:
         """Format the log record with timestamp."""
-        record.timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        return f"[{record.timestamp}] {record.getMessage()}"
+        timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        return f"[{timestamp}] {record.getMessage()}"
 
 def create_formatter(
     log_format: Optional[str] = None,

@@ -20,7 +20,7 @@ class PipelineExecutor:
     used across multiple pipelines.
     """
     
-    def __init__(self, name: str = "PipelineExecutor"):
+    def __init__(self, name: str = "PipelineExecutor") -> None:
         """Initialize the pipeline executor."""
         self.name = name
         self.step_timings = []
@@ -28,12 +28,12 @@ class PipelineExecutor:
     def run_step(
         self,
         step_name: str,
-        step_func: Callable,
+        step_func: Callable[..., Any],
         domain: Optional[str] = None,
         input_path: Optional[Union[str, Path]] = None,
         output_path: Optional[Union[str, Path]] = None,
         paths: Optional[Dict[str, Any]] = None,
-        **kwargs
+        **kwargs: Any
     ) -> bool:
         """
         Run a single pipeline step with standardized logging and error handling.
@@ -81,7 +81,7 @@ class PipelineExecutor:
         steps: List[Dict[str, Any]],
         domain: Optional[str] = None,
         paths: Optional[Dict[str, Any]] = None,
-        **kwargs
+        **kwargs: Any
     ) -> Dict[str, bool]:
         """
         Run multiple pipeline steps.
@@ -139,12 +139,12 @@ class PipelineExecutor:
 
 def run_pipeline_step(
     step_name: str,
-    step_func: Callable,
+    step_func: Callable[..., Any],
     domain: Optional[str] = None,
     input_path: Optional[Union[str, Path]] = None,
     output_path: Optional[Union[str, Path]] = None,
     paths: Optional[Dict[str, Any]] = None,
-    **kwargs
+    **kwargs: Any
 ) -> bool:
     """
     Run a single pipeline step with standardized execution.
@@ -177,7 +177,7 @@ def run_pipeline_steps(
     steps: List[Dict[str, Any]],
     domain: Optional[str] = None,
     paths: Optional[Dict[str, Any]] = None,
-    **kwargs
+    **kwargs: Any
 ) -> Dict[str, bool]:
     """
     Run multiple pipeline steps with standardized execution.
@@ -202,13 +202,13 @@ def run_pipeline_steps(
 
 def create_pipeline_step(
     name: str,
-    func: Callable,
+    func: Callable[..., Any],
     input_key: str = "input",
     output_key: str = "output",
     check_exists: bool = True,
     run_mode: str = "domain",
     tags: Optional[List[str]] = None,
-    **kwargs
+    **kwargs: Any
 ) -> Dict[str, Any]:
     """
     Create a standardized pipeline step configuration.

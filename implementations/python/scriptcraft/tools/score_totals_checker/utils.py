@@ -4,7 +4,17 @@ import pandas as pd
 from scipy.stats import zscore
 from scriptcraft.common.logging import log_and_print
 
-def calculate_totals_and_compare(df, domain):
+def calculate_totals_and_compare(df: pd.DataFrame, domain: str) -> pd.DataFrame:
+    """
+    Calculate totals and compare with existing total columns.
+    
+    Args:
+        df: DataFrame to analyze
+        domain: Domain name for context
+        
+    Returns:
+        DataFrame with calculated totals and comparisons
+    """
     # Identify numeric columns (excluding known total columns)
     numeric_cols = df.select_dtypes(include='number').columns
     total_like_cols = [col for col in numeric_cols if "total" in col.lower() or "sum" in col.lower()]

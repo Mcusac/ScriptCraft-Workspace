@@ -14,7 +14,7 @@ Features:
 Author: ScriptCraft Team
 """
 
-from .tool import MedVisitIntegrityValidator
+from .main import MedVisitIntegrityValidator
 
 # Tool metadata
 __description__ = "🔒 Validates Med/Visit ID integrity across datasets"
@@ -24,6 +24,3 @@ __domains__ = ["clinical", "biomarkers", "genomics", "imaging"]
 __complexity__ = "simple"
 __maturity__ = "stable"
 __distribution__ = "pipeline"
-
-# Export the main tool
-__all__ = ['MedVisitIntegrityValidator']

@@ -220,7 +220,7 @@ def launch_browser() -> webdriver.Chrome:
 
 
 # === 📋 High-level Panel Filler ===
-def fill_panel(driver, panel_idx: int, address_blocks: list, logger=None):
+def fill_panel(driver, panel_idx: int, address_blocks: list, logger=None) -> None:
     try:
         # Detect form language before filling
         form_language = detect_form_language(driver, logger)
@@ -239,7 +239,7 @@ def fill_panel(driver, panel_idx: int, address_blocks: list, logger=None):
 
 
 # === 📂 Open the Panel ===
-def open_panel(driver, panel_idx: int):
+def open_panel(driver, panel_idx: int) -> None:
     try:
         # Try the standard ID format first
         panel_header = driver.find_element(By.ID, f"mat-expansion-panel-header-{panel_idx}")
@@ -267,7 +267,7 @@ def open_panel(driver, panel_idx: int):
 
 
 # === 📂 Get Panel Element ===
-def get_panel_element(driver, panel_idx: int):
+def get_panel_element(driver, panel_idx: int) -> None:
     try:
         # Try standard xpath first
         return driver.find_element(By.XPATH, f"//mat-expansion-panel[{panel_idx+1}]")
@@ -281,7 +281,7 @@ def get_panel_element(driver, panel_idx: int):
 
 
 # === 🗑️ Remove Extra Address Blocks ===
-def remove_extra_address_blocks(driver, panel, required_blocks: int):
+def remove_extra_address_blocks(driver, panel, required_blocks: int) -> None:
     panel_content = panel.find_element(By.CSS_SELECTOR, "div.panel-content")
     address_forms = panel_content.find_elements(By.TAG_NAME, "form")
     n_existing = len(address_forms)
@@ -311,7 +311,7 @@ def remove_extra_address_blocks(driver, panel, required_blocks: int):
 
 
 # === ➕ Ensure Enough Address Blocks ===
-def ensure_address_blocks(driver, panel, required_blocks: int, form_language: str = 'en'):
+def ensure_address_blocks(driver, panel, required_blocks: int, form_language: str = 'en') -> None:
     # Find the panel-content div that contains all address forms
     panel_content = panel.find_element(By.CSS_SELECTOR, "div.panel-content")
 
@@ -356,7 +356,7 @@ def ensure_address_blocks(driver, panel, required_blocks: int, form_language: st
 
 
 # === 📝 Fill All Blocks in Panel ===
-def fill_all_blocks(panel, address_blocks: list, panel_idx: int, form_language: str, logger=None):
+def fill_all_blocks(panel, address_blocks: list, panel_idx: int, form_language: str, logger=None) -> None:
     panel_content = panel.find_element(By.CSS_SELECTOR, "div.panel-content")
     address_forms = panel_content.find_elements(By.TAG_NAME, "form")
 
@@ -370,7 +370,7 @@ def fill_all_blocks(panel, address_blocks: list, panel_idx: int, form_language: 
 
 
 # === 📝 Fill a Single Address Block ===
-def fill_single_block(form, block_data: dict, form_language: str, logger=None):
+def fill_single_block(form, block_data: dict, form_language: str, logger=None) -> None:
     for col, val in block_data.items():
         # Skip empty, nan, or "MISSING" values
         if pd.isna(val) or not str(val).strip() or str(val).strip().upper() == "MISSING":
@@ -401,7 +401,7 @@ def fill_single_block(form, block_data: dict, form_language: str, logger=None):
 
 
 # === ☑️ Enhanced Checkbox Filling Helper ===
-def fill_checkbox(panel, val: str, form_language: str, logger=None):
+def fill_checkbox(panel, val: str, form_language: str, logger=None) -> None:
     if str(val).strip() == "1":
         try:
             # First try: Find checkbox by position (usually the last checkbox in address forms)
@@ -441,7 +441,7 @@ def fill_checkbox(panel, val: str, form_language: str, logger=None):
 
 
 # === 📝 Safe Input Field Filler ===
-def fill_input_field(panel, label: str, value: str, form_language: str, logger=None):
+def fill_input_field(panel, label: str, value: str, form_language: str, logger=None) -> None:
     """
     Fill input field using label mapping with enhanced fallbacks for robustness.
     """

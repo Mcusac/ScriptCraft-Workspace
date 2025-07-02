@@ -14,8 +14,9 @@ import time
 import argparse
 from pathlib import Path
 from collections import namedtuple
-from typing import Dict, Optional
-from ..common import shortcuts as cu
+from typing import Dict, Optional, List, Any, Callable, Union
+from ..common import *
+import scriptcraft.common as cu
 from .base_pipeline import BasePipeline
 
 # === 🏗️ PipelineStep Data Structure ===
@@ -26,7 +27,25 @@ PipelineStep = namedtuple(
 )
 
 # === 🧩 Create a Pipeline Step ===
-def make_step(name, log_filename, qc_func, input_key, output_filename=None, check_exists=False, run_mode="domain", tags=None):
+def make_step(name: str, log_filename: str, qc_func: Callable, input_key: str, 
+              output_filename: Optional[str] = None, check_exists: bool = False, 
+              run_mode: str = "domain", tags: Optional[List[str]] = None) -> PipelineStep:
+    """
+    Create a pipeline step with validation.
+    
+    Args:
+        name: Step name
+        log_filename: Log file name
+        qc_func: Function to execute
+        input_key: Input key for path resolution
+        output_filename: Optional output filename
+        check_exists: Whether to check if input exists
+        run_mode: Execution mode
+        tags: Optional tags for filtering
+        
+    Returns:
+        PipelineStep object
+    """
     DOMAIN_SCOPED_INPUTS = {"raw_data", "merged_data", "processed_data", "old_data"}
     GLOBAL_INPUTS = {"rhq_inputs", "global_data"}
 
@@ -43,7 +62,16 @@ def make_step(name, log_filename, qc_func, input_key, output_filename=None, chec
 
 
 # === ✅ Validate Pipeline Definitions ===
-def validate_pipelines(step_map) -> bool:
+def validate_pipelines(step_map: Dict[str, List[PipelineStep]]) -> bool:
+    """
+    Validate pipeline definitions.
+    
+    Args:
+        step_map: Dictionary mapping pipeline names to step lists
+        
+    Returns:
+        True if all pipelines are valid
+    """
     valid = True
     for name, steps in step_map.items():
         if not steps:
@@ -77,7 +105,22 @@ def add_supplement_steps(pipeline: BasePipeline, prepare: bool = False, merge: b
 
 
 # === 🚀 Core Execution Logic ===
-def run_qc_for_each_domain(log_filename, qc_func, input_key=cu.STANDARD_KEYS["input"], output_filename=None, filename_suffix=None, check_exists=True):
+def run_qc_for_each_domain(log_filename: str, qc_func: Callable, 
+                          input_key: str = cu.STANDARD_KEYS["input"], 
+                          output_filename: Optional[str] = None, 
+                          filename_suffix: Optional[str] = None, 
+                          check_exists: bool = True) -> None:
+    """
+    Run QC function for each domain.
+    
+    Args:
+        log_filename: Log file name
+        qc_func: Function to execute
+        input_key: Input key for path resolution
+        output_filename: Optional output filename
+        filename_suffix: Optional filename suffix
+        check_exists: Whether to check if input exists
+    """
     root = cu.get_project_root()
     domain_paths = cu.get_domain_paths(root)
 
@@ -97,7 +140,20 @@ def run_qc_for_each_domain(log_filename, qc_func, input_key=cu.STANDARD_KEYS["in
             cu.log_and_print(f"✅ Completed QC for {domain}")
 
 
-def run_qc_for_single_domain(domain, log_filename, qc_func, input_key, output_filename=None, check_exists=True):
+def run_qc_for_single_domain(domain: str, log_filename: str, qc_func: Callable, 
+                            input_key: str, output_filename: Optional[str] = None, 
+                            check_exists: bool = True) -> None:
+    """
+    Run QC function for a single domain.
+    
+    Args:
+        domain: Domain name
+        log_filename: Log file name
+        qc_func: Function to execute
+        input_key: Input key for path resolution
+        output_filename: Optional output filename
+        check_exists: Whether to check if input exists
+    """
     root = cu.get_project_root()
     domain_paths = cu.get_domain_paths(root).get(domain)
 
@@ -119,7 +175,14 @@ def run_qc_for_single_domain(domain, log_filename, qc_func, input_key, output_fi
         cu.log_and_print(f"✅ Completed QC for {domain}")
 
 
-def run_qc_single_step(log_filename, qc_func):
+def run_qc_single_step(log_filename: str, qc_func: Callable) -> None:
+    """
+    Run a single QC step.
+    
+    Args:
+        log_filename: Log file name
+        qc_func: Function to execute
+    """
     log_path = cu.get_project_root() / "logs" / Path(log_filename).name
     with cu.qc_log_context(log_path):
         try:
@@ -129,7 +192,7 @@ def run_qc_single_step(log_filename, qc_func):
             cu.log_and_print(f"❌ Error in single-step QC: {e}")
 
 
-def run_global_tool(qc_func, tool_name: Optional[str] = None) -> None:
+def run_global_tool(qc_func: Callable, tool_name: Optional[str] = None) -> None:
     """
     Run a global tool with standard input/output handling.
     
@@ -149,8 +212,17 @@ def run_global_tool(qc_func, tool_name: Optional[str] = None) -> None:
 
 
 # === 🔁 Main Pipeline Executor ===
-def run_pipeline_from_steps(steps, tag_filter=None, args=None):
-    step_timings = []
+def run_pipeline_from_steps(steps: List[PipelineStep], tag_filter: Optional[str] = None, 
+                           args: Optional[argparse.Namespace] = None) -> None:
+    """
+    Run pipeline from a list of steps.
+    
+    Args:
+        steps: List of pipeline steps
+        tag_filter: Optional tag to filter steps
+        args: Optional command line arguments
+    """
+    step_timings: List[tuple] = []
     filtered = [s for s in steps if tag_filter is None or tag_filter in s.tags]
 
     for idx, step in enumerate(filtered, 1):
@@ -191,7 +263,13 @@ def run_pipeline_from_steps(steps, tag_filter=None, args=None):
 
 
 # === 🕒 Timed Pipeline Runner ===
-def timed_pipeline(pipeline_func):
+def timed_pipeline(pipeline_func: Callable) -> None:
+    """
+    Run a pipeline function with timing.
+    
+    Args:
+        pipeline_func: Pipeline function to run
+    """
     start = time.time()
     pipeline_func()
     duration = time.time() - start

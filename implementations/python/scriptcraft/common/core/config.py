@@ -259,7 +259,10 @@ class Config:
                 if tool_name not in self.tools:
                     # Get tool metadata for description
                     metadata = discover_tool_metadata(tool_name)
-                    description = metadata.get('description', f"🔧 {tool_name.replace('_', ' ').title()}")
+                    if metadata:
+                        description = metadata.description
+                    else:
+                        description = f"🔧 {tool_name.replace('_', ' ').title()}"
                     
                     self.tools[tool_name] = {
                         'description': description,

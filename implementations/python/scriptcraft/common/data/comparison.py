@@ -6,7 +6,7 @@ data type mismatches, content differences, and ID integrity validation.
 """
 
 from dataclasses import dataclass
-from typing import Set, Tuple, Dict, Union, Optional, List, Any
+from typing import Set, Tuple, Dict, Union, Optional, List, Any, Callable
 import pandas as pd
 from pathlib import Path
 from functools import wraps
@@ -39,18 +39,18 @@ class ComparisonResult:
     only_in_first: Set[str]
     only_in_second: Set[str]
     differences: Optional[pd.DataFrame] = None
-    dtype_mismatches: Dict[str, Tuple[Any, Any]] = None
+    dtype_mismatches: Optional[Dict[str, Tuple[Any, Any]]] = None
     shape_mismatch: Optional[Tuple[Tuple[int, int], Tuple[int, int]]] = None
     missing_ids: Optional[Tuple[pd.DataFrame, pd.DataFrame]] = None
     index_comparison: Optional[Tuple[Set[Any], Set[Any], Set[Any]]] = None
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         if self.dtype_mismatches is None:
             self.dtype_mismatches = {}
 
 # ==== 🚨 Error Handling Decorator ====
 
-def handle_comparison_errors(func):
+def handle_comparison_errors(func: Callable[..., Any]) -> Callable[..., Any]:
     """
     Decorator to handle and log errors in comparison functions.
     
@@ -64,7 +64,7 @@ def handle_comparison_errors(func):
         >>> @handle_comparison_errors
     """
     @wraps(func)
-    def wrapper(*args, **kwargs):
+    def wrapper(*args: Any, **kwargs: Any) -> Any:
         try:
             return func(*args, **kwargs)
         except Exception as e:
@@ -78,18 +78,18 @@ class DataFrameComparer:
     # ==== 📏 Initialization & Alignment ====
     def __init__(
         self, 
-        df1: Union[pd.DataFrame, Set], 
-        df2: Union[pd.DataFrame, Set], 
+        df1: Union[pd.DataFrame, Set[Any]], 
+        df2: Union[pd.DataFrame, Set[Any]], 
         dataset_name: str = "Dataset", 
         output_dir: Union[str, Path] = OUTPUT_DIR
-    ):
+    ) -> None:
         self.df1 = df1
         self.df2 = df2
         self.dataset_name = dataset_name
         self.output_dir = Path(output_dir)
         self._align_dataframes()
 
-    def _align_dataframes(self):
+    def _align_dataframes(self) -> None:
         """
         Align DataFrames using ID_COLUMNS if available.
 
@@ -141,13 +141,14 @@ class DataFrameComparer:
             only_in_first=only_a,
             only_in_second=only_b,
             differences=None,
-            dtype_mismatches=None,
+            dtype_mismatches={},
             shape_mismatch=None,
             missing_ids=None,
             index_comparison=None
         )
 
-    def _log_column_comparison(self, common, only_a, only_b, label_a, label_b):
+    def _log_column_comparison(self, common: Set[str], only_a: Set[str], only_b: Set[str], 
+                              label_a: str, label_b: str) -> None:
         log_and_print(f"\n🔍 Column Comparison for {self.dataset_name}")
         log_and_print(f"🔹 Total Columns in {label_a}: {len(only_a) + len(common)}")
         log_and_print(f"🔹 Total Columns in {label_b}: {len(only_b) + len(common)}")
@@ -178,7 +179,7 @@ class DataFrameComparer:
         self._log_dtype_comparison(mismatches)
         return mismatches
 
-    def _log_dtype_comparison(self, mismatches):
+    def _log_dtype_comparison(self, mismatches: Dict[str, Tuple[Any, Any]]) -> None:
         if mismatches:
             log_and_print(f"\n🔍 Dtype mismatches in {self.dataset_name}:")
             for col, (dtype_old, dtype_new) in mismatches.items():
@@ -205,7 +206,7 @@ class DataFrameComparer:
         self._log_and_save_differences(differences)
         return differences
 
-    def _log_and_save_differences(self, differences: pd.DataFrame):
+    def _log_and_save_differences(self, differences: pd.DataFrame) -> None:
         """
         Log and save differences to a CSV file.
 
@@ -337,8 +338,8 @@ class DataFrameComparer:
 # ==== 🧩 Convenience Function ====
 
 def compare_dataframes(
-    df1: Union[pd.DataFrame, Set], 
-    df2: Union[pd.DataFrame, Set], 
+    df1: Union[pd.DataFrame, Set[Any]], 
+    df2: Union[pd.DataFrame, Set[Any]], 
     dataset_name: str = "Dataset", 
     output_dir: Union[str, Path] = OUTPUT_DIR, 
     steps: Optional[List[str]] = None

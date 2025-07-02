@@ -14,7 +14,7 @@ Features:
 Author: ScriptCraft Team
 """
 
-from .tool import ReleaseConsistencyChecker
+from .main import ReleaseConsistencyChecker
 
 # Tool metadata
 __description__ = "🔄 Validates data consistency between different releases"
@@ -24,6 +24,3 @@ __domains__ = ["clinical", "biomarkers", "genomics", "imaging"]
 __complexity__ = "moderate"
 __maturity__ = "stable"
 __distribution__ = "hybrid"
-
-# Export the main tool
-__all__ = ['ReleaseConsistencyChecker']

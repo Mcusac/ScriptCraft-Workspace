@@ -7,7 +7,7 @@ including data loading, validation, transformation, and saving operations.
 
 import pandas as pd
 from pathlib import Path
-from typing import Union, List, Dict, Any, Optional, Callable, Tuple
+from typing import Union, List, Dict, Any, Optional, Callable, Tuple, Type
 from ..logging import log_and_print
 from ..io import load_data, ensure_output_dir, find_latest_file, find_matching_file, FILE_PATTERNS
 
@@ -120,12 +120,12 @@ def save_data(data: pd.DataFrame, output_path: Union[str, Path], format: str = '
 
 
 def standardize_tool_execution(
-    tool_class,
+    tool_class: Type[Any],
     domain: str,
     input_path: str,
     output_path: str,
     paths: Dict[str, Any],
-    **kwargs
+    **kwargs: Any
 ) -> None:
     """
     Standardized tool execution pattern.
@@ -170,7 +170,7 @@ def standardize_tool_execution(
         raise
 
 
-def create_tool_runner(tool_class, **default_kwargs):
+def create_tool_runner(tool_class: Type[Any], **default_kwargs: Any) -> Callable[[str, str, str, Dict[str, Any]], None]:
     """
     Create a standardized tool runner function.
     
@@ -181,7 +181,7 @@ def create_tool_runner(tool_class, **default_kwargs):
     Returns:
         Function that can be used as a tool runner
     """
-    def runner(domain: str, input_path: str, output_path: str, paths: dict, **kwargs):
+    def runner(domain: str, input_path: str, output_path: str, paths: Dict[str, Any], **kwargs: Any) -> None:
         """Standardized tool runner function."""
         # Merge default kwargs with provided kwargs
         execution_kwargs = {**default_kwargs, **kwargs}
@@ -193,9 +193,9 @@ def create_tool_runner(tool_class, **default_kwargs):
 # Convenience functions for common patterns
 def load_and_process_data(
     input_paths: Union[str, Path, List[Union[str, Path]]],
-    process_func: Callable,
+    process_func: Callable[[pd.DataFrame, Any], pd.DataFrame],
     output_path: Union[str, Path],
-    **kwargs
+    **kwargs: Any
 ) -> pd.DataFrame:
     """
     Load data, apply processing function, and save result.
@@ -217,8 +217,8 @@ def load_and_process_data(
 def validate_and_transform_data(
     data: pd.DataFrame,
     validation_rules: Dict[str, Any],
-    transform_func: Optional[Callable] = None,
-    **kwargs
+    transform_func: Optional[Callable[[pd.DataFrame], pd.DataFrame]] = None,
+    **kwargs: Any
 ) -> pd.DataFrame:
     """
     Validate data against rules and optionally transform.

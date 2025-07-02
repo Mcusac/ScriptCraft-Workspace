@@ -5,7 +5,7 @@
 from scriptcraft.common.plugins import registry
 
 # Import plugins after registry is created to avoid circular dependency
-def _load_plugins():
+def _load_plugins() -> None:
     """Load all plugins after registry is initialized."""
     try:
         from . import validators  # Load the main validators file

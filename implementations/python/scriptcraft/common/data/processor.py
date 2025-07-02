@@ -36,7 +36,7 @@ class DataProcessor:
         self,
         input_paths: Union[str, Path, List[Union[str, Path]]],
         required_columns: Optional[List[str]] = None,
-        **kwargs
+        **kwargs: Any
     ) -> Union[pd.DataFrame, List[pd.DataFrame]]:
         """
         Load and validate data from input paths.
@@ -75,8 +75,8 @@ class DataProcessor:
     def process_data(
         self,
         data: Union[pd.DataFrame, List[pd.DataFrame]],
-        process_func: Callable,
-        **kwargs
+        process_func: Callable[..., Any],
+        **kwargs: Any
     ) -> Any:
         """
         Process data using a custom function.
@@ -102,7 +102,7 @@ class DataProcessor:
         data: Any,
         output_path: Union[str, Path],
         format: str = 'excel',
-        **kwargs
+        **kwargs: Any
     ) -> Path:
         """
         Save results to output path with standard formatting.
@@ -141,11 +141,11 @@ class DataProcessor:
     def run_pipeline(
         self,
         input_paths: Union[str, Path, List[Union[str, Path]]],
-        process_func: Callable,
+        process_func: Callable[..., Any],
         output_path: Union[str, Path],
         required_columns: Optional[List[str]] = None,
         format: str = 'excel',
-        **kwargs
+        **kwargs: Any
     ) -> Tuple[Any, Path]:
         """
         Run a complete data processing pipeline.
@@ -178,11 +178,11 @@ class DataProcessor:
 
 def load_and_process_data(
     input_paths: Union[str, Path, List[Union[str, Path]]],
-    process_func: Callable,
+    process_func: Callable[..., Any],
     output_path: Union[str, Path],
     required_columns: Optional[List[str]] = None,
     format: str = 'excel',
-    **kwargs
+    **kwargs: Any
 ) -> Tuple[Any, Path]:
     """
     Convenience function for loading and processing data.
@@ -208,8 +208,8 @@ def load_and_process_data(
 def validate_and_transform_data(
     data: pd.DataFrame,
     validation_rules: Dict[str, Any],
-    transform_func: Optional[Callable] = None,
-    **kwargs
+    transform_func: Optional[Callable[..., Any]] = None,
+    **kwargs: Any
 ) -> pd.DataFrame:
     """
     Validate and optionally transform data.
@@ -242,10 +242,10 @@ def validate_and_transform_data(
 
 def batch_process_files(
     input_dir: Union[str, Path],
-    process_func: Callable,
+    process_func: Callable[..., Any],
     output_dir: Union[str, Path],
     file_pattern: str = "*.csv",
-    **kwargs
+    **kwargs: Any
 ) -> List[Path]:
     """
     Process multiple files in a directory.

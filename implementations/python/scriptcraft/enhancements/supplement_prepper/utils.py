@@ -1,10 +1,19 @@
 # scripts/qc/supplement_prepper/utils.py
 
 import pandas as pd
+from pathlib import Path
+from typing import List, Dict, Any
 from scriptcraft.common.logging import log_and_print
 
 
-def merge_and_clean_supplement(file_paths, output_path):
+def merge_and_clean_supplement(file_paths: List[Path], output_path: Path) -> None:
+    """
+    Merge and clean supplement files.
+    
+    Args:
+        file_paths: List of paths to supplement files
+        output_path: Path where to save the merged output
+    """
     log_and_print("🔄 Merging supplement files...")
 
     merged = pd.DataFrame()
@@ -26,7 +35,7 @@ def merge_and_clean_supplement(file_paths, output_path):
     merged = merged.fillna("")
 
     # Build final structured rows
-    final_rows = []
+    final_rows: List[Dict[str, Any]] = []
     for _, row in merged.iterrows():
         variable = str(row.get('variable')).strip()
         label = str(row.get('notes')).strip()

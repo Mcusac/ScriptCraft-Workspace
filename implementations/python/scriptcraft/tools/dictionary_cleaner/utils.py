@@ -2,6 +2,7 @@
 
 from pathlib import Path
 import re
+from typing import Union, Any, Dict, List
 import pandas as pd
 from scriptcraft.common import (
     log_and_print, load_data,
@@ -18,7 +19,7 @@ DOMAIN_PATHS = get_domain_paths(PROJECT_ROOT)
 
 
 # Global dictionary to store fix counts for summary
-fix_counts = {
+fix_counts: Dict[str, int] = {
     "Switched numerical representations of categorical variables to integers": 0,
     "Normalized = or : to comma": 0,
     "Ensure space after comma in '{}' pairs": 0,
@@ -53,9 +54,9 @@ fix_counts = {
 def convert_numeric_keys_to_ints(text: str) -> str:
     """Converts numeric keys like 1.0 or 2.00 to integers inside {key, value} pairs, but skips ranges like {0-1}."""
     count = 0
-    malformed = []
+    malformed: List[str] = []
 
-    def replace(match):
+    def replace(match: re.Match) -> str:
         nonlocal count, malformed
         content = match.group(1).strip()
 
@@ -95,7 +96,7 @@ def convert_numeric_keys_to_ints(text: str) -> str:
     return new_text
 
 
-def parse_values(value, filename):
+def parse_values(value: Union[str, float, None], filename: str) -> Union[str, float, None]:
     global fix_counts
 
     if pd.isna(value) or value in ["Numeric", "Text", "Mm/YYYY"]:
@@ -145,8 +146,8 @@ def parse_values(value, filename):
         (r'\s*=\s*', ' = ', "Add space before and after '='"),
         (r'\{\s*([^}]*\S)\s*\}', r'{\1}', "Removed trailing spaces inside '{}'"),
         (r'\s+-\s*$', '', "Removed random trailing ' - '"),
-        (r"[’`´ʹ]", "'", None),  # Normalize apostrophes
-        (r"\b[Dd]on['’`]?[Tt]+\b", "Don't", "Fixed incorrect 'Don't' capitalization"),
+        (r"[''`´ʹ]", "'", None),  # Normalize apostrophes
+        (r"\b[Dd]on[''`]?[Tt]+\b", "Don't", "Fixed incorrect 'Don't' capitalization"),
         (r'-(\{)', r' - \1', "Added space before '{' following '-'"),
         # Collapse multiple spaces outside of curly braces
         (r' {2,}', ' ', "Collapsed multiple spaces to single space"),
@@ -185,7 +186,7 @@ def parse_values(value, filename):
 
 def fix_language_blocks(text: str) -> str:
     """Fix bilingual value blocks like [Spanish = {...} {...}] [English = {...} {...}]"""
-    def fix_block(match):
+    def fix_block(match: re.Match) -> str:
         full = match.group(0)
         content = match.group(1)
         fixed_content = re.sub(r'\{(\d+(?:\.\d+)?)\s*[:=]?\s*([^\{\}]+?)\}', r'{\1, \2}', content)
@@ -197,7 +198,7 @@ def fix_language_blocks(text: str) -> str:
     return re.sub(pattern, fix_block, text)
 
 
-def clean_data(file_path: Path, output_folder: Path):
+def clean_data(file_path: Path, output_folder: Path) -> None:
     global fix_counts
     fix_counts = {key: 0 for key in fix_counts}  # ✅ Reset early to avoid carryover
 

@@ -6,7 +6,7 @@ This module separates path resolution logic from configuration and business logi
 """
 
 from pathlib import Path
-from typing import Dict, Optional, List
+from typing import Dict, Optional, List, Any
 from abc import ABC, abstractmethod
 
 
@@ -47,7 +47,7 @@ class PathResolver(ABC):
 class WorkspacePathResolver(PathResolver):
     """Workspace-aware path resolver for multi-workspace architecture."""
     
-    def __init__(self, workspace_root: Path):
+    def __init__(self, workspace_root: Path) -> None:
         """
         Initialize with workspace root directory.
         
@@ -185,7 +185,7 @@ class WorkspacePathResolver(PathResolver):
 class LegacyPathResolver(PathResolver):
     """Legacy path resolver for backward compatibility with old project structure."""
     
-    def __init__(self, project_root: Path):
+    def __init__(self, project_root: Path) -> None:
         """
         Initialize with legacy project root.
         

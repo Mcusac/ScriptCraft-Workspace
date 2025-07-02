@@ -1,15 +1,12 @@
-# scripts/tools/automated_labeler/utils.py
-
 """
-utils.py
-
 🧰 Helper functions for the automated label generation tool.
 
 Includes:
 - fill_full_page(): populates a DOCX template with ID values for printing.
+- Data processing utilities with DRY pattern support.
 
 Example:
-    from scripts.tools.automated_labeler.utils import fill_full_page
+    from .utils import fill_full_page
 """
 
 from docx import Document
@@ -18,7 +15,22 @@ from copy import deepcopy
 from typing import List, Tuple, Union, Optional, Dict, Any
 from pathlib import Path
 import pandas as pd
-from scriptcraft.common.io import load_data as common_load_data
+
+# Try to import common utilities with fallback
+try:
+    from scriptcraft.common.io import load_data as common_load_data
+except ImportError:
+    try:
+        from common.io import load_data as common_load_data
+    except ImportError:
+        # Fallback to basic pandas loading
+        def common_load_data(file_path, **kwargs):
+            if str(file_path).endswith('.csv'):
+                return pd.read_csv(file_path, **kwargs)
+            elif str(file_path).endswith(('.xlsx', '.xls')):
+                return pd.read_excel(file_path, **kwargs)
+            else:
+                raise ValueError(f"Unsupported file format: {file_path}")
 
 SETS_PER_PAGE = 8  # Number of ID sets per label sheet
 
@@ -36,7 +48,7 @@ def fill_full_page(template_doc: Document, id_pairs: List[Tuple[str, str, str]])
     """
     page = deepcopy(template_doc)
 
-    def replace_placeholders(paragraphs, rid, mid, visit, idx):
+    def replace_placeholders(paragraphs, rid: str, mid: str, visit: str, idx: int) -> None:
         target_rid = f'{{RID {idx}}}'
         target_mid = f'{{MID {idx}}}'
         target_v = f'{{V {idx}}}'
@@ -74,12 +86,12 @@ def fill_full_page(template_doc: Document, id_pairs: List[Tuple[str, str, str]])
     return page
 
 
-def load_data(input_path: Union[str, Path], **kwargs) -> pd.DataFrame:
+def load_data(input_path: Union[str, Path], **kwargs: Any) -> pd.DataFrame:
     """Load data from input file."""
     return common_load_data(input_path, **kwargs)
 
 
-def apply_labeling_rules(data: pd.DataFrame, rules: Dict[str, Any] = None, domain: str = None) -> pd.DataFrame:
+def apply_labeling_rules(data: pd.DataFrame, rules: Optional[Dict[str, Any]] = None, domain: Optional[str] = None) -> pd.DataFrame:
     """
     Apply labeling rules to the data.
     
@@ -131,6 +143,6 @@ def save_labeled_data(data: pd.DataFrame, output_path: Union[str, Path], format:
         data.to_csv(output_path, index=False)
 
 
-def process_data(input_path: Union[str, Path], **kwargs):
+def process_data(input_path: Union[str, Path], **kwargs: Any) -> pd.DataFrame:
     """Process input data file."""
     return load_data(input_path, **kwargs)

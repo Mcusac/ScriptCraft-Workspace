@@ -1,30 +1,27 @@
 """
-🔍 Dictionary-Driven Checker Tool
+📋 Dictionary-Driven Checker Tool
 
-A flexible checker that validates data against dictionaries using configurable plugins.
-Supports multiple validation types and provides detailed reporting.
+Validates datasets against data dictionaries to ensure compliance and accuracy.
+Uses dictionary definitions to check data types, ranges, and value constraints.
 
 Features:
-- 🔌 Plugin-based validation system
-- 📊 Multiple data type support (numeric, text, date)
-- 🎯 Dictionary-driven validation rules
-- 📋 Comprehensive error reporting
-- ⚙️ Configurable validation options
-- 🔍 Outlier detection
+- 📋 Dictionary-based validation
+- 🔍 Data type checking
+- 📊 Range and constraint validation
+- ⚠️ Compliance reporting
+- 🎯 Healthcare data patterns
+- 📈 Quality metrics
 
 Author: ScriptCraft Team
 """
 
-from .tool import DictionaryDrivenChecker
+from .main import DictionaryDrivenChecker
 
 # Tool metadata
-__description__ = "🔍 Validates data against dictionaries using configurable plugins"
-__tags__ = ["validation", "dictionaries", "quality-control", "plugins", "checking"]
+__description__ = "📋 Validates datasets against data dictionaries for compliance"
+__tags__ = ["validation", "dictionaries", "compliance", "quality-control", "checking"]
 __data_types__ = ["csv", "xlsx", "xls"]
 __domains__ = ["clinical", "biomarkers", "genomics", "imaging"]
-__complexity__ = "complex"
+__complexity__ = "moderate"
 __maturity__ = "stable"
-__distribution__ = "hybrid"
-
-# Export the main tool
-__all__ = ['DictionaryDrivenChecker']
+__distribution__ = "pipeline"

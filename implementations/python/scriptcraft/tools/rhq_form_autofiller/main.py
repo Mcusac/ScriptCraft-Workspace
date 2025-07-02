@@ -15,11 +15,11 @@ import sys
 import time
 import argparse
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Union, Tuple
 
 # === Environment Detection & Import Setup ===
 # Import the environment detection module
-from .env import setup_environment, import_dual_env
+from .env import setup_environment
 
 # Set up environment and get imports
 IS_DISTRIBUTABLE = setup_environment()
@@ -53,37 +53,22 @@ from selenium.webdriver.support import expected_conditions as EC
 class RHQFormAutofiller(cu.BaseTool):
     """Tool for automatically filling RHQ forms with address data."""
     
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize the tool."""
         super().__init__(
             name="RHQ Form Autofiller",
-            description="Automates filling of RHQ forms using pre-processed data from Excel files."
+            description="Automates filling of RHQ forms using pre-processed data from Excel files.",
+            tool_name="rhq_form_autofiller"
         )
-        self.driver = None
-        self.config = None
-        self.logger = None
+        self.driver: Optional[webdriver.Remote] = None
+        self.logger: Optional[Any] = None
         
-        # Load configuration with fallbacks
-        try:
-            config_path = "config.yaml" if not IS_DISTRIBUTABLE else "../config.yaml"
-            self.config = cu.Config.from_yaml(config_path)
-            tool_config = self.config.get_tool_config("rhq_form_autofiller")
-            template_config = self.config.get_template_config()
-            
-            # Store configurable values
-            self.browser_timeout = tool_config.get("browser_timeout", 60)
-            self.form_wait_time = tool_config.get("form_wait_time", 10) 
-            self.login_retry_attempts = tool_config.get("login_retry_attempts", 3)
-            self.auto_login = tool_config.get("auto_login", True)
-            self.default_output_dir = template_config.get("package_structure", {}).get("default_output_dir", "output")
-        except Exception as e:
-            print(f"⚠️ Config loading failed, using defaults: {e}")
-            # Fallback to defaults if config loading fails
-            self.browser_timeout = 60
-            self.form_wait_time = 10
-            self.login_retry_attempts = 3
-            self.auto_login = True
-            self.default_output_dir = "output"
+        # Get tool-specific configuration
+        tool_config = self.get_tool_config()
+        self.browser_timeout = tool_config.get("browser_timeout", 60)
+        self.form_wait_time = tool_config.get("form_wait_time", 10) 
+        self.login_retry_attempts = tool_config.get("login_retry_attempts", 3)
+        self.auto_login = tool_config.get("auto_login", True)
     
     def run(self,
             mode: Optional[str] = None,
@@ -91,7 +76,7 @@ class RHQFormAutofiller(cu.BaseTool):
             output_dir: Optional[Union[str, Path]] = None,
             domain: Optional[str] = None,
             output_filename: Optional[str] = None,
-            **kwargs) -> None:
+            **kwargs: Any) -> None:
         """
         Run the RHQ Form Autofiller's main functionality.
         
@@ -144,7 +129,7 @@ class RHQFormAutofiller(cu.BaseTool):
                 self.driver.quit()
                 cu.log_and_print("🔄 Browser closed")
     
-    def _resolve_input_file(self, input_paths: Optional[List[Union[str, Path]]], kwargs: dict) -> Path:
+    def _resolve_input_file(self, input_paths: Optional[List[Union[str, Path]]], kwargs: Dict[str, Any]) -> Path:
         """Resolve the input file from various sources."""
         # Priority: input_paths -> input_excel kwarg -> auto-discovery
         if input_paths and len(input_paths) > 0:
@@ -177,7 +162,7 @@ class RHQFormAutofiller(cu.BaseTool):
         
         return input_file
     
-    def _process_forms(self, data: dict) -> None:
+    def _process_forms(self, data: Dict[str, Any]) -> None:
         """Process all forms with the loaded data."""
         # Launch browser
         cu.log_and_print("🌐 Launching browser...")
@@ -195,7 +180,7 @@ class RHQFormAutofiller(cu.BaseTool):
             cu.log_and_print(f"❌ Form processing failed: {str(e)}", level="error")
             raise
     
-    def _handle_login(self, data: dict) -> None:
+    def _handle_login(self, data: Dict[str, Any]) -> None:
         """Handle the login process."""
         first_med_id = next(iter(data))
         url = self.config.tools["rhq_form_autofiller"]["url_template"].format(
@@ -237,7 +222,7 @@ class RHQFormAutofiller(cu.BaseTool):
         # Wait for the page to be fully loaded after login
         time.sleep(5)
     
-    def _process_single_form(self, med_id: str, panels_data: list) -> None:
+    def _process_single_form(self, med_id: str, panels_data: List[Any]) -> None:
         """Process a single form for one Med_ID."""
         try:
             # Navigate to form
@@ -291,7 +276,7 @@ class RHQFormAutofiller(cu.BaseTool):
         except Exception as e:
             cu.log_and_print(f"⚠️ Could not submit form for {med_id}: {e}", level="warning")
     
-    def run_from_cli(self, args) -> None:
+    def run_from_cli(self, args: argparse.Namespace) -> None:
         """
         Run the tool from command line arguments.
         
@@ -318,7 +303,7 @@ class RHQFormAutofiller(cu.BaseTool):
 
 
 # === 🔐 Credentials Management ===
-def load_credentials():
+def load_credentials() -> Tuple[Optional[str], Optional[str]]:
     """
     Load credentials from credentials.txt file.
     Returns tuple (username, password) or (None, None) if not found/configured.
@@ -328,7 +313,7 @@ def load_credentials():
         if not cred_file.exists():
             return None, None
             
-        credentials = {}
+        credentials: Dict[str, str] = {}
         with open(cred_file, 'r') as f:
             for line in f:
                 line = line.strip()
@@ -349,7 +334,7 @@ def load_credentials():
         return None, None
 
 
-def attempt_automatic_login(driver, logger=None):
+def attempt_automatic_login(driver: webdriver.Remote, logger: Optional[Any] = None) -> bool:
     """
     Attempt automatic login if credentials are available.
     Returns True if login was attempted, False otherwise.
@@ -404,58 +389,19 @@ def attempt_automatic_login(driver, logger=None):
         return False
 
 
-# === CLI Interface ===
-def parse_cli_args():
-    """Parse command line arguments."""
-    # Import ParserFactory with fallback for dual environment support
-    try:
-        from scriptcraft.common.cli import ParserFactory
-    except ImportError:
-        from common.cli import ParserFactory
-    
-    parser = ParserFactory.create_tool_parser("rhq_form_autofiller", 
-                                             "🏥 RHQ Form Autofiller - Automate filling of RHQ forms with address data")
-    
-    parser.add_argument("input_path", type=str, nargs='?',
-                       help="Path to Excel file with address data (optional - will auto-discover)")
-    
-    # Tool-specific arguments
-    parser.add_argument("--input-excel", dest="input_excel",
-                       help="Path to Excel file with address data (alternative to input_path)")
-    parser.add_argument("--med-id", dest="med_id",
-                       help="Optional Med_ID to filter for specific record")
-    
-    return parser.parse_args()
-
-
-def run_from_args(args):
-    """Run the tool with parsed arguments."""
-    tool = RHQFormAutofiller()
-    tool.run_from_cli(args)
-
-
-def main_runner(**kwargs):
-    """Main entry point for the tool when run from the pipeline."""
-    tool = RHQFormAutofiller()
-    
-    # If config is passed from pipeline, use it instead of the tool's loaded config
-    if 'config' in kwargs and kwargs['config'] is not None:
-        tool.config = kwargs['config']
-    
-    tool.run(
-        mode=kwargs.get('mode'),
-        input_paths=kwargs.get('input_paths'),
-        output_dir=kwargs.get('output_dir', 'output'),
-        domain=kwargs.get('domain'),
-        output_filename=kwargs.get('output_filename'),
-        **{k: v for k, v in kwargs.items() if k not in ['mode', 'input_paths', 'output_dir', 'domain', 'output_filename']}
-    )
-
-
 def main():
-    """Main CLI entry point."""
-    args = parse_cli_args()
-    run_from_args(args)
+    """Main entry point for the RHQ form autofiller tool."""
+    args = cu.parse_tool_args("🏥 Automates filling of RHQ forms with address data from Excel files")
+    
+    # Create and run the tool
+    tool = RHQFormAutofiller()
+    tool.run(
+        input_paths=args.input_paths,
+        output_dir=args.output_dir,
+        domain=args.domain,
+        output_filename=args.output_filename,
+        mode=args.mode
+    )
 
 
 if __name__ == "__main__":

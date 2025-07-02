@@ -14,7 +14,7 @@ Features:
 Author: ScriptCraft Team
 """
 
-from .tool import FeatureChangeChecker
+from .main import FeatureChangeChecker
 
 # Tool metadata
 __description__ = "🔄 Tracks and categorizes changes in feature values between visits"
@@ -24,6 +24,3 @@ __domains__ = ["clinical", "biomarkers", "genomics"]
 __complexity__ = "moderate"
 __maturity__ = "stable"
 __distribution__ = "pipeline"
-
-# Export the main tool
-__all__ = ['FeatureChangeChecker']

@@ -10,7 +10,7 @@ import os
 import sys
 from enum import Enum
 from pathlib import Path
-from typing import List, Dict, FrozenSet
+from typing import List, Dict, FrozenSet, Any, Optional
 import yaml
 
 # ==== 📄 Configuration Loading ====
@@ -61,7 +61,7 @@ else:
     }
 
 
-def get_config(key=None, default=None):
+def get_config(key: Any = None, default: Any = None) -> Any:
     """
     Get configuration values from the loaded YAML config.
     
@@ -110,7 +110,7 @@ def get_domain_paths(project_root: Path) -> Dict[str, Dict[str, Path]]:
     Returns:
         Dictionary mapping domain names to their path dictionaries
     """
-    domain_paths = {}
+    domain_paths: Dict[str, Dict[str, Path]] = {}
     domains_dir = project_root / "domains"
     
     if not domains_dir.exists():
@@ -133,7 +133,7 @@ def get_domain_paths(project_root: Path) -> Dict[str, Dict[str, Path]]:
     return domain_paths
 
 
-def get_output_path(domain_paths: Dict[str, Path], filename: str = None, suffix: str = None) -> Path:
+def get_output_path(domain_paths: Dict[str, Path], filename: Optional[str] = None, suffix: Optional[str] = None) -> Path:
     """
     Get the output path for a domain.
     

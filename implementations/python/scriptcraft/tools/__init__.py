@@ -6,11 +6,11 @@ Tools are organized by functionality but all accessible through a unified interf
 
 Example Usage:
     from scriptcraft.tools import (
-        # Automation Tools (exemplar)
-        RHQFormAutofiller,
-        
-        # Other tools (will be available after refactoring)
-        # DataContentComparer, SchemaDetector, DictionaryDrivenChecker, etc.
+        # All tools are now available
+        RHQFormAutofiller, DataContentComparer, SchemaDetector, 
+        DictionaryDrivenChecker, ReleaseConsistencyChecker, ScoreTotalsChecker,
+        FeatureChangeChecker, DictionaryValidator, MedVisitIntegrityValidator,
+        DictionaryCleaner, DateFormatStandardizer, AutomatedLabeler
     )
 
 Tool Discovery:
@@ -38,37 +38,64 @@ def get_tool_categories() -> list:
     return list(registry.get_tools_by_category().keys())
 
 
-# === EXPLICIT TOOL EXPORTS ===
-# Import only the exemplar tool explicitly
+# === TOOL IMPORTS ===
+# Import all standardized tools
 try:
     from .rhq_form_autofiller import RHQFormAutofiller
 except ImportError:
     RHQFormAutofiller = None
 
-# Placeholder for other tools (will be imported after refactoring)
-DataContentComparer = None
-SchemaDetector = None
-DictionaryDrivenChecker = None
-ReleaseConsistencyChecker = None
-ScoreTotalsChecker = None
-FeatureChangeChecker = None
-DictionaryValidator = None
-MedVisitIntegrityValidator = None
-DictionaryCleaner = None
-DateFormatStandardizer = None
-AutomatedLabeler = None
+try:
+    from .data_content_comparer import DataContentComparer
+except ImportError:
+    DataContentComparer = None
 
-__all__ = [
-    # Tool discovery functions
-    'get_available_tools', 'list_tools_by_category', 'get_tool_categories',
-    'run_tool', 'discover_tool_metadata',
-    
-    # Tool classes (exemplar only for now)
-    'RHQFormAutofiller',
-    
-    # Placeholder exports for other tools
-    'DataContentComparer', 'SchemaDetector', 'DictionaryDrivenChecker', 
-    'ReleaseConsistencyChecker', 'ScoreTotalsChecker', 'FeatureChangeChecker', 
-    'DictionaryValidator', 'MedVisitIntegrityValidator', 'DictionaryCleaner', 
-    'DateFormatStandardizer', 'AutomatedLabeler'
-]
+try:
+    from .schema_detector import SchemaDetectorTool as SchemaDetector
+except ImportError:
+    SchemaDetector = None
+
+try:
+    from .dictionary_driven_checker import DictionaryDrivenChecker
+except ImportError:
+    DictionaryDrivenChecker = None
+
+try:
+    from .release_consistency_checker import ReleaseConsistencyChecker
+except ImportError:
+    ReleaseConsistencyChecker = None
+
+try:
+    from .score_totals_checker import ScoreTotalsChecker
+except ImportError:
+    ScoreTotalsChecker = None
+
+try:
+    from .feature_change_checker import FeatureChangeChecker
+except ImportError:
+    FeatureChangeChecker = None
+
+try:
+    from .dictionary_validator import DictionaryValidator
+except ImportError:
+    DictionaryValidator = None
+
+try:
+    from .medvisit_integrity_validator import MedVisitIntegrityValidator
+except ImportError:
+    MedVisitIntegrityValidator = None
+
+try:
+    from .dictionary_cleaner import DictionaryCleaner
+except ImportError:
+    DictionaryCleaner = None
+
+try:
+    from .date_format_standardizer import DateFormatStandardizer
+except ImportError:
+    DateFormatStandardizer = None
+
+try:
+    from .automated_labeler import AutomatedLabeler
+except ImportError:
+    AutomatedLabeler = None

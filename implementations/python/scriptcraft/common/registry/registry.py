@@ -70,7 +70,7 @@ class ToolMetadata:
     author: str = ""
     maintainer: str = ""
     
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         """Initialize mutable defaults."""
         if self.tags is None:
             self.tags = []
@@ -103,7 +103,7 @@ class ComponentMetadata:
     version: str = __version__
     author: str = "ScriptCraft Team"
     entry_point: Optional[str] = None
-    config_schema: Optional[Dict] = None
+    config_schema: Optional[Dict[str, Any]] = None
     dependencies: List[str] = field(default_factory=list)
     is_experimental: bool = False
     is_deprecated: bool = False
@@ -116,7 +116,7 @@ class UnifiedRegistry:
     This is the single source of truth for all registry functionality.
     """
     
-    def __init__(self):
+    def __init__(self) -> None:
         # Tool registry
         self._tools: Dict[str, Type[BaseTool]] = {}
         self._tool_instances: Dict[str, BaseTool] = {}
@@ -151,7 +151,7 @@ class UnifiedRegistry:
             ]
         
         self._discovery_paths = paths
-        discovered_tools = {}
+        discovered_tools: Dict[str, Type[BaseTool]] = {}
         
         for path in paths:
             if not path.exists():
@@ -190,7 +190,7 @@ class UnifiedRegistry:
             module = importlib.import_module(module_path)
             
             # Look for tool class (common patterns)
-            tool_class = None
+            tool_class: Optional[Type[BaseTool]] = None
             
             # Pattern 1: Direct class export
             for attr_name in dir(module):
@@ -410,7 +410,7 @@ class UnifiedRegistry:
         
         return {pt: list(plugins.keys()) for pt, plugins in self._plugins.items()}
     
-    def run_tool(self, tool_name: str, **kwargs) -> None:
+    def run_tool(self, tool_name: str, **kwargs: Any) -> None:
         """
         Run a tool by name.
         
@@ -480,7 +480,7 @@ def list_tools_by_category(category: Optional[str] = None) -> Dict[str, List[str
         return {category: unified_registry.get_tools_by_category().get(category, [])}
     return unified_registry.get_tools_by_category()
 
-def run_tool(tool_name: str, **kwargs) -> None:
+def run_tool(tool_name: str, **kwargs: Any) -> None:
     """Run a tool by name (convenience function)."""
     unified_registry.run_tool(tool_name, **kwargs)
 
@@ -491,7 +491,7 @@ def discover_tool_metadata(tool_name: str) -> Optional[ToolMetadata]:
 
 # ===== DECORATORS =====
 
-def register_tool_decorator(name: str, **metadata):
+def register_tool_decorator(name: str, **metadata: Any) -> Callable[[Type[BaseTool]], Type[BaseTool]]:
     """Decorator for registering tools."""
     def decorator(tool_class: Type[BaseTool]) -> Type[BaseTool]:
         tool_metadata = ToolMetadata(
@@ -513,7 +513,7 @@ def register_tool_decorator(name: str, **metadata):
         return tool_class
     return decorator
 
-def register_plugin_decorator(plugin_type: str, name: str, **metadata):
+def register_plugin_decorator(plugin_type: str, name: str, **metadata: Any) -> Callable[[Type], Type]:
     """Decorator for registering plugins."""
     def decorator(plugin_class: Type) -> Type:
         unified_registry.register_plugin(plugin_type, name, plugin_class, metadata)
@@ -530,7 +530,7 @@ class ToolRegistry:
     This maintains backward compatibility with existing code.
     """
     
-    def __init__(self):
+    def __init__(self) -> None:
         self._registry = unified_registry
     
     def get_tool(self, tool_name: str) -> Optional[BaseTool]:

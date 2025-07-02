@@ -5,13 +5,15 @@ Context management for logging operations.
 import logging
 import contextlib
 from pathlib import Path
-from typing import Optional, Dict, Any, Generator, Union, Callable
+from typing import Optional, Dict, Any, Generator, Union, Callable, TypeVar
 from datetime import datetime
+
+T = TypeVar('T')
 
 class QCLogContext:
     """Context manager for QC-specific logging."""
     
-    def __init__(self, logger: logging.Logger, context: Dict[str, Any]):
+    def __init__(self, logger: logging.Logger, context: Dict[str, Any]) -> None:
         """Initialize QC log context.
         
         Args:
@@ -27,7 +29,8 @@ class QCLogContext:
         self.logger.info(f"Starting QC operation: {self.context.get('operation', 'Unknown')}")
         return self
     
-    def __exit__(self, exc_type, exc_val, exc_tb) -> None:
+    def __exit__(self, exc_type: Optional[type], exc_val: Optional[Exception], 
+                 exc_tb: Optional[Any]) -> None:
         """Exit the QC log context."""
         duration = datetime.now() - self.start_time
         if exc_type is None:
@@ -39,7 +42,7 @@ class QCLogContext:
 def qc_log_context(
     log_path: Union[str, Path],
     operation: Optional[str] = None,
-    **context
+    **context: Any
 ) -> Generator[logging.Logger, None, None]:
     """Context manager for QC logging operations.
     
@@ -83,7 +86,7 @@ def qc_log_context(
 @contextlib.contextmanager
 def with_domain_logger(
     log_path: Union[str, Path],
-    func: Callable
+    func: Callable[[], T]
 ) -> Generator[None, None, None]:
     """Context manager for domain-specific logging operations.
     

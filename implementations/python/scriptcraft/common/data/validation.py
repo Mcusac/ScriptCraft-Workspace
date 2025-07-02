@@ -9,7 +9,7 @@ and formats before proceeding with data processing or comparisons.
 
 from pathlib import Path
 from ..logging import log_and_print
-from typing import Union, Tuple, List, Any, Optional, Dict, Type
+from typing import Union, Tuple, List, Any, Optional, Dict, Type, Callable
 import pandas as pd
 from dataclasses import dataclass
 from abc import ABC, abstractmethod
@@ -52,7 +52,7 @@ class ColumnValidator(PluginBase):
         return 'validator'
 
     @abstractmethod
-    def validate_value(self, value: any, expected_values: str) -> Optional[str]:
+    def validate_value(self, value: Any, expected_values: str) -> Optional[str]:
         """Validate a single value. Return error message if invalid, else None."""
         pass
 
@@ -63,15 +63,15 @@ class PluginRegistry:
     def __init__(self):
         self._validators: Dict[str, Type[ColumnValidator]] = {}
 
-    def register(self, type_name: str) -> callable:
-        def decorator(validator_class) -> type:
+    def register(self, type_name: str) -> Callable[[Type[ColumnValidator]], Type[ColumnValidator]]:
+        def decorator(validator_class: Type[ColumnValidator]) -> Type[ColumnValidator]:
             self._validators[type_name] = validator_class
             # Also register with the unified registry for backward compatibility
             plugin_registry.register_plugin('validator', type_name, validator_class)
             return validator_class
         return decorator
 
-    def get_all_validators(self):
+    def get_all_validators(self) -> Dict[str, Type[ColumnValidator]]:
         return self._validators
 
 

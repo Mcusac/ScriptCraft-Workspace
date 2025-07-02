@@ -14,7 +14,7 @@ Features:
 Author: ScriptCraft Team
 """
 
-from .tool import ScoreTotalsChecker
+from .main import ScoreTotalsChecker
 
 # Tool metadata
 __description__ = "🧮 Validates calculated score totals against component values"
@@ -24,6 +24,3 @@ __domains__ = ["clinical", "biomarkers"]
 __complexity__ = "simple"
 __maturity__ = "stable"
 __distribution__ = "pipeline"
-
-# Export the main tool
-__all__ = ['ScoreTotalsChecker']

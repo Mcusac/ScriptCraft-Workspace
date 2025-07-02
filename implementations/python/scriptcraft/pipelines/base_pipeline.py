@@ -14,7 +14,8 @@ from pathlib import Path
 from typing import List, Dict, Any, Optional, Callable, Union
 from dataclasses import dataclass
 import argparse
-from ..common import shortcuts as cu
+from ..common import *
+import scriptcraft.common as cu
 from ..common.io.path_resolver import PathResolver
 
 

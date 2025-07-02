@@ -11,7 +11,7 @@ import yaml
 def load_data(
     file_path: Union[str, Path],
     encoding: Optional[str] = None,
-    **kwargs
+    **kwargs: Any
 ) -> pd.DataFrame:
     """Load data from a file into a DataFrame.
     
@@ -34,10 +34,10 @@ def load_data(
     else:
         raise ValueError(f"Unsupported file format: {file_path.suffix}")
 
-def load_datasets(
+def load_datasets_as_dict(
     file_paths: List[Union[str, Path]],
     encoding: Optional[str] = None,
-    **kwargs
+    **kwargs: Any
 ) -> Dict[str, pd.DataFrame]:
     """Load multiple datasets from files.
     
@@ -58,7 +58,7 @@ def load_dataset_columns(
     file_path: Union[str, Path],
     columns: List[str],
     encoding: Optional[str] = None,
-    **kwargs
+    **kwargs: Any
 ) -> pd.DataFrame:
     """Load specific columns from a dataset.
     
@@ -76,7 +76,7 @@ def load_dataset_columns(
 def load_dictionary_columns(
     file_path: Union[str, Path],
     encoding: Optional[str] = None,
-    **kwargs
+    **kwargs: Any
 ) -> pd.DataFrame:
     """Load dictionary columns from a file.
     
@@ -93,7 +93,7 @@ def load_dictionary_columns(
 def load_comparison_datasets(
     file_paths: List[Union[str, Path]],
     encoding: Optional[str] = None,
-    **kwargs
+    **kwargs: Any
 ) -> Dict[str, pd.DataFrame]:
     """Load datasets for comparison.
     
@@ -105,7 +105,7 @@ def load_comparison_datasets(
     Returns:
         Dictionary mapping file names to DataFrames
     """
-    return load_datasets(file_paths, encoding, **kwargs)
+    return load_datasets_as_dict(file_paths, encoding, **kwargs)
 
 def load_json(file_path: Union[str, Path]) -> Dict[str, Any]:
     """Load data from a JSON file.
@@ -117,7 +117,11 @@ def load_json(file_path: Union[str, Path]) -> Dict[str, Any]:
         Loaded JSON data
     """
     with open(file_path, 'r') as f:
-        return json.load(f)
+        data = json.load(f)
+        if isinstance(data, dict):
+            return data
+        else:
+            return {"data": data}
 
 def load_yaml(file_path: Union[str, Path]) -> Dict[str, Any]:
     """Load data from a YAML file.
@@ -129,4 +133,8 @@ def load_yaml(file_path: Union[str, Path]) -> Dict[str, Any]:
         Loaded YAML data
     """
     with open(file_path, 'r') as f:
-        return yaml.safe_load(f) 
+        data = yaml.safe_load(f)
+        if isinstance(data, dict):
+            return data
+        else:
+            return {"data": data} 

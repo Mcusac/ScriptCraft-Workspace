@@ -4,8 +4,11 @@ Provides reusable argument groups and parser factories to maintain DRY principle
 """
 
 import argparse
-from typing import Optional, List, Dict, Any
+import sys
+from typing import Optional, List, Dict, Any, Callable
 from pathlib import Path
+
+from ..logging import log_and_print
 
 
 class ArgumentGroups:
@@ -68,6 +71,20 @@ class ArgumentGroups:
         """Add arguments for listing available options."""
         parser.add_argument("--list", action="store_true",
                           help="List available options and exit")
+    
+    @staticmethod
+    def add_tool_io_args(parser: argparse.ArgumentParser) -> None:
+        """Add standard tool input/output arguments."""
+        parser.add_argument("--input-paths", nargs='+', required=True,
+                          help="Input file paths to process.")
+        parser.add_argument("--output-dir", default="output",
+                          help="Output directory (default: output).")
+        parser.add_argument("--domain",
+                          help="Domain name (e.g., Clinical, Biomarkers).")
+        parser.add_argument("--output-filename",
+                          help="Output filename (default: auto-generated).")
+        parser.add_argument("--mode", 
+                          help="Tool mode (e.g., standard, custom).")
 
 
 class ParserFactory:
@@ -87,13 +104,23 @@ class ParserFactory:
         return parser
     
     @staticmethod
-    def create_tool_parser(tool_name: str, description: str = None) -> argparse.ArgumentParser:
+    def create_tool_parser(tool_name: str, description: Optional[str] = None) -> argparse.ArgumentParser:
         """Create a parser for tool operations."""
         desc = description or f"{tool_name} Tool"
         parser = argparse.ArgumentParser(description=f"🛠️ {desc}")
         
         ArgumentGroups.add_common_args(parser)
         ArgumentGroups.add_io_args(parser)
+        
+        return parser
+    
+    @staticmethod
+    def create_standard_tool_parser(tool_name: str, description: Optional[str] = None) -> argparse.ArgumentParser:
+        """Create a standard parser for tools with common I/O patterns."""
+        desc = description or f"{tool_name} Tool"
+        parser = argparse.ArgumentParser(description=f"🛠️ {desc}")
+        
+        ArgumentGroups.add_tool_io_args(parser)
         
         return parser
     
@@ -138,22 +165,67 @@ class ArgumentValidator:
         return path
 
 
+def create_standard_main_function(tool_class: type, tool_name: str, description: str) -> Callable:
+    """
+    Create a standard main function for tools.
+    
+    Args:
+        tool_class: The tool class to instantiate
+        tool_name: Name of the tool for argument parsing
+        description: Description of the tool
+        
+    Returns:
+        A main function that can be used as the entry point
+    """
+    def main() -> None:
+        """Standard main entry point for tools."""
+        try:
+            # Parse arguments
+            parser = ParserFactory.create_standard_tool_parser(tool_name, description)
+            args = parser.parse_args()
+            
+            # Create and run tool
+            tool = tool_class()
+            tool.run(
+                input_paths=args.input_paths,
+                output_dir=args.output_dir,
+                domain=args.domain,
+                output_filename=args.output_filename,
+                mode=args.mode
+            )
+            
+        except KeyboardInterrupt:
+            log_and_print("🛑 Interrupted by user")
+            sys.exit(1)
+        except Exception as e:
+            log_and_print(f"❌ Fatal error: {e}", level="error")
+            sys.exit(1)
+    
+    return main
+
+
 # Convenience functions for common parser patterns
-def parse_pipeline_args(description: str = None) -> argparse.Namespace:
+def parse_pipeline_args(description: Optional[str] = None) -> argparse.Namespace:
     """Parse arguments for pipeline operations."""
-    parser = ParserFactory.create_pipeline_parser(description)
+    parser = ParserFactory.create_pipeline_parser(description or "Pipeline & Tool Controller")
     return parser.parse_args()
 
 
-def parse_tool_args(tool_name: str, description: str = None) -> argparse.Namespace:
+def parse_tool_args(tool_name: str, description: Optional[str] = None) -> argparse.Namespace:
     """Parse arguments for tool operations."""
     parser = ParserFactory.create_tool_parser(tool_name, description)
     return parser.parse_args()
 
 
-def parse_main_args(description: str = None) -> argparse.Namespace:
+def parse_standard_tool_args(tool_name: str, description: Optional[str] = None) -> argparse.Namespace:
+    """Parse arguments for standard tool operations."""
+    parser = ParserFactory.create_standard_tool_parser(tool_name, description)
+    return parser.parse_args()
+
+
+def parse_main_args(description: Optional[str] = None) -> argparse.Namespace:
     """Parse arguments for main application."""
-    parser = ParserFactory.create_main_parser(description)
+    parser = ParserFactory.create_main_parser(description or "Main Application")
     return parser.parse_args()
 
 
@@ -162,7 +234,9 @@ __all__ = [
     'ArgumentGroups',
     'ParserFactory', 
     'ArgumentValidator',
+    'create_standard_main_function',
     'parse_pipeline_args',
     'parse_tool_args',
+    'parse_standard_tool_args',
     'parse_main_args'
 ] 

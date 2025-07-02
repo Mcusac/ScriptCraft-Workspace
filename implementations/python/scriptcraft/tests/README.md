@@ -4,10 +4,32 @@ This directory contains all test suites for the release workspace packages. The 
 
 ---
 
-📅 **Build Date:** [INSERT_DATE_HERE]
+📅 **Build Date:** January 2025
 
 This test framework was last updated on the date above.  
 For reproducibility and support, always refer to this date when sharing logs or output.
+
+## 🚀 Quick Start
+
+### Smoke Test (Fast Verification)
+```bash
+# Quick test to verify all tools can be imported
+python tests/smoke_test.py
+```
+
+### Comprehensive Test Suite
+```bash
+# Run all tests
+python tests/run_comprehensive_tests.py
+
+# Run specific categories
+python tests/run_comprehensive_tests.py --category unit
+python tests/run_comprehensive_tests.py --category tools
+python tests/run_comprehensive_tests.py --category integration
+
+# Verbose output
+python tests/run_comprehensive_tests.py --verbose
+```
 
 ---
 

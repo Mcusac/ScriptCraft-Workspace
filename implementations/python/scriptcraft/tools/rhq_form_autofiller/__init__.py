@@ -1,15 +1,15 @@
 """
-🌐 RHQ Form Autofiller Tool
+🔄 RHQ Form Autofiller Tool
 
-Automates filling of web forms for Residence History Questionnaire (RHQ) data.
-Uses Selenium WebDriver to interact with web interfaces and submit form data.
+Automatically fills RHQ (Research Health Questionnaire) forms with data from Excel files.
+Supports form automation and document generation for research workflows.
 
 Features:
-- 🌐 Web form automation
+- 📄 Document template filling
+- 🏷️ Automatic label generation
+- 📊 Excel data processing
 - 🔄 Batch processing support
-- 🏠 Address data handling
-- 🔐 Authentication support
-- 📊 Excel data integration
+- 📋 Multiple output formats
 
 Author: ScriptCraft Team
 """
@@ -17,13 +17,10 @@ Author: ScriptCraft Team
 from .main import RHQFormAutofiller
 
 # Tool metadata
-__description__ = "🌐 Automates filling of RHQ web forms with data"
-__tags__ = ["automation", "web-forms", "rhq", "selenium", "data-entry"]
-__data_types__ = ["csv", "xlsx", "xls"]
-__domains__ = ["clinical"]
-__complexity__ = "complex"
+__description__ = "🔄 Automatically fills RHQ forms with data from Excel files"
+__tags__ = ["automation", "forms", "documents", "excel", "templates"]
+__data_types__ = ["csv", "xlsx", "docx"]
+__domains__ = ["clinical", "biomarkers", "genomics", "imaging"]
+__complexity__ = "moderate"
 __maturity__ = "stable"
 __distribution__ = "standalone"
-
-# Export the main tool
-__all__ = ['RHQFormAutofiller']

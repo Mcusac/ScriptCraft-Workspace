@@ -5,7 +5,7 @@ This module provides plugin registration and management functionality.
 It consolidates all plugin-related code from the old plugins system.
 """
 
-from typing import Dict, List, Optional, Callable, Any, Type
+from typing import Dict, List, Optional, Callable, Any, Type, Union
 from abc import ABC, abstractmethod
 from functools import wraps
 
@@ -15,9 +15,9 @@ from ..logging import log_and_print
 class PluginBase(ABC):
     """Base class for all plugins."""
     
-    def __init__(self):
-        self.name = self.__class__.__name__
-        self.description = getattr(self, '__doc__', 'No description available')
+    def __init__(self) -> None:
+        self.name: str = self.__class__.__name__
+        self.description: str = getattr(self, '__doc__', 'No description available')
     
     @abstractmethod
     def get_plugin_type(self) -> str:
@@ -32,7 +32,7 @@ class PluginRegistry:
     This is a simplified, focused plugin registry that works with the unified registry.
     """
     
-    def __init__(self):
+    def __init__(self) -> None:
         self._plugins: Dict[str, Dict[str, Type[PluginBase]]] = {}
         self._metadata: Dict[str, Dict[str, Dict[str, Any]]] = {}
     
@@ -63,7 +63,7 @@ class PluginRegistry:
         """Get a registered plugin class."""
         return self._plugins.get(plugin_type, {}).get(name)
     
-    def get_plugin_instance(self, plugin_type: str, name: str, **kwargs) -> Optional[PluginBase]:
+    def get_plugin_instance(self, plugin_type: str, name: str, **kwargs: Any) -> Optional[PluginBase]:
         """Get an instance of a registered plugin."""
         plugin_class = self.get_plugin(plugin_type, name)
         if plugin_class:
@@ -93,21 +93,21 @@ plugin_registry = PluginRegistry()
 
 # ===== CONVENIENCE DECORATORS =====
 
-def register_validator(name: str, **metadata):
+def register_validator(name: str, **metadata: Any) -> Callable[[Type[PluginBase]], Type[PluginBase]]:
     """Decorator for registering validator plugins."""
     def decorator(plugin_class: Type[PluginBase]) -> Type[PluginBase]:
         plugin_registry.register_plugin('validator', name, plugin_class, metadata)
         return plugin_class
     return decorator
 
-def register_tool_plugin(name: str, **metadata):
+def register_tool_plugin(name: str, **metadata: Any) -> Callable[[Type[PluginBase]], Type[PluginBase]]:
     """Decorator for registering tool plugins."""
     def decorator(plugin_class: Type[PluginBase]) -> Type[PluginBase]:
         plugin_registry.register_plugin('tool', name, plugin_class, metadata)
         return plugin_class
     return decorator
 
-def register_pipeline_step(name: str, **metadata):
+def register_pipeline_step(name: str, **metadata: Any) -> Callable[[Type[PluginBase]], Type[PluginBase]]:
     """Decorator for registering pipeline step plugins."""
     def decorator(plugin_class: Type[PluginBase]) -> Type[PluginBase]:
         plugin_registry.register_plugin('pipeline_step', name, plugin_class, metadata)
@@ -120,18 +120,18 @@ def register_pipeline_step(name: str, **metadata):
 class LegacyPluginRegistry:
     """Backward compatibility wrapper for the old validation PluginRegistry."""
     
-    def __init__(self):
+    def __init__(self) -> None:
         self._validators: Dict[str, Type] = {}
     
-    def register(self, type_name: str) -> callable:
-        def decorator(validator_class) -> type:
+    def register(self, type_name: str) -> Callable[[Type], Type]:
+        def decorator(validator_class: Type) -> Type:
             self._validators[type_name] = validator_class
             # Also register with the new plugin registry
             plugin_registry.register_plugin('validator', type_name, validator_class)
             return validator_class
         return decorator
     
-    def get_all_validators(self):
+    def get_all_validators(self) -> Dict[str, Type]:
         return self._validators
 
 
