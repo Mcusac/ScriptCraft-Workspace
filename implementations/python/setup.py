@@ -101,6 +101,6 @@ setup(
         "Topic :: Software Development :: Libraries :: Python Modules",
         "Topic :: Utilities",
     ],
-    keywords="data-processing, quality-control, research, validation, automation, huntington-disease",
+    keywords="data-processing, quality-control, research, validation, automation",
     zip_safe=False,
 ) 
