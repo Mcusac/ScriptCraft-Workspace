@@ -4,6 +4,26 @@ A comprehensive data processing and quality control workspace for research data 
 
 ## 🚀 Quick Start
 
+### For New Users (Quick Setup)
+
+1. **Clone and configure:**
+   ```bash
+   git clone https://github.com/mcusac/ScriptCraft-Workspace.git
+   cd ScriptCraft-Workspace
+   cp config_template.yaml config.yaml
+   ```
+
+2. **Edit `config.yaml`** with your settings (URLs, study name, etc.)
+
+3. **Start using tools:**
+   ```bash
+   # Run individual tools
+   python -m implementations.python.scriptcraft.tools.schema_detector input/*.xlsx
+   
+   # Or use the workspace pipeline system
+   python run_all.py --pipeline test
+   ```
+
 ### Option 1: Install Python Package (Recommended for Developers)
 
 ```bash
@@ -38,7 +58,7 @@ rhq.run(input_paths=["patient_data.xlsx"])
 
 2. **Create your configuration:**
    ```bash
-   cp sample_config.yaml config.yaml
+   cp config_template.yaml config.yaml
    ```
 
 3. **Edit `config.yaml`** with your specific settings:
@@ -193,11 +213,12 @@ pipelines:
 This repository is configured to **exclude all sensitive data**:
 
 - **`domains/`** - All domain data is gitignored
-- **`input/`, `output/`, `logs/`** - Runtime directories are gitignored
+- **`input/`, `output/`, `logs/`** - Runtime directories are gitignored (with `.gitkeep` files to maintain structure)
 - **`config.yaml`** - Your configuration file is gitignored
+- **`config_template.yaml`** - Safe template for public repositories
 - **`distributables/`** - Built packages are gitignored
 
-Only the code structure and templates are tracked in git.
+Only the code structure and templates are tracked in git. The `config_template.yaml` provides a safe starting point for new users.
 
 ## 🛠️ Development
 
@@ -244,8 +265,12 @@ ScriptCraft-Workspace/
 ├── distributables/      # Self-contained tool packages (gitignored)
 ├── templates/           # Development templates
 ├── tools/               # Build and packaging utilities
-├── workspaces/          # Example configurations
+├── domains/             # Domain data directories (gitignored, with .gitkeep)
+├── input/               # Input data directory (gitignored, with .gitkeep)
+├── output/              # Output directory (gitignored, with .gitkeep)
+├── logs/                # Logs directory (gitignored, with .gitkeep)
 ├── config.yaml          # Main configuration (gitignored)
+├── config_template.yaml # Safe configuration template
 └── README.md            # This file
 ```
 
