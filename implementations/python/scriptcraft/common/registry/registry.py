@@ -19,10 +19,13 @@ from typing import Dict, List, Optional, Any, Type, Callable, Union
 from dataclasses import dataclass, field
 from enum import Enum
 from functools import wraps
+import logging
 
 from ..logging import log_and_print
 from ..core.base import BaseTool
+from scriptcraft._version import __version__
 
+logger = logging.getLogger(__name__)
 
 class ToolMaturity(Enum):
     """Tool maturity levels."""
@@ -40,11 +43,21 @@ class DistributionType(Enum):
     HYBRID = "hybrid"
 
 
+class ComponentType(Enum):
+    """Types of components that can be registered."""
+    TOOL = "tool"
+    CHECKER = "checker"
+    VALIDATOR = "validator"
+    TRANSFORMER = "transformer"
+    ENHANCEMENT = "enhancement"
+    PLUGIN = "plugin"
+
+
 @dataclass
 class ToolMetadata:
     """Comprehensive tool metadata."""
     name: str
-    version: str = "1.0.0"
+    version: str = __version__
     description: str = ""
     category: str = "uncategorized"
     tags: List[str] = field(default_factory=list)
@@ -75,9 +88,25 @@ class PluginMetadata:
     name: str
     plugin_type: str
     description: str = ""
-    version: str = "1.0.0"
+    version: str = __version__
     tags: List[str] = field(default_factory=list)
     metadata: Dict[str, Any] = field(default_factory=dict)
+
+
+@dataclass
+class ComponentMetadata:
+    """Metadata for a registered component."""
+    name: str
+    type: ComponentType
+    description: str
+    tags: List[str] = field(default_factory=list)
+    version: str = __version__
+    author: str = "ScriptCraft Team"
+    entry_point: Optional[str] = None
+    config_schema: Optional[Dict] = None
+    dependencies: List[str] = field(default_factory=list)
+    is_experimental: bool = False
+    is_deprecated: bool = False
 
 
 class UnifiedRegistry:
@@ -233,7 +262,7 @@ class UnifiedRegistry:
             # Extract metadata from module attributes
             metadata = ToolMetadata(
                 name=tool_name,
-                version=getattr(module, '__version__', '1.0.0'),
+                version=getattr(module, '__version__', __version__),
                 description=getattr(module, '__description__', f"🔧 {tool_name.replace('_', ' ').title()}"),
                 category=getattr(module, '__category__', 'uncategorized'),
                 tags=getattr(module, '__tags__', []),
@@ -362,7 +391,7 @@ class UnifiedRegistry:
             name=name,
             plugin_type=plugin_type,
             description=metadata.get('description', '') if metadata else '',
-            version=metadata.get('version', '1.0.0') if metadata else '1.0.0',
+            version=metadata.get('version', __version__) if metadata else __version__,
             tags=metadata.get('tags', []) if metadata else [],
             metadata=metadata or {}
         )

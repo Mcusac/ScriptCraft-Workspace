@@ -1,11 +1,14 @@
 """
 Supplement Prepper Enhancement
 
-This enhancement merges and cleans supplement files to prepare them for splitting
-and application to domain dictionaries.
+Prepares data supplements for dictionary enhancement workflows.
 """
+
+from scriptcraft._version import __version__
+
+__description__ = "🔧 Prepare data supplements for dictionary enhancement"
+__tags__ = ["enhancement", "supplement", "preparation", "workflow"]
 
 from .tool import SupplementPrepper, enhancement
 
-__version__ = "1.0.0"
 __all__ = ["SupplementPrepper", "enhancement"]

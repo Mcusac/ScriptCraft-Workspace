@@ -10,7 +10,7 @@ id_columns: ["Med_ID", "Visit_ID"]  # Customize based on your data structure
 
 # === Project Configuration ===
 project_name: "Release Workspace"
-version: "1.0.0"
+version: "1.0.0"  # Update this to match your ScriptCraft version
 
 # === Paths Configuration ===
 paths:

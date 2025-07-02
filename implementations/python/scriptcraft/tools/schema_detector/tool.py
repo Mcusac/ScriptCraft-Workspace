@@ -14,7 +14,7 @@ Features:
 - 📋 Index and constraint recommendations
 
 Author: ScriptCraft Team
-Version: 1.0.0
+Version: {__version__}
 """
 
 import pandas as pd
@@ -32,6 +32,7 @@ import yaml
 from scriptcraft.common.core import BaseTool
 from scriptcraft.common.logging import setup_logger, log_and_print
 from scriptcraft.common.io import ensure_output_dir, get_project_root
+from scriptcraft._version import __version__
 
 
 @dataclass
@@ -714,7 +715,7 @@ class SchemaDetector(BaseTool):
 -- Target Database: {self.config['target_database'].upper()}
 -- Total Tables: {len(schemas)}
 --
--- 🔍 Schema Detection Tool v1.0.0
+-- 🔍 Schema Detection Tool v{__version__}
 -- Generated from dataset analysis with privacy protection
 """)
         
@@ -812,7 +813,7 @@ class SchemaDetector(BaseTool):
 # 📊 Dataset Schema Analysis Report
 
 **Generated**: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}  
-**Tool**: Schema Detection Tool v1.0.0  
+**Tool**: Schema Detection Tool v{__version__}  
 **Database Target**: {self.config['target_database'].upper()}  
 **Tables Analyzed**: {len(schemas)}
 
@@ -888,7 +889,7 @@ class SchemaDetector(BaseTool):
             json_data = {
                 'metadata': {
                     'generated_at': datetime.now().isoformat(),
-                    'tool_version': '1.0.0',
+                    'tool_version': __version__,
                     'target_database': self.config['target_database']
                 },
                 'schemas': [self._schema_to_dict(schema) for schema in schemas]
@@ -903,7 +904,7 @@ class SchemaDetector(BaseTool):
             yaml_data = {
                 'metadata': {
                     'generated_at': datetime.now().isoformat(),
-                    'tool_version': '1.0.0',
+                    'tool_version': __version__,
                     'target_database': self.config['target_database']
                 },
                 'schemas': [self._schema_to_dict(schema) for schema in schemas]

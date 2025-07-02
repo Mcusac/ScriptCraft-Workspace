@@ -13,6 +13,8 @@ from typing import Dict, List, Set, Optional, Any
 from dataclasses import dataclass
 from enum import Enum
 
+from scriptcraft._version import __version__
+
 class ToolMaturity(Enum):
     """Tool maturity levels."""
     EXPERIMENTAL = "experimental"  # New, may change significantly
@@ -68,7 +70,7 @@ def discover_tool_metadata(tool_name: str) -> Optional[ToolMetadata]:
         # Extract metadata from module attributes
         metadata = ToolMetadata(
             name=tool_name,
-            version=getattr(module, '__version__', '1.0.0'),
+            version=getattr(module, '__version__', __version__),
             description=getattr(module, '__description__', f"🔧 {tool_name.replace('_', ' ').title()}"),
             tags=getattr(module, '__tags__', []),
             data_types=getattr(module, '__data_types__', []),

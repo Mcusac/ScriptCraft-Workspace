@@ -1,11 +1,14 @@
 """
 Dictionary Supplementer Enhancement
 
-This enhancement applies domain-specific supplements to cleaned dictionary files,
-enhancing them with additional data and validations.
+Enhances data dictionaries with additional information and validation rules.
 """
+
+from scriptcraft._version import __version__
+
+__description__ = "📝 Enhance data dictionaries with additional information"
+__tags__ = ["enhancement", "dictionary", "supplement", "validation"]
 
 from .tool import DictionarySupplementer, enhancement
 
-__version__ = "1.0.0"
 __all__ = ["DictionarySupplementer", "enhancement"]

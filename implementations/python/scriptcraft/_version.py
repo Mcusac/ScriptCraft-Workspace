@@ -5,13 +5,11 @@ This is the single source of truth for version information.
 All other files should import from here to maintain DRY principles.
 """
 
-__version__ = "1.1.0"
+__version__ = "1.2.3"
 __author__ = "ScriptCraft Team"
 
-# Version components for programmatic access
-VERSION_MAJOR = 1
-VERSION_MINOR = 1
-VERSION_PATCH = 0
+# Parse version components from the version string
+VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH = map(int, __version__.split('.'))
 
 # Version info tuple
 VERSION_INFO = (VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH)
