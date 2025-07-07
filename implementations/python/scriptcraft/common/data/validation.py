@@ -43,7 +43,7 @@ class FlaggedValue:
 class ColumnValidator(PluginBase):
     """Base class for all validator plugins."""
 
-    def __init__(self, outlier_method: Optional[Any] = None):
+    def __init__(self, outlier_method: Optional[Any] = None) -> None:
         super().__init__()
         self.outlier_method = outlier_method
 
@@ -57,22 +57,8 @@ class ColumnValidator(PluginBase):
         pass
 
 
-class PluginRegistry:
-    """Registry for validator plugins."""
-
-    def __init__(self):
-        self._validators: Dict[str, Type[ColumnValidator]] = {}
-
-    def register(self, type_name: str) -> Callable[[Type[ColumnValidator]], Type[ColumnValidator]]:
-        def decorator(validator_class: Type[ColumnValidator]) -> Type[ColumnValidator]:
-            self._validators[type_name] = validator_class
-            # Also register with the unified registry for backward compatibility
-            plugin_registry.register_plugin('validator', type_name, validator_class)
-            return validator_class
-        return decorator
-
-    def get_all_validators(self) -> Dict[str, Type[ColumnValidator]]:
-        return self._validators
+# Use the unified PluginRegistry from registry.plugin_registry
+from ..registry.plugin_registry import PluginRegistry
 
 
 # ==== 🎨 Validation Utilities ====

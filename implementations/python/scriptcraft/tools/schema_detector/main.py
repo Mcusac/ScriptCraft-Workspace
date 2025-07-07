@@ -13,7 +13,7 @@ from scriptcraft.common.logging import setup_logger
 from scriptcraft.common.core.base import BaseTool
 from scriptcraft.common import log_and_print
 from .env import is_development_environment
-from .tool import SchemaDetector
+from .utils import SchemaDetector
 
 
 class SchemaDetectorTool(BaseTool):

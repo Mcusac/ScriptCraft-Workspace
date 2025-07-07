@@ -12,8 +12,7 @@ sys.path.insert(0, str(Path(__file__).parent / "implementations" / "python"))
 from implementations.python.scriptcraft.common.core import Config
 from implementations.python.scriptcraft.common.logging import setup_logger, log_and_print
 from implementations.python.scriptcraft.common.cli import parse_main_args
-from implementations.python.scriptcraft.pipelines.pipeline_steps import PipelineFactory
-from implementations.python.scriptcraft.pipelines.pipeline_utils import list_pipelines, preview_pipeline, run_pipeline
+from implementations.python.scriptcraft.common.pipeline import PipelineFactory, list_pipelines, preview_pipeline, run_pipeline
 
 
 def get_workspace_config(args):

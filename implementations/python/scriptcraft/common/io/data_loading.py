@@ -4,7 +4,7 @@ Data loading operations for various file formats.
 
 import pandas as pd
 from pathlib import Path
-from typing import Optional, Union, List, Dict, Any
+from typing import Optional, Union, List, Dict, Any, Tuple
 import json
 import yaml
 
@@ -53,6 +53,33 @@ def load_datasets_as_dict(
         Path(fp).stem: load_data(fp, encoding, **kwargs)
         for fp in file_paths
     }
+
+def load_datasets(*filenames: str, data_dir: str = ".", **kwargs: Any) -> Tuple[Optional[pd.DataFrame], ...]:
+    """
+    Load multiple datasets from individual filenames.
+    
+    Args:
+        *filenames: Individual filenames to load
+        data_dir: Directory containing the files
+        **kwargs: Additional arguments for load_data
+        
+    Returns:
+        Tuple of loaded DataFrames in the same order as filenames
+    """
+    data_path = Path(data_dir)
+    
+    datasets = []
+    for filename in filenames:
+        file_path = data_path / filename
+        try:
+            df = load_data(file_path, **kwargs)
+            datasets.append(df)
+        except Exception as e:
+            from ..logging import log_and_print
+            log_and_print(f"❌ Error loading {filename}: {e}")
+            datasets.append(None)
+    
+    return tuple(datasets)
 
 def load_dataset_columns(
     file_path: Union[str, Path],

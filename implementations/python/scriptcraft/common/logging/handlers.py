@@ -77,6 +77,6 @@ def setup_secondary_log(
     
     # Add file handler
     from .utils import add_file_handler
-    add_file_handler(secondary_logger.name, log_file, level)
+    add_file_handler(secondary_logger.name, log_file, str(level))
     
     return secondary_logger 

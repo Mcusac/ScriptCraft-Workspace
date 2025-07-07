@@ -4,7 +4,7 @@
 
 # RHQ Form Autofiller 📝
 
-Automatically fill out RHQ (Residential History Questionnaire) web forms using participant data from Excel files. Uses browser automation to fill forms efficiently and accurately.
+Automatically fill RHQ (Research Health Questionnaire) forms using data from various sources. Streamlines form completion and reduces manual errors with comprehensive validation and reporting.
 
 ---
 
@@ -19,28 +19,27 @@ For reproducibility and support, always refer to this date when sharing logs or 
 
 ```
 rhq_form_autofiller_distributable/
-├── input/                  # Place your Excel data files here
-├── output/                # (No output files - forms filled directly on web)
-├── logs/                  # Execution logs
+├── input/                  # Place your data files and form templates here
+├── output/                # Filled forms and reports
+├── logs/                  # Log files from tool execution
 ├── scripts/               # Core implementation (no need to modify)
-├── embed_py311/          # Embedded Python environment
-├── config.bat            # Configuration settings
-└── run.bat              # Start the autofiller
+│   ├── main.py            # Main tool entry point
+│   ├── utils.py           # Tool-specific helper functions
+│   ├── common/            # Shared utilities
+│   └── __init__.py        # Package marker
+├── embed_py311/           # Embedded Python environment
+├── config.bat             # Tool configuration settings
+└── run.bat               # Main execution script
 ```
 
 ---
 
 ## 🚀 Quick Start
 
-1. **Prepare your data**:
-   - Place Excel file with participant data in `input/`
-   - File should contain columns for address information
-   - Use format: `rhq_data.xlsx` or any `.xlsx` file
-2. **Double-click `run.bat`**
-3. **Browser will open automatically**:
-   - Tool will navigate to RHQ website
-   - Forms will be filled automatically
-   - Monitor progress in console window
+1. **Place your data files** in the `input/` folder
+2. **Place your form templates** in the `input/` folder
+3. **Double-click `run.bat`**
+4. **Find your filled forms** in the `output/` folder
 
 ---
 
@@ -48,49 +47,50 @@ rhq_form_autofiller_distributable/
 
 - Windows 10 or later
 - 4GB RAM minimum
-- 200MB free disk space
-- Internet connection required
-- Input data must be:
-  - Excel format (.xlsx)
-  - Contain participant address data
-  - Have proper column headers
-  - Under 100MB
+- 1GB free disk space
+- Input files must be:
+  - Data files: CSV or Excel format (.csv, .xlsx)
+  - Form templates: Word document format (.docx)
+  - Contain required form fields and data
+  - Not password protected
+  - Under 100MB each
 
 ---
 
 ## ⚙️ Configuration
 
-Default settings work for most cases, but you can customize in config.bat:
+Default settings are ready to use, but you can customize in config.bat:
 
-1. **Browser Settings**
-   - Login credentials
-   - Browser timeout
-   - Form wait time
-   - Auto-login behavior
+1. **Input Settings**
+   - File types accepted (CSV, Excel, Word)
+   - Required data fields
+   - Form template settings
 
-2. **Input Settings**
-   - Excel file detection
-   - Column mapping
-   - Data validation
+2. **Output Settings**
+   - Output format and detail level
+   - Output file naming
+   - Output location
 
-3. **Processing Settings**
+3. **Processing Options**
+   - Form filling validation
    - Error handling
-   - Retry attempts
-   - Log detail level
+   - Performance settings
 
 ---
 
 ## 📊 Example Usage
 
-### Basic Form Filling
-1. Copy participant data Excel file to `input/`
-2. Run the autofiller
-3. Watch browser automatically fill forms
+### Basic Use
+1. Copy your data files to `input/`
+2. Copy your form templates to `input/`
+3. Run the tool
+4. Check `output/` for filled forms
 
-### Multiple Participants
-1. Excel file can contain multiple participants
-2. Tool processes each participant sequentially
-3. Monitor progress in console
+### Advanced Use
+- Use strict validation mode
+- Include metadata in forms
+- Process multiple form templates
+- Generate detailed completion reports
 
 ---
 
@@ -98,24 +98,24 @@ Default settings work for most cases, but you can customize in config.bat:
 
 ### Common Issues
 
-1. **"Excel File Not Found"**
-   - Symptom: Can't find input file
-   - Solution: Check input/ folder contains .xlsx file
+1. **"Form Template Not Recognized"**
+   - Symptom: Tool can't read form template
+   - Solution: Check template format and required fields
 
-2. **"Browser Failed to Load"**
-   - Symptom: Browser automation error
-   - Solution: Check internet connection and website availability
+2. **"Data Mapping Failed"**
+   - Symptom: Data mapping to form fields failed
+   - Solution: Check data format and field mapping
 
-3. **"Form Fields Not Found"**
-   - Symptom: Can't locate form elements
-   - Solution: Website may have changed - contact support
+3. **"Form Generation Error"**
+   - Symptom: Filled form generation failed
+   - Solution: Verify template compatibility and output permissions
 
 ### Error Messages
 
-- `[RHQ001]`: Input Excel file missing
-- `[RHQ002]`: Browser automation failed
-- `[RHQ003]`: Form element not found
-- `[RHQ004]`: Network/website error
+- `[RFA001]`: Input file missing or invalid
+- `[RFA002]`: Form template error
+- `[RFA003]`: Data mapping failure
+- `[RFA004]`: Form generation error
 
 ---
 
@@ -130,17 +130,17 @@ Default settings work for most cases, but you can customize in config.bat:
 
 ## 📝 Release Notes
 
-### Current Version (2.0.0)
-- Enhanced browser automation
-- Improved form field detection
-- Better error handling
-- Multi-language form support
+### Current Version (1.1.0)
+- Enhanced form automation
+- Improved field mapping
+- Better validation and verification
+- Faster processing speed
 
 ### Known Issues
-- Requires active internet connection
-- Browser must remain open during processing
-- Some form fields may need manual verification
-- Workaround: Monitor browser during operation
+- Some complex form templates may not be processed properly
+- Very large files (>100MB) may cause memory issues
+- Special characters in form data may cause filling errors
+- Workaround: Use standard form templates when possible
 
 ---
 ```

@@ -2,7 +2,7 @@
 
 import pandas as pd
 
-from ....common import shortcuts as cu
+from ....common import cu
 
 
 def run_mode(input_paths, output_dir, domain=None) -> None:

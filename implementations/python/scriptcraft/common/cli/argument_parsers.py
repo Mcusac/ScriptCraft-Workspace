@@ -85,6 +85,30 @@ class ArgumentGroups:
                           help="Output filename (default: auto-generated).")
         parser.add_argument("--mode", 
                           help="Tool mode (e.g., standard, custom).")
+    
+    @staticmethod
+    def add_dictionary_workflow_args(parser: argparse.ArgumentParser) -> None:
+        """Add dictionary workflow specific arguments."""
+        parser.add_argument("--dictionary-paths", nargs='+', required=True,
+                          help="Dictionary file paths to enhance.")
+        parser.add_argument("--workflow-steps", nargs='+', 
+                          choices=['prepare', 'split', 'enhance'],
+                          default=['prepare', 'split', 'enhance'],
+                          help="Workflow steps to run (default: all steps).")
+        parser.add_argument("--merge-strategy", 
+                          choices=['outer', 'inner', 'left', 'right'],
+                          default='outer',
+                          help="Strategy for merging supplements (default: outer).")
+        parser.add_argument("--enhancement-strategy", 
+                          choices=['append', 'merge', 'replace'],
+                          default='append',
+                          help="Strategy for enhancing dictionaries (default: append).")
+        parser.add_argument("--domain-column", default='domain',
+                          help="Column name containing domain information (default: domain).")
+        parser.add_argument("--clean-data", action='store_true', default=True,
+                          help="Clean data during processing (default: True).")
+        parser.add_argument("--no-clean-data", action='store_false', dest='clean_data',
+                          help="Disable data cleaning during processing.")
 
 
 class ParserFactory:
@@ -121,6 +145,17 @@ class ParserFactory:
         parser = argparse.ArgumentParser(description=f"🛠️ {desc}")
         
         ArgumentGroups.add_tool_io_args(parser)
+        
+        return parser
+    
+    @staticmethod
+    def create_dictionary_workflow_parser(tool_name: str, description: Optional[str] = None) -> argparse.ArgumentParser:
+        """Create a parser for dictionary workflow tools."""
+        desc = description or f"{tool_name} Tool"
+        parser = argparse.ArgumentParser(description=f"📚 {desc}")
+        
+        ArgumentGroups.add_tool_io_args(parser)
+        ArgumentGroups.add_dictionary_workflow_args(parser)
         
         return parser
     
@@ -165,7 +200,7 @@ class ArgumentValidator:
         return path
 
 
-def create_standard_main_function(tool_class: type, tool_name: str, description: str) -> Callable:
+def create_standard_main_function(tool_class: type, tool_name: str, description: str) -> Callable[[], None]:
     """
     Create a standard main function for tools.
     
@@ -223,6 +258,12 @@ def parse_standard_tool_args(tool_name: str, description: Optional[str] = None) 
     return parser.parse_args()
 
 
+def parse_dictionary_workflow_args(tool_name: str, description: Optional[str] = None) -> argparse.Namespace:
+    """Parse arguments for dictionary workflow tool operations."""
+    parser = ParserFactory.create_dictionary_workflow_parser(tool_name, description)
+    return parser.parse_args()
+
+
 def parse_main_args(description: Optional[str] = None) -> argparse.Namespace:
     """Parse arguments for main application."""
     parser = ParserFactory.create_main_parser(description or "Main Application")
@@ -238,5 +279,6 @@ __all__ = [
     'parse_pipeline_args',
     'parse_tool_args',
     'parse_standard_tool_args',
+    'parse_dictionary_workflow_args',
     'parse_main_args'
 ] 

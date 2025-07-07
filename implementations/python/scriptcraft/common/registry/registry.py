@@ -72,14 +72,8 @@ class ToolMetadata:
     
     def __post_init__(self) -> None:
         """Initialize mutable defaults."""
-        if self.tags is None:
-            self.tags = []
-        if self.data_types is None:
-            self.data_types = []
-        if self.domains is None:
-            self.domains = []
-        if self.dependencies is None:
-            self.dependencies = []
+        # All fields are already initialized as lists by default_factory
+        pass
 
 
 @dataclass
@@ -288,23 +282,18 @@ class UnifiedRegistry:
         
         Args:
             tool_name: Name of the tool
-            create_instance: If True, return an instance; if False, return the class
+            create_instance: Whether to create an instance (default: True)
             
         Returns:
-            Tool class or instance if found, None otherwise
+            Tool class or instance, or None if not found
         """
-        # Auto-discover if not done yet
-        if not self._discovered and self._auto_discover:
-            self.discover_tools()
-        
         if tool_name not in self._tools:
             return None
         
         if create_instance:
-            # Return cached instance or create new one
-            if tool_name not in self._tool_instances:
-                self._tool_instances[tool_name] = self._tools[tool_name]()
-            return self._tool_instances[tool_name]
+            # Return the tool class instead of trying to instantiate it
+            # Tools should be instantiated by their own constructors
+            return self._tools[tool_name]
         else:
             return self._tools[tool_name]
     
@@ -346,7 +335,7 @@ class UnifiedRegistry:
         if not self._discovered and self._auto_discover:
             self.discover_tools()
         
-        categories = {}
+        categories: Dict[str, List[str]] = {}
         for tool_name in self._tools:
             metadata = self.get_tool_metadata(tool_name)
             category = metadata.category if metadata else "uncategorized"
@@ -410,6 +399,14 @@ class UnifiedRegistry:
         
         return {pt: list(plugins.keys()) for pt, plugins in self._plugins.items()}
     
+    def get_all_validators(self) -> Dict[str, Type]:
+        """Get all registered validators (backward compatibility)."""
+        return self._plugins.get('validator', {})
+    
+    def get_all_plugins(self) -> Dict[str, Dict[str, Type]]:
+        """Get all registered plugins (backward compatibility)."""
+        return self._plugins
+    
     def run_tool(self, tool_name: str, **kwargs: Any) -> None:
         """
         Run a tool by name.
@@ -466,23 +463,42 @@ unified_registry = UnifiedRegistry()
 
 # ===== CONVENIENCE FUNCTIONS =====
 
-def get_available_tools() -> Dict[str, BaseTool]:
-    """Get all available tools (convenience function)."""
+def get_available_tools() -> Dict[str, Type[BaseTool]]:
+    """Get all available tool classes (convenience function)."""
     # Auto-discover if not done yet
     if not unified_registry._discovered and unified_registry._auto_discover:
         unified_registry.discover_tools()
     
-    return {name: unified_registry.get_tool(name) for name in unified_registry._tools}
+    tools: Dict[str, Type[BaseTool]] = {}
+    for name in unified_registry._tools:
+        tool_class = unified_registry.get_tool(name, create_instance=False)
+        if tool_class is not None and isinstance(tool_class, type) and issubclass(tool_class, BaseTool):
+            tools[name] = tool_class
+    return tools
+
+def get_available_tool_instances() -> Dict[str, BaseTool]:
+    """Get all available tool instances (convenience function)."""
+    # Auto-discover if not done yet
+    if not unified_registry._discovered and unified_registry._auto_discover:
+        unified_registry.discover_tools()
+    
+    tools: Dict[str, BaseTool] = {}
+    for name in unified_registry._tools:
+        tool_class = unified_registry.get_tool(name, create_instance=False)
+        if tool_class is not None and isinstance(tool_class, type) and issubclass(tool_class, BaseTool):
+            try:
+                # Create instance using the tool's own constructor
+                tools[name] = tool_class()
+            except Exception as e:
+                # Log error but continue with other tools
+                print(f"⚠️ Failed to instantiate {name}: {e}")
+    return tools
 
 def list_tools_by_category(category: Optional[str] = None) -> Dict[str, List[str]]:
     """List tools by category (convenience function)."""
     if category:
         return {category: unified_registry.get_tools_by_category().get(category, [])}
     return unified_registry.get_tools_by_category()
-
-def run_tool(tool_name: str, **kwargs: Any) -> None:
-    """Run a tool by name (convenience function)."""
-    unified_registry.run_tool(tool_name, **kwargs)
 
 def discover_tool_metadata(tool_name: str) -> Optional[ToolMetadata]:
     """Discover metadata for a tool (convenience function)."""
@@ -518,52 +534,4 @@ def register_plugin_decorator(plugin_type: str, name: str, **metadata: Any) -> C
     def decorator(plugin_class: Type) -> Type:
         unified_registry.register_plugin(plugin_type, name, plugin_class, metadata)
         return plugin_class
-    return decorator
-
-
-# ===== LEGACY COMPATIBILITY =====
-
-class ToolRegistry:
-    """
-    Legacy compatibility wrapper for ToolRegistry.
-    
-    This maintains backward compatibility with existing code.
-    """
-    
-    def __init__(self) -> None:
-        self._registry = unified_registry
-    
-    def get_tool(self, tool_name: str) -> Optional[BaseTool]:
-        """Get a tool instance by name."""
-        return self._registry.get_tool(tool_name)
-    
-    def list_tools(self) -> Dict[str, str]:
-        """Get a dictionary of available tools."""
-        return self._registry.list_tools()
-    
-    def discover_tools(self) -> Dict[str, Type[BaseTool]]:
-        """Discover available tools."""
-        return self._registry.discover_tools()
-
-
-# Create legacy registry instance for backward compatibility
-legacy_registry = ToolRegistry()
-
-
-__all__ = [
-    # Main registry object and classes
-    'unified_registry', 'UnifiedRegistry',
-    'ToolMetadata', 'PluginMetadata',
-    'ToolMaturity', 'DistributionType',
-
-    # Main registry functions
-    'get_available_tools',
-    'list_tools_by_category',
-    'run_tool',
-    'discover_tool_metadata',
-    'register_tool_decorator',
-    'register_plugin_decorator',
-
-    # Legacy compatibility
-    'ToolRegistry', 'legacy_registry',
-] 
+    return decorator 

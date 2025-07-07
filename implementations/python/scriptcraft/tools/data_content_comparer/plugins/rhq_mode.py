@@ -1,6 +1,6 @@
 # scripts/tools/data_content_diff/plugins/rhq_mode.py
 
-from ....common import shortcuts as cu
+from ....common import cu
 
 import pandas as pd
 

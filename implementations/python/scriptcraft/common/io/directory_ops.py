@@ -53,12 +53,12 @@ def get_qc_output_dir(domain: str) -> Path:
     """
     return Path("qc_output") / domain
 
-def get_output_path(
+def get_file_output_path(
     domain: str,
     filename: str,
     subdir: Optional[str] = None
 ) -> Path:
-    """Get the full output path for a file.
+    """Get the full output path for a file in a specific domain.
     
     Args:
         domain: Domain name

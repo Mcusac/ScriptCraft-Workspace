@@ -68,7 +68,7 @@ setup(
     entry_points={
         "console_scripts": [
             # Main CLI entry point
-            "scriptcraft=scriptcraft.cli:main",
+            "scriptcraft=scriptcraft.common.cli:main",
             
             # Individual tool shortcuts for power users
             "rhq-autofiller=scriptcraft.tools.rhq_form_autofiller:main",

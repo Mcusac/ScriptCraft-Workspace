@@ -1,26 +1,35 @@
 """
-🧮 Score Totals Checker Tool
+📊 Score Totals Checker Tool
 
-Validates calculated score totals against their component values to ensure
-mathematical accuracy and data integrity in scoring systems.
+Validates score calculations and totals in datasets to ensure accuracy.
+Checks for mathematical consistency and identifies calculation errors.
 
 Features:
-- 🧮 Total score validation
-- 📊 Component value checking
-- ⚠️ Discrepancy detection
-- 📋 Accuracy reporting
-- 🔍 Score integrity analysis
+- 📊 Score validation and verification
+- 🔢 Mathematical consistency checking
+- 📋 Calculation error detection
+- 🔍 Total verification
+- 📈 Statistical analysis
+- ⚠️ Error reporting
 
 Author: ScriptCraft Team
 """
 
-from .main import ScoreTotalsChecker
+# === WILDCARD IMPORTS FOR SCALABILITY ===
+from .main import *
+from .utils import *
+
+# === FUTURE API CONTROL (COMMENTED) ===
+# Uncomment and populate when you want to control public API
+# __all__ = [
+#     'ScoreTotalsChecker'
+# ]
 
 # Tool metadata
-__description__ = "🧮 Validates calculated score totals against component values"
-__tags__ = ["validation", "scores", "totals", "calculation", "integrity"]
+__description__ = "📊 Validates score calculations and totals in datasets to ensure accuracy"
+__tags__ = ["scores", "totals", "validation", "calculations", "mathematics"]
 __data_types__ = ["csv", "xlsx", "xls"]
-__domains__ = ["clinical", "biomarkers"]
-__complexity__ = "simple"
+__domains__ = ["clinical", "biomarkers", "genomics", "imaging"]
+__complexity__ = "moderate"
 __maturity__ = "stable"
 __distribution__ = "pipeline"

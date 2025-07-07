@@ -7,7 +7,7 @@ from scriptcraft.common.data.validation import FlaggedValue, ColumnValidator, ge
 from scriptcraft.common.logging import log_and_print
 from scriptcraft.common.io.paths import OutlierMethod
 from . import registry
-from scriptcraft.common import shortcuts as cu
+from scriptcraft.common import cu
 
 # Load configuration
 config = cu.load_config()

@@ -6,7 +6,7 @@ from scriptcraft.common.logging import log_and_print
 from scriptcraft.common.data.cleaning import MISSING_VALUE_STRINGS
 from scriptcraft.common.data.validation import FlaggedValue, ColumnValidator
 from . import registry
-from scriptcraft.common import shortcuts as cu
+from scriptcraft.common import cu
 
 # Load configuration
 config = cu.load_config()

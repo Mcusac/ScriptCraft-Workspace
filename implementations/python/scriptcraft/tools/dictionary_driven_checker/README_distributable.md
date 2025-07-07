@@ -1,6 +1,6 @@
-# Dictionary Driven Checker 📚
+# Dictionary Driven Checker 🔍
 
-Validate your data against a data dictionary to ensure it meets all requirements. Perfect for quality control and data validation workflows.
+Validate your data files against dictionary specifications to ensure data quality and consistency. Uses plugin-based validation rules for numeric, categorical, date, and text data with comprehensive reporting.
 
 ---
 
@@ -16,26 +16,27 @@ For reproducibility and support, always refer to this date when sharing logs or 
 ```
 dictionary_driven_checker_distributable/
 ├── input/                  # Place your data and dictionary files here
-├── output/                # Validation reports
-├── logs/                  # Detailed execution logs
+├── output/                # Validation reports and results
+├── logs/                  # Log files from tool execution
 ├── scripts/               # Core implementation (no need to modify)
-├── embed_py311/          # Embedded Python environment
-├── config.bat            # Configuration settings
-└── run.bat              # Start the checker
+│   ├── main.py            # Main tool entry point
+│   ├── utils.py           # Tool-specific helper functions
+│   ├── plugins/           # Validation plugins
+│   ├── common/            # Shared utilities
+│   └── __init__.py        # Package marker
+├── embed_py311/           # Embedded Python environment
+├── config.bat             # Tool configuration settings
+└── run.bat               # Main execution script
 ```
 
 ---
 
 ## 🚀 Quick Start
 
-1. **Place your files** in the `input/` folder:
-   - Your data file (e.g., `clinical_data.xlsx`)
-   - Dictionary file (e.g., `Clinical_dictionary.csv`)
-2. **Double-click `run.bat`**
-3. **Check results** in the `output/` folder:
-   - `validation_report.xlsx`: Detailed findings
-   - `summary.txt`: Quick overview
-   - `outliers.csv`: Identified outliers
+1. **Place your data file** in the `input/` folder
+2. **Place your dictionary file** in the `input/` folder
+3. **Double-click `run.bat`**
+4. **Find your validation reports** in the `output/` folder
 
 ---
 
@@ -43,55 +44,50 @@ dictionary_driven_checker_distributable/
 
 - Windows 10 or later
 - 4GB RAM minimum
-- 500MB free disk space
-- Files must be:
-  - Data: Excel (.xlsx) or CSV
-  - Dictionary: CSV format
+- 1GB free disk space
+- Input files must be:
+  - CSV or Excel format (.csv, .xlsx)
+  - Data file: Contains the data to validate
+  - Dictionary file: Contains validation rules and specifications
   - Not password protected
-  - Follow naming convention:
-    - Data: any name
-    - Dictionary: `[Domain]_dictionary.csv`
+  - Under 500MB each
 
 ---
 
 ## ⚙️ Configuration
 
-Default settings work for most cases, but you can customize:
+Default settings are ready to use, but you can customize in config.bat:
 
-1. **Validation Rules**
-   - Outlier detection method
-   - Text validation rules
-   - Date format requirements
-   - Custom validation rules
+1. **Input Settings**
+   - File types accepted (CSV, Excel)
+   - Required dictionary columns
+   - Validation plugin settings
 
-2. **Input Settings**
-   - File naming patterns
-   - Required columns
-   - Domain settings
+2. **Output Settings**
+   - Report format and detail level
+   - Output file naming
+   - Output location
 
-3. **Output Settings**
-   - Report format
-   - Error highlighting
-   - Log detail level
+3. **Processing Options**
+   - Validation strictness
+   - Error handling
+   - Performance settings
 
 ---
 
 ## 📊 Example Usage
 
-### Basic Validation
-1. Copy your files to `input/`:
-   - `clinical_data.xlsx`
-   - `Clinical_dictionary.csv`
-2. Run the checker
-3. Review validation report
+### Basic Use
+1. Copy your data file to `input/`
+2. Copy your dictionary file to `input/`
+3. Run the tool
+4. Check `output/` for validation reports
 
-### Advanced Validation
-1. Edit config.bat to set:
-   - Custom validation rules
-   - Domain-specific settings
-   - Output preferences
-2. Run the checker
-3. Check detailed reports
+### Advanced Use
+- Use specific validation plugins
+- Customize validation rules
+- Process multiple data files
+- Generate detailed validation reports
 
 ---
 
@@ -99,24 +95,24 @@ Default settings work for most cases, but you can customize:
 
 ### Common Issues
 
-1. **"Dictionary Not Found"**
-   - Symptom: Can't find dictionary file
-   - Solution: Check file naming (must be `[Domain]_dictionary.csv`)
+1. **"Dictionary Format Not Recognized"**
+   - Symptom: Tool can't read dictionary structure
+   - Solution: Check dictionary column names and format
 
-2. **"Invalid Column"**
-   - Symptom: Column missing from dictionary
-   - Solution: Update dictionary or check column names
+2. **"Validation Plugin Error"**
+   - Symptom: Validation fails or plugin not found
+   - Solution: Check plugin compatibility and dictionary format
 
-3. **"Data Type Error"**
-   - Symptom: Data doesn't match dictionary type
-   - Solution: Check data format matches dictionary
+3. **"Data Validation Failed"**
+   - Symptom: No validation reports created
+   - Solution: Review logs for specific validation errors
 
 ### Error Messages
 
-- `[DD001]`: Missing dictionary file
-- `[DD002]`: Invalid data format
-- `[DD003]`: Column validation error
-- `[DD004]`: Outlier detected
+- `[DDC001]`: Input file missing or invalid
+- `[DDC002]`: Dictionary format error
+- `[DDC003]`: Validation plugin error
+- `[DDC004]`: Data validation failure
 
 ---
 
@@ -131,16 +127,16 @@ Default settings work for most cases, but you can customize:
 
 ## 📝 Release Notes
 
-### Current Version (2.0.0)
-- Added plugin system for custom validation
-- Improved outlier detection
-- Better error reporting
-- Enhanced dictionary support
+### Current Version (1.1.0)
+- Enhanced validation plugins
+- Improved error reporting
+- Better performance for large files
+- More detailed validation reports
 
 ### Known Issues
-- Large files (>1GB) may be slow
-- Some special characters in column names cause issues
-- Maximum 1000 columns per file
-- Workaround: Split large files
+- Some complex validation rules may be slow
+- Very large dictionaries (>500MB) may cause memory issues
+- Special characters in data may cause validation errors
+- Workaround: Use standard data formats when possible
 
 --- 

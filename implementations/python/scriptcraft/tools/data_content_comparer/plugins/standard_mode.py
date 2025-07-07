@@ -1,6 +1,6 @@
 # scripts/tools/data_content_diff/plugins/standard_mode.py
 
-from ....common import shortcuts as cu
+from ....common import cu
 
 
 def run_mode(input_paths, output_dir, domain=None) -> None:

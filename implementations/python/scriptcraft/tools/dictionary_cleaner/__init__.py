@@ -1,27 +1,35 @@
 """
 🧹 Dictionary Cleaner Tool
 
-Cleans and standardizes data dictionary files to ensure consistency and quality.
-Removes inconsistencies, standardizes formats, and validates dictionary structure.
+Cleans and standardizes data dictionaries for consistency and quality.
+Removes duplicates, standardizes formats, and ensures dictionary integrity.
 
 Features:
-- 🧹 Data cleaning and standardization
-- 📋 Format validation
-- 🔍 Inconsistency detection
-- 📊 Quality reporting
-- 🎯 Healthcare dictionary patterns
-- ⚠️ Error identification
+- 🧹 Dictionary cleaning and standardization
+- 🔍 Duplicate removal
+- 📊 Format standardization
+- 📋 Quality improvement
+- 🔄 Consistency enforcement
+- ⚠️ Error reporting
 
 Author: ScriptCraft Team
 """
 
-from .main import DictionaryCleaner
+# === WILDCARD IMPORTS FOR SCALABILITY ===
+from .main import *
+from .utils import *
+
+# === FUTURE API CONTROL (COMMENTED) ===
+# Uncomment and populate when you want to control public API
+# __all__ = [
+#     'DictionaryCleaner'
+# ]
 
 # Tool metadata
-__description__ = "🧹 Cleans and standardizes data dictionary files"
-__tags__ = ["cleaning", "dictionaries", "standardization", "validation", "quality"]
-__data_types__ = ["csv", "xlsx", "xls"]
+__description__ = "🧹 Cleans and standardizes data dictionaries for consistency and quality"
+__tags__ = ["dictionary", "cleaning", "standardization", "quality", "consistency"]
+__data_types__ = ["csv", "xlsx", "xls", "json"]
 __domains__ = ["clinical", "biomarkers", "genomics", "imaging"]
-__complexity__ = "simple"
+__complexity__ = "moderate"
 __maturity__ = "stable"
 __distribution__ = "pipeline"

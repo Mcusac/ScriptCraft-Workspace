@@ -15,7 +15,15 @@ Features:
 Author: ScriptCraft Team
 """
 
-from .main import DataContentComparer
+# === WILDCARD IMPORTS FOR SCALABILITY ===
+from .main import *
+from .utils import *
+
+# === FUTURE API CONTROL (COMMENTED) ===
+# Uncomment and populate when you want to control public API
+# __all__ = [
+#     'DataContentComparer'
+# ]
 
 # Tool metadata
 __description__ = "🔄 Compares content between datasets to identify differences and changes"

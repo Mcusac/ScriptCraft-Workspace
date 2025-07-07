@@ -44,42 +44,29 @@ def qc_log_context(
     operation: Optional[str] = None,
     **context: Any
 ) -> Generator[logging.Logger, None, None]:
-    """Context manager for QC logging operations.
-    
-    Args:
-        log_path: Path to log file or logger to use
-        operation: Name of the operation
-        **context: Additional context information
-    
-    Yields:
-        Logger instance
-    """
-    # Import here to avoid circular imports
+    """Context manager for QC logging operations."""
     from .core import setup_logger
-    
-    # Set up logger for this context
     if isinstance(log_path, (str, Path)):
         logger = setup_logger(log_file=log_path, clear_handlers=False)
     else:
         logger = log_path
-    
     if operation:
         context['operation'] = operation
-    
     start_time = datetime.now()
     if operation:
         logger.info(f"Starting QC operation: {operation}")
-    
+    success = False
     try:
         yield logger
+        success = True
     except Exception as e:
         duration = datetime.now() - start_time
         if operation:
             logger.error(f"QC operation '{operation}' failed after {duration.total_seconds():.2f} seconds: {e}")
         raise
-    else:
-        duration = datetime.now() - start_time
-        if operation:
+    finally:
+        if success and operation:
+            duration = datetime.now() - start_time
             logger.info(f"Completed QC operation '{operation}' in {duration.total_seconds():.2f} seconds")
 
 

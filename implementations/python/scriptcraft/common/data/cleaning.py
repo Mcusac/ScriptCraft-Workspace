@@ -7,7 +7,7 @@ and cleaning brace formatting.
 """
 
 import re
-from typing import Any, Dict
+from typing import Any, Dict, Optional, Union
 import pandas as pd
 from ..logging import log_and_print
 from ..io.paths import MISSING_VALUE_STRINGS
@@ -213,3 +213,99 @@ def get_clean_numeric_series(df: pd.DataFrame, col: str) -> pd.Series:
         )
 
     return cleaned
+
+
+def clean_supplement_data(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Standard supplement data cleaning.
+    
+    Args:
+        df: Input DataFrame
+        
+    Returns:
+        Cleaned DataFrame
+    """
+    # Remove unnamed columns
+    df = df.loc[:, ~df.columns.str.contains("^Unnamed", na=False)]
+    
+    # Remove completely empty columns
+    df = df.dropna(axis=1, how='all')
+    
+    # Fill NaN values with empty string
+    df = df.fillna("")
+    
+    return df
+
+
+def standardize_supplement_columns(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Standardize supplement column names and structure.
+    
+    Args:
+        df: Input DataFrame
+        
+    Returns:
+        DataFrame with standardized columns
+    """
+    # Standard column mappings
+    column_mappings = {
+        'variable': 'Main Variable',
+        'notes': 'Label',
+        'min': 'Min_Value',
+        'max': 'Max_Value'
+    }
+    
+    # Rename columns if they exist
+    for old_col, new_col in column_mappings.items():
+        if old_col in df.columns and new_col not in df.columns:
+            df = df.rename(columns={old_col: new_col})
+    
+    return df
+
+
+def create_standardized_supplement_row(
+    variable: str,
+    label: str = "",
+    min_val: Optional[Union[int, float]] = None,
+    max_val: Optional[Union[int, float]] = None,
+    missing_unit: str = "-9999",
+    quality_level: str = "Supplement",
+    visits: str = "",
+    notes: str = ""
+) -> Dict[str, Any]:
+    """
+    Create a standardized supplement row.
+    
+    Args:
+        variable: Main variable name
+        label: Variable label
+        min_val: Minimum value
+        max_val: Maximum value
+        missing_unit: Missing value/unit of measure
+        quality_level: Level of quality check
+        visits: Visit information
+        notes: Additional notes
+        
+    Returns:
+        Dictionary representing a standardized supplement row
+    """
+    # Determine value field
+    if min_val is not None and max_val is not None:
+        try:
+            min_int = int(float(min_val))
+            max_int = int(float(max_val))
+            value = f"{{{min_int}-{max_int}}}"
+        except (ValueError, TypeError):
+            value = "Numeric"
+    else:
+        value = "Numeric"
+    
+    return {
+        "Main Variable": str(variable).strip(),
+        "Label": str(label).strip(),
+        "Value": value,
+        "Missing/Unit of Measure": str(missing_unit),
+        "Level of quality check": str(quality_level),
+        "Visits": str(visits),
+        "Notes": str(notes)
+    }

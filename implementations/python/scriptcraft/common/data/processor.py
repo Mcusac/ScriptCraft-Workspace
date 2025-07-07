@@ -23,7 +23,7 @@ class DataProcessor:
     - Error handling and logging
     """
     
-    def __init__(self, name: str = "DataProcessor"):
+    def __init__(self, name: str = "DataProcessor") -> None:
         """
         Initialize the data processor.
         

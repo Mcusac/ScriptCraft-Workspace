@@ -65,6 +65,7 @@ Tool Discovery:
     from scriptcraft.tools import get_available_tools, list_tools_by_category
 """
 
+# === WILDCARD IMPORTS FOR SCALABILITY ===
 # Import version info from centralized location
 from ._version import __version__, __author__
 
@@ -79,20 +80,20 @@ from .common import (
 
 # Make tools discoverable
 from . import tools
-from . import enhancements
 from . import pipelines
 
-# === EXPLICIT EXPORTS ===
-__all__ = [
-    # Version info
-    "__version__", "__author__",
-    
-    # Core classes
-    "BaseTool", "Config", "load_config",
-    
-    # Logging
-    "setup_logger", "log_and_print", 
-    
-    # Sub-packages
-    "tools", "enhancements", "pipelines"
-]
+# === FUTURE API CONTROL (COMMENTED) ===
+# Uncomment and populate when you want to control public API
+# __all__ = [
+#     # Version info
+#     "__version__", "__author__",
+#     
+#     # Core classes
+#     "BaseTool", "Config", "load_config",
+#     
+#     # Logging
+#     "setup_logger", "log_and_print", 
+#     
+#     # Sub-packages
+#     "tools", "pipelines"
+# ]

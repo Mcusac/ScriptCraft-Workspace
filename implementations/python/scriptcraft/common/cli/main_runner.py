@@ -59,8 +59,8 @@ class StandardToolRunner(ToolRunner):
     def run_tool(self, args: argparse.Namespace) -> bool:
         """Run the tool with standard BaseTool interface."""
         try:
-            # Create tool instance
-            tool = self.tool_class()
+            # Create tool instance with required arguments
+            tool = self.tool_class(name=self.tool_name, description=self.description)
             
             # Convert args to kwargs for tool.run()
             kwargs: Dict[str, Any] = vars(args)

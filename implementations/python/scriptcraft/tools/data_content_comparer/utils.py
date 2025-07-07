@@ -4,9 +4,18 @@ from pathlib import Path
 import importlib.util
 from typing import List, Union, Optional, Dict, Any
 import pandas as pd
-from ...common import shortcuts as cu
-from scriptcraft.common.io import load_data
-from scriptcraft.common.data import compare_dataframes
+
+# Import based on environment (this will be handled by the main.py file)
+# For now, we'll use the development import pattern
+try:
+    import scriptcraft.common as cu
+    from scriptcraft.common.io import load_data
+    from scriptcraft.common.data import compare_dataframes
+except ImportError:
+    # Fallback for distributable environment
+    import common as cu
+    from common.io import load_data
+    from common.data import compare_dataframes
 
 def load_mode(mode_name: str) -> None:
     """Dynamically load a mode plugin from the plugins/ directory relative to this script."""

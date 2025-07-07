@@ -1,26 +1,34 @@
 """
-🔒 Med/Visit Integrity Validator Tool
+🏥 MedVisit Integrity Validator Tool
 
-Validates the integrity of medical ID and visit ID combinations across datasets.
-Ensures data consistency and identifies potential data integrity issues.
+Validates medical visit data for integrity, consistency, and completeness.
+Ensures visit data quality and compliance with medical standards.
 
 Features:
-- 🔒 ID combination validation
-- 🔍 Duplicate detection
-- 📊 Cross-dataset consistency checking
-- ⚠️ Integrity violation reporting
-- 📋 Data quality metrics
+- 🏥 Medical visit validation
+- 🔍 Data integrity checking
+- 📊 Consistency analysis
+- 📋 Completeness assessment
+- 🔄 Medical standard compliance
+- ⚠️ Error reporting
 
 Author: ScriptCraft Team
 """
 
-from .main import MedVisitIntegrityValidator
+# === WILDCARD IMPORTS FOR SCALABILITY ===
+from .main import *
+
+# === FUTURE API CONTROL (COMMENTED) ===
+# Uncomment and populate when you want to control public API
+# __all__ = [
+#     'MedVisitIntegrityValidator'
+# ]
 
 # Tool metadata
-__description__ = "🔒 Validates Med/Visit ID integrity across datasets"
-__tags__ = ["validation", "integrity", "ids", "quality-control", "consistency"]
+__description__ = "🏥 Validates medical visit data for integrity, consistency, and completeness"
+__tags__ = ["medical", "visits", "validation", "integrity", "compliance"]
 __data_types__ = ["csv", "xlsx", "xls"]
 __domains__ = ["clinical", "biomarkers", "genomics", "imaging"]
-__complexity__ = "simple"
+__complexity__ = "moderate"
 __maturity__ = "stable"
 __distribution__ = "pipeline"

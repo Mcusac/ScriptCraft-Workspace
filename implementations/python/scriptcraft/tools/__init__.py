@@ -27,7 +27,6 @@ Tool Discovery:
 from scriptcraft.common.registry import (
     get_available_tools,
     list_tools_by_category,
-    run_tool,
     discover_tool_metadata,
     registry
 )
@@ -37,65 +36,34 @@ def get_tool_categories() -> list:
     """Get list of available tool categories."""
     return list(registry.get_tools_by_category().keys())
 
+# Convenience function for running tools
+def run_tool(tool_name: str, **kwargs) -> None:
+    """Run a tool by name with the given arguments."""
+    registry.run_tool(tool_name, **kwargs)
 
-# === TOOL IMPORTS ===
-# Import all standardized tools
-try:
-    from .rhq_form_autofiller import RHQFormAutofiller
-except ImportError:
-    RHQFormAutofiller = None
+# === WILDCARD IMPORTS FOR SCALABILITY ===
+from .rhq_form_autofiller import *
+from .data_content_comparer import *
+from .schema_detector import *
+from .dictionary_driven_checker import *
+from .release_consistency_checker import *
+from .score_totals_checker import *
+from .feature_change_checker import *
+from .dictionary_validator import *
+from .medvisit_integrity_validator import *
+from .dictionary_cleaner import *
+from .date_format_standardizer import *
+from .automated_labeler import *
+from .dictionary_workflow import *
 
-try:
-    from .data_content_comparer import DataContentComparer
-except ImportError:
-    DataContentComparer = None
-
-try:
-    from .schema_detector import SchemaDetectorTool as SchemaDetector
-except ImportError:
-    SchemaDetector = None
-
-try:
-    from .dictionary_driven_checker import DictionaryDrivenChecker
-except ImportError:
-    DictionaryDrivenChecker = None
-
-try:
-    from .release_consistency_checker import ReleaseConsistencyChecker
-except ImportError:
-    ReleaseConsistencyChecker = None
-
-try:
-    from .score_totals_checker import ScoreTotalsChecker
-except ImportError:
-    ScoreTotalsChecker = None
-
-try:
-    from .feature_change_checker import FeatureChangeChecker
-except ImportError:
-    FeatureChangeChecker = None
-
-try:
-    from .dictionary_validator import DictionaryValidator
-except ImportError:
-    DictionaryValidator = None
-
-try:
-    from .medvisit_integrity_validator import MedVisitIntegrityValidator
-except ImportError:
-    MedVisitIntegrityValidator = None
-
-try:
-    from .dictionary_cleaner import DictionaryCleaner
-except ImportError:
-    DictionaryCleaner = None
-
-try:
-    from .date_format_standardizer import DateFormatStandardizer
-except ImportError:
-    DateFormatStandardizer = None
-
-try:
-    from .automated_labeler import AutomatedLabeler
-except ImportError:
-    AutomatedLabeler = None
+# === FUTURE API CONTROL (COMMENTED) ===
+# Uncomment and populate when you want to control public API
+# __all__ = [
+#     'RHQFormAutofiller', 'DataContentComparer', 'SchemaDetector',
+#     'DictionaryDrivenChecker', 'ReleaseConsistencyChecker', 'ScoreTotalsChecker',
+#     'FeatureChangeChecker', 'DictionaryValidator', 'MedVisitIntegrityValidator',
+#     'DictionaryCleaner', 'DateFormatStandardizer', 'AutomatedLabeler',
+#     'DictionaryWorkflow',
+#     'get_available_tools', 'list_tools_by_category', 'run_tool', 'discover_tool_metadata',
+#     'get_tool_categories'
+# ]

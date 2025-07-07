@@ -1,26 +1,34 @@
 """
 🏷️ Automated Labeler Tool
 
-Automatically generates labels and documentation for datasets and data dictionaries.
-Provides intelligent labeling based on content analysis and healthcare patterns.
+Automatically generates labels and annotations for datasets.
+Supports various labeling strategies and quality control measures.
 
 Features:
 - 🏷️ Automatic label generation
-- 📋 Documentation creation
-- 🎯 Healthcare-specific patterns
-- 📊 Content analysis
-- 🔍 Pattern recognition
-- 📝 Template-based output
+- 📊 Label quality assessment
+- 📋 Annotation management
+- 🔍 Quality control
+- 🔄 Batch processing
+- ⚠️ Error reporting
 
 Author: ScriptCraft Team
 """
 
-from .main import AutomatedLabeler
+# === WILDCARD IMPORTS FOR SCALABILITY ===
+from .main import *
+from .utils import *
+
+# === FUTURE API CONTROL (COMMENTED) ===
+# Uncomment and populate when you want to control public API
+# __all__ = [
+#     'AutomatedLabeler'
+# ]
 
 # Tool metadata
-__description__ = "🏷️ Automatically generates labels and documentation for datasets"
-__tags__ = ["automation", "labeling", "documentation", "templates", "healthcare"]
-__data_types__ = ["csv", "xlsx", "xls", "docx"]
+__description__ = "🏷️ Automatically generates labels and annotations for datasets"
+__tags__ = ["labeling", "automation", "annotations", "quality", "processing"]
+__data_types__ = ["csv", "xlsx", "xls"]
 __domains__ = ["clinical", "biomarkers", "genomics", "imaging"]
 __complexity__ = "moderate"
 __maturity__ = "stable"

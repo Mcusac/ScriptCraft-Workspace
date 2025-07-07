@@ -34,15 +34,5 @@ from .pipeline import *
 # ===== TOOLS UTILITIES =====
 from .tools import *
 
-# ===== SHORTCUTS =====
-from .shortcuts import *
-
-# ===== BACKWARD COMPATIBILITY =====
-# Legacy imports for migration period
-from .core import BaseTool as BaseComponent
-from .core import BaseTool as BaseProcessor  
-from .core import BaseTool as BasePipelineStep
-from .core import BaseTool as BaseEnhancement
-from .core import BaseTool as DataAnalysisTool
-from .core import BaseTool as DataComparisonTool
-from .core import BaseTool as DataProcessorTool
+# ===== PLUGINS SYSTEM =====
+from .plugins import *

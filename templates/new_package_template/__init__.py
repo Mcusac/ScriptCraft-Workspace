@@ -14,7 +14,15 @@ Features:
 Author: ScriptCraft Team
 """
 
-from .main import ToolName
+# === WILDCARD IMPORTS FOR SCALABILITY ===
+from .main import *
+from .utils import *
+
+# === FUTURE API CONTROL (COMMENTED) ===
+# Uncomment and populate when you want to control public API
+# __all__ = [
+#     'ToolName'
+# ]
 
 # Tool metadata
 __description__ = "🔧 Brief description of the tool's main function"
@@ -24,9 +32,6 @@ __domains__ = ["clinical", "biomarkers", "genomics", "imaging"]  # Applicable do
 __complexity__ = "simple"  # simple | moderate | complex
 __maturity__ = "beta"  # experimental | beta | stable | mature | deprecated
 __distribution__ = "hybrid"  # standalone | pipeline | hybrid
-
-# Export the main tool
-__all__ = ['ToolName']
 
 # Register with the unified plugin system (development and distributable)
 try:

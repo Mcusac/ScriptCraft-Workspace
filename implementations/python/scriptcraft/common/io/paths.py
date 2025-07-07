@@ -77,10 +77,6 @@ def get_config(key: Any = None, default: Any = None) -> Any:
     return _CONFIG.get(key, default)
 
 
-# Alias for backward compatibility
-load_config = get_config
-
-
 def get_project_root() -> Path:
     """
     Get the project root directory.
@@ -133,9 +129,9 @@ def get_domain_paths(project_root: Path) -> Dict[str, Dict[str, Path]]:
     return domain_paths
 
 
-def get_output_path(domain_paths: Dict[str, Path], filename: Optional[str] = None, suffix: Optional[str] = None) -> Path:
+def get_domain_output_path(domain_paths: Dict[str, Path], filename: Optional[str] = None, suffix: Optional[str] = None) -> Path:
     """
-    Get the output path for a domain.
+    Get the output path for a domain using domain path dictionary.
     
     Args:
         domain_paths: Dictionary of domain paths

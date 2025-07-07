@@ -63,7 +63,7 @@ def create_standard_tool(
                         return
                     func(domain, dataset_file, output_path, paths)
         
-        def transform(self, domain: str, input_path: str, output_path: str, paths: Dict[str, Any]) -> None:
+        def transform(self, domain: str, input_path: Union[str, Path], output_path: Union[str, Path], paths: Optional[Dict[str, Any]] = None) -> None:
             """Standard transformation pattern."""
             if tool_type == 'transformation':
                 try:
@@ -117,7 +117,7 @@ def create_runner_function(tool_class: Type[BaseTool], **default_kwargs: Any) ->
         """Standardized tool runner function."""
         try:
             # Create tool instance
-            tool = tool_class()
+            tool = tool_class(name=tool_class.__name__, description=getattr(tool_class, '__doc__', '') or '')
             
             # Merge default kwargs with provided kwargs
             execution_kwargs = {**default_kwargs, **kwargs}

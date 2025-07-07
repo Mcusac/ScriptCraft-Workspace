@@ -112,28 +112,4 @@ def register_pipeline_step(name: str, **metadata: Any) -> Callable[[Type[PluginB
     def decorator(plugin_class: Type[PluginBase]) -> Type[PluginBase]:
         plugin_registry.register_plugin('pipeline_step', name, plugin_class, metadata)
         return plugin_class
-    return decorator
-
-
-# ===== BACKWARD COMPATIBILITY =====
-
-class LegacyPluginRegistry:
-    """Backward compatibility wrapper for the old validation PluginRegistry."""
-    
-    def __init__(self) -> None:
-        self._validators: Dict[str, Type] = {}
-    
-    def register(self, type_name: str) -> Callable[[Type], Type]:
-        def decorator(validator_class: Type) -> Type:
-            self._validators[type_name] = validator_class
-            # Also register with the new plugin registry
-            plugin_registry.register_plugin('validator', type_name, validator_class)
-            return validator_class
-        return decorator
-    
-    def get_all_validators(self) -> Dict[str, Type]:
-        return self._validators
-
-
-# Export for backward compatibility
-PluginRegistry = LegacyPluginRegistry 
+    return decorator 

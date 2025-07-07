@@ -14,7 +14,15 @@ Features:
 Author: ScriptCraft Team
 """
 
-from .main import RHQFormAutofiller
+# === WILDCARD IMPORTS FOR SCALABILITY ===
+from .main import *
+from .utils import *
+
+# === FUTURE API CONTROL (COMMENTED) ===
+# Uncomment and populate when you want to control public API
+# __all__ = [
+#     'RHQFormAutofiller'
+# ]
 
 # Tool metadata
 __description__ = "🔄 Automatically fills RHQ forms with data from Excel files"

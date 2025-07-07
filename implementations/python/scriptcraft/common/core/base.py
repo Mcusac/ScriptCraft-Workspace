@@ -28,7 +28,7 @@ class BaseTool(ABC):
     """
     
     def __init__(self, name: str, description: str, supported_formats: Optional[List[str]] = None,
-                 tool_name: Optional[str] = None, requires_dictionary: bool = False):
+                 tool_name: Optional[str] = None, requires_dictionary: bool = False) -> None:
         """
         Initialize tool.
         
@@ -79,7 +79,11 @@ class BaseTool(ABC):
         if self.config:
             try:
                 template_config = self.config.get_template_config()
-                return template_config.get("package_structure", {}).get("default_output_dir", "output")
+                package_structure = template_config.get("package_structure", {})
+                if isinstance(package_structure, dict):
+                    default_dir = package_structure.get("default_output_dir", "output")
+                    if isinstance(default_dir, str):
+                        return default_dir
             except Exception:
                 pass
         return "output"
@@ -247,7 +251,7 @@ class BaseTool(ABC):
     
     # ===== EXECUTION PATTERNS (DRY) =====
     
-    def run_with_error_handling(self, func: Callable, *args, **kwargs) -> Any:
+    def run_with_error_handling(self, func: Callable, *args: Any, **kwargs: Any) -> Any:
         """Execute a function with standardized logging and error handling."""
         self.log_start()
         try:
@@ -337,7 +341,7 @@ class BaseMainRunner:
             raise ImportError(f"Could not import tool {tool_name}: {e}")
     
     @classmethod
-    def run(cls, tool_name: str, parse_args_func: Optional[Callable] = None) -> None:
+    def run(cls, tool_name: str, parse_args_func: Optional[Callable[[], Any]] = None) -> None:
         """Run a tool by name."""
         cls.setup_environment()
         tool_class = cls.import_tool(tool_name)

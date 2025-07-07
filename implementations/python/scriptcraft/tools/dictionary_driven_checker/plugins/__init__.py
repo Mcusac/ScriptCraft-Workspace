@@ -2,7 +2,14 @@
 
 """Plugin system for dictionary-driven validation."""
 
+# === WILDCARD IMPORTS FOR SCALABILITY ===
 from scriptcraft.common.plugins import registry
+
+# === FUTURE API CONTROL (COMMENTED) ===
+# Uncomment and populate when you want to control public API
+# __all__ = [
+#     'registry', '_load_plugins'
+# ]
 
 # Import plugins after registry is created to avoid circular dependency
 def _load_plugins() -> None:

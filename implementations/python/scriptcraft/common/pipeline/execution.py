@@ -23,7 +23,7 @@ class PipelineExecutor:
     def __init__(self, name: str = "PipelineExecutor") -> None:
         """Initialize the pipeline executor."""
         self.name = name
-        self.step_timings = []
+        self.step_timings: List[tuple] = []
     
     def run_step(
         self,

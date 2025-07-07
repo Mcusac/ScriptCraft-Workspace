@@ -4,7 +4,7 @@ from typing import Dict, List, Any, Optional, Tuple, Set
 import pandas as pd
 import numpy as np
 from pathlib import Path
-from ...common import shortcuts as cu
+from ... import common as cu
 
 
 # Define dataset-specific parameters

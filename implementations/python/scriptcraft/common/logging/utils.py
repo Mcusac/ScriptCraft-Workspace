@@ -12,7 +12,7 @@ import yaml
 from pathlib import Path
 from datetime import datetime
 from contextlib import contextmanager
-from typing import Optional, Union, Dict, Any
+from typing import Optional, Union, Dict, Any, Generator
 import sys
 
 from ..io.paths import LOG_LEVEL
@@ -44,7 +44,7 @@ class LogConfig:
         formatter (logging.Formatter): Current formatter instance.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.use_timestamps = True
         self.log_level = getattr(logging, LOG_LEVEL.upper(), logging.INFO)
         self.verbose_mode = True  # Default to True for better visibility
@@ -131,7 +131,7 @@ class StructuredFormatter(logging.Formatter):
     Adds timestamp and extra data fields to log records when enabled.
     """
 
-    def __init__(self, use_timestamps: bool = True):
+    def __init__(self, use_timestamps: bool = True) -> None:
         super().__init__()
         self.use_timestamps = use_timestamps
 
@@ -377,7 +377,7 @@ def setup_logging_with_config(
 def qc_log_context(
     log_file: Union[str, Path],
     level: str = "INFO"
-) -> None:
+) -> Generator[logging.Logger, None, None]:
     """
     Context manager for QC logging operations.
     

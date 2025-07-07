@@ -2,47 +2,35 @@
 Centralized CLI utilities for consistent command-line interfaces.
 """
 
-import argparse
-from .argument_parsers import (
-    ArgumentGroups,
-    ParserFactory,
-    ArgumentValidator,
-    create_standard_main_function,
-    parse_pipeline_args,
-    parse_tool_args,
-    parse_standard_tool_args,
-    parse_main_args
-)
+# === WILDCARD IMPORTS FOR SCALABILITY ===
+from .argument_parsers import *
+from .main_runner import *
 
-# Convenience function for tools that want to use the new standardized pattern
-def parse_tool_args(description: str) -> argparse.Namespace:
-    """
-    Parse standard tool arguments.
-    
-    This is a convenience function that provides the standard argument parsing
-    pattern used by most tools. It includes:
-    - Input file paths (required)
-    - Output directory (optional, defaults to "output")
-    - Domain specification (optional)
-    - Output filename (optional)
-    - Mode specification (optional)
-    
-    Args:
-        description: Description of the tool for help text
-        
-    Returns:
-        Parsed arguments namespace
-    """
-    return parse_standard_tool_args("tool", description)
+# === FUTURE API CONTROL (COMMENTED) ===
+# Uncomment and populate when you want to control public API
+# __all__ = [
+#     # Argument parsing
+#     'ArgumentGroups', 'ParserFactory', 'ArgumentValidator',
+#     'create_standard_main_function', 'parse_pipeline_args',
+#     'parse_tool_args', 'parse_standard_tool_args',
+#     'parse_dictionary_workflow_args', 'parse_main_args',
+#     # Main runner
+#     'main'
+# ]
 
-# Export all the main functions
-__all__ = [
-    'ArgumentGroups',
-    'ParserFactory', 
-    'ArgumentValidator',
-    'create_standard_main_function',
-    'parse_pipeline_args',
-    'parse_tool_args',
-    'parse_standard_tool_args',
-    'parse_main_args'
-] 
+def main() -> None:
+    """Main entry point for ScriptCraft CLI."""
+    from scriptcraft.common.registry import get_available_tool_instances
+    print("🚀 ScriptCraft CLI")
+    print("Available commands:")
+    print("  scriptcraft --help         Show detailed help")
+    print("  scriptcraft tools          List available tools")
+    print("  scriptcraft run <tool>     Run a specific tool")
+    print("")
+    print("Available tools:")
+    tools = get_available_tool_instances()
+    for tool_name, tool_instance in tools.items():
+        print(f"  - {tool_name}: {getattr(tool_instance, 'description', 'No description')}")
+    print("")
+    print("Or import directly in Python:")
+    print("  from scriptcraft import setup_logger, Config, BaseTool") 

@@ -1,27 +1,34 @@
 """
 📅 Date Format Standardizer Tool
 
-Standardizes date formats across datasets to ensure consistency and compatibility.
-Supports multiple input formats and provides flexible output formatting options.
+Standardizes date formats across datasets for consistency and compatibility.
+Converts various date formats to standardized representations.
 
 Features:
-- 📅 Multi-format date parsing
-- 🔄 Format standardization
-- 📊 Batch processing support
-- ⚠️ Invalid date detection
-- 📋 Format validation
-- 🎯 Healthcare date patterns
+- 📅 Date format standardization
+- 🔄 Format conversion
+- 📊 Consistency enforcement
+- 📋 Validation and verification
+- 🔍 Error detection
+- ⚠️ Format reporting
 
 Author: ScriptCraft Team
 """
 
-from .main import DateFormatStandardizer
+# === WILDCARD IMPORTS FOR SCALABILITY ===
+from .main import *
+
+# === FUTURE API CONTROL (COMMENTED) ===
+# Uncomment and populate when you want to control public API
+# __all__ = [
+#     'DateFormatStandardizer'
+# ]
 
 # Tool metadata
-__description__ = "📅 Standardizes date formats across datasets for consistency"
-__tags__ = ["dates", "formatting", "standardization", "validation", "processing"]
+__description__ = "📅 Standardizes date formats across datasets for consistency and compatibility"
+__tags__ = ["dates", "formatting", "standardization", "conversion", "consistency"]
 __data_types__ = ["csv", "xlsx", "xls"]
 __domains__ = ["clinical", "biomarkers", "genomics", "imaging"]
-__complexity__ = "simple"
+__complexity__ = "moderate"
 __maturity__ = "stable"
 __distribution__ = "pipeline"
