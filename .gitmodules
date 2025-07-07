@@ -1,0 +1,3 @@
+[submodule "implementations/python-package"]
+	path = implementations/python-package
+	url = https://github.com/Mcusac/ScriptCraft-Python
