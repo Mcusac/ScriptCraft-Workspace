@@ -1,0 +1,27 @@
+# Testing dependencies for ScriptCraft
+# Install with: pip install -r tests/requirements-test.txt
+
+# Core testing framework
+pytest>=6.2.5
+pytest-cov>=2.12.1
+pytest-benchmark>=3.4.0
+pytest-mock>=3.6.1
+
+# Code quality and linting
+black>=21.12b0
+flake8>=3.9.0
+mypy>=0.910
+
+# Performance testing
+psutil>=5.8.0
+memory-profiler>=0.60.0
+
+# Test data generation
+faker>=8.12.0
+factory-boy>=3.2.1
+
+# Coverage reporting
+coverage>=5.5.0
+
+# Development tools
+pre-commit>=2.15.0 

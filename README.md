@@ -17,8 +17,11 @@ A comprehensive data processing and quality control workspace for research data 
 
 3. **Start using tools:**
    ```bash
-   # Run individual tools
-   python -m implementations.python.scriptcraft.tools.schema_detector input/*.xlsx
+   # Run data content comparison (all domains)
+   python -m implementations.python-package.scriptcraft.tools.data_content_comparer.main --mode release_consistency
+   
+   # Run individual domain comparison
+   python -m implementations.python-package.scriptcraft.tools.data_content_comparer.main --mode release_consistency --domain Clinical
    
    # Or use the workspace pipeline system
    python run_all.py --pipeline test
@@ -105,9 +108,13 @@ checker.run(input_paths=["data.xlsx"])
 
 **Workspace Mode:**
 ```bash
-# Individual Tools
-python -m implementations.python.scriptcraft.tools.data_content_comparer
-python -m implementations.python.scriptcraft.checkers.dictionary_driven_checker
+# Data Content Comparison (Recommended)
+python -m implementations.python-package.scriptcraft.tools.data_content_comparer.main --mode release_consistency
+python -m implementations.python-package.scriptcraft.tools.data_content_comparer.main --mode release_consistency --domain Clinical
+
+# Other Individual Tools
+python -m implementations.python-package.scriptcraft.tools.rhq_form_autofiller.main
+python -m implementations.python-package.scriptcraft.tools.dictionary_driven_checker.main
 
 # Pipeline Execution  
 python run_all.py --domain Clinical --pipeline data_quality

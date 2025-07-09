@@ -6,13 +6,13 @@ import sys
 import yaml
 from pathlib import Path
 
-# Add implementations/python to Python path for dynamic imports
-sys.path.insert(0, str(Path(__file__).parent / "implementations" / "python"))
+# Add implementations/python-package to Python path for dynamic imports
+sys.path.insert(0, str(Path(__file__).parent / "implementations" / "python-package"))
 
-from implementations.python.scriptcraft.common.core import Config
-from implementations.python.scriptcraft.common.logging import setup_logger, log_and_print
-from implementations.python.scriptcraft.common.cli import parse_main_args
-from implementations.python.scriptcraft.common.pipeline import PipelineFactory, list_pipelines, preview_pipeline, run_pipeline
+from scriptcraft.common.core import Config
+from scriptcraft.common.logging import setup_logger, log_and_print
+from scriptcraft.common.cli import parse_main_args
+from scriptcraft.common.pipeline import PipelineFactory, list_pipelines, preview_pipeline, run_pipeline
 
 
 def get_workspace_config(args):
@@ -153,7 +153,7 @@ def main():
         
         # Import and use tool dispatcher
         try:
-            from implementations.python.scriptcraft.tools.tool_dispatcher import dispatch_tool
+            from scriptcraft.tools.tool_dispatcher import dispatch_tool
             dispatch_tool(args.tool, args)
         except Exception as e:
             logger.error(f"❌ Tool execution failed: {e}")

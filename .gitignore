@@ -2,22 +2,21 @@
 
 # === SENSITIVE DATA AND WORKSPACES ===
 # Exclude all workspace directories (contain user-specific data and configs)
-dev&test/
-!dev&test/.gitkeep
+# Note: data/ directory contains workspace data - exclude sensitive files but keep structure
 
 # Exclude all domain-specific data (contains sensitive research data)
-domains/
-!domains/.gitkeep
+data/domains/
+!data/domains/.gitkeep
 
 # Input/Output directories (may contain sensitive data)
-/input/
-!/input/.gitkeep
-/output/
-!/output/.gitkeep
+data/input/
+!data/input/.gitkeep
+data/output/
+!data/output/.gitkeep
 
 # Logs directory (contains runtime logs with potentially sensitive info)
-/logs/
-!/logs/.gitkeep
+data/logs/
+!data/logs/.gitkeep
 
 # QC output directories within domains (already covered by domains/ but being explicit)
 **/qc_output/
