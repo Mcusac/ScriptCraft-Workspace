@@ -69,7 +69,7 @@ tools:
 paths:
   tools_dir: "implementations\\python\\scriptcraft\\tools"
   common_dir: "implementations\\python\\scriptcraft\\common"
-  templates_dir: "templates\\distributable_template"
+      templates_dir: "templates\\distributable_modern_template"
   embed_builder_path: "tools\\py_embed_setup\\build_embed_python.bat"
 
 # === Pipeline Definitions ===

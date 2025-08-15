@@ -58,7 +58,7 @@ templates/backups/
 
 # Generated batch files and executables
 *.bat
-!packaging.bat
+!packaging_streamlined.bat
 !templates/**/*.bat
 !tools/**/*.bat
 

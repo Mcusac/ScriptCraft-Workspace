@@ -17,7 +17,7 @@ paths:
   scripts_dir: scripts
   common_dir: scripts\common
   tools_dir: scripts\tools
-  templates_dir: "templates/distributable_template"
+      templates_dir: "templates/distributable_modern_template"
 export_dir: distributables
   output_dir: output
   input_dir: input

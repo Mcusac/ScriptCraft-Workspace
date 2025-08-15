@@ -125,6 +125,17 @@ if not "!PACKAGES!"=="" (
 echo 📋 Final installed packages:
 "%PYTHON%" -m pip list
 
+:: ================================
+:: 🧹 Fix distutils-precedence.pth issue
+:: ================================
+echo 🧹 Fixing distutils-precedence.pth issue...
+if exist "%EMBED_DIR%\Lib\site-packages\distutils-precedence.pth" (
+    del "%EMBED_DIR%\Lib\site-packages\distutils-precedence.pth"
+    echo ✅ Removed problematic distutils-precedence.pth file
+) else (
+    echo ℹ️ distutils-precedence.pth not found (already fixed)
+)
+
 popd
 
 echo.
