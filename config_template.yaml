@@ -2,17 +2,17 @@
 # This is a SAFE template for public repositories
 # Copy this to config.yaml and customize with your actual settings
 
-# === Workspace Configuration ===
-active_workspace: "dev&test"
-workspace_base_path: "."
+# === Framework Configuration ===
+framework:
+  version: "2.0.0"
+  active_workspace: "data"
+  workspace_base_path: "."
+  # Available workspaces (for reference)
+  available_workspaces:
+    - "data"
+    # - "future_workspace_1"
+    # - "future_workspace_2"
 
-# Available workspaces (for reference)
-workspaces:
-  - "dev&test"
-  # - "future_workspace_1"
-  # - "future_workspace_2"
-
-# === Packaging Configuration ===
 # Framework-level packaging settings
 packaging:
   tool_to_ship: "rhq_form_autofiller"
@@ -29,6 +29,26 @@ packaging:
     - "*.pyc"
     - "*.pyo"
     - "*.pyd"
+  
+  # Common packages installed in all embedded Python environments
+  common_packages:
+    - "setuptools"
+    - "wheel"
+    - "pandas"
+    - "numpy"
+    - "openpyxl"
+    - "python-docx"
+    - "pyyaml"
+    - "pytz"
+    - "python-dateutil"
+    - "selenium"
+
+  # Framework paths configuration
+  paths:
+    tools_dir: implementations/python-package/scriptcraft/tools
+    common_dir: implementations/python-package/scriptcraft/common
+    templates_dir: templates/distributable_template
+    embed_builder_path: tools/py_embed_setup/build_embed_python.bat
 
 # === Tools for Packaging ===
 # Tool definitions used during packaging process
@@ -36,8 +56,8 @@ tools:
   rhq_form_autofiller:
     description: "🏠 Automatically fills RHQ residential history forms using participant data"
     tool_name: rhq_form_autofiller
-    entry_command: main.py
-    packages: [pyyaml, pandas, python-docx, openpyxl, selenium]
+    entry_command: -m scriptcraft.tools.rhq_form_autofiller.main
+    packages: [pyyaml, pandas, python-docx, openpyxl, selenium, pytz]
     url_template: "https://your-form-server.com/residential-history/{med_id}"  # REPLACE WITH YOUR URL
     auto_login: true
     browser_timeout: 60
@@ -48,20 +68,13 @@ tools:
   data_content_comparer:
     description: "📊 Compares data content between releases to identify changes and differences"
     tool_name: data_content_comparer
-    entry_command: main.py --mode rhq_mode
+    entry_command: -m scriptcraft.tools.data_content_comparer.main
     packages: [pyyaml, pandas, numpy, pytz, python-dateutil, openpyxl]
-
-  release_consistency_checker:
-    description: "🔍 Validates data consistency across different release versions"
-    tool_name: release_consistency_checker
-    entry_command: main.py --input input/R5.csv input/R6.csv
-    entry_command_domain: main.py
-    packages: [pyyaml, pandas, numpy, python-dateutil, openpyxl]
 
   automated_labeler:
     description: "🏷️ Automatically generates labels and documentation from data schemas"
     tool_name: automated_labeler
-    entry_command: main.py
+    entry_command: -m scriptcraft.tools.automated_labeler.main
     packages: [pyyaml, pandas, python-docx, openpyxl]
 
 # === Framework Paths Configuration ===
@@ -69,7 +82,7 @@ tools:
 paths:
   tools_dir: "implementations\\python\\scriptcraft\\tools"
   common_dir: "implementations\\python\\scriptcraft\\common"
-      templates_dir: "templates\\distributable_modern_template"
+  templates_dir: "templates\\distributable_template"
   embed_builder_path: "tools\\py_embed_setup\\build_embed_python.bat"
 
 # === Pipeline Definitions ===
