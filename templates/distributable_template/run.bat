@@ -19,7 +19,11 @@ if not exist "%BASE_DIR%logs" (
 :: 📝 Begin Logging
 :: =======================
 (
-echo 🚀 Running ScriptCraft Tool...
+if defined TOOL_DESCRIPTION (
+    echo 🚀 Running %TOOL_DESCRIPTION%...
+) else (
+    echo 🚀 Running ScriptCraft Tool...
+)
 echo 🔧 Current Directory: %cd%
 echo ====================
 echo 🕒 Run started: %DATE% %TIME%
@@ -37,6 +41,16 @@ if not exist "%PYTHON_PATH%" (
 echo ✅ Python found: %PYTHON_PATH%
 
 :: =======================
+:: 📋 Load configuration from config.bat
+:: =======================
+if exist "%BASE_DIR%config.bat" (
+    call "%BASE_DIR%config.bat"
+    echo ✅ Configuration loaded from config.bat
+) else (
+    echo ⚠️ config.bat not found, using defaults
+)
+
+:: =======================
 :: 📂 Show input folder
 :: =======================
 echo 📂 Input folder contents:
@@ -49,7 +63,11 @@ if exist "%BASE_DIR%input" (
 :: =======================
 :: 🔄 Execute Python script
 :: =======================
-echo 🔄 Executing Python script...
+if defined TOOL_DESCRIPTION (
+    echo 🔄 Executing %TOOL_DESCRIPTION%...
+) else (
+    echo 🔄 Executing Python script...
+)
 echo --------------------------------
 "%PYTHON_PATH%" "%BASE_DIR%run.py" %*
 echo --------------------------------

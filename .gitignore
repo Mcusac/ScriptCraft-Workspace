@@ -17,6 +17,8 @@ data/output/
 # Logs directory (contains runtime logs with potentially sensitive info)
 data/logs/
 !data/logs/.gitkeep
+logs/*
+!logs/.gitkeep
 
 # QC output directories within domains (already covered by domains/ but being explicit)
 **/qc_output/
@@ -52,15 +54,22 @@ tools/py_embed_setup/embed_py311/
 tools/py_embed_setup/embed_py311.zip
 tools/py_embed_setup/build_embed.log
 
+# Template embedded Python (generated during build)
+templates/**/embed_py311/
+
 # Backup files
 tools/backups/
 templates/backups/
 
-# Generated batch files and executables
-*.bat
-!packaging_streamlined.bat
-!templates/**/*.bat
-!tools/**/*.bat
+# Generated and binary files
+*.exe
+
+# Generated config.bat files (auto-generated from config.yaml)
+templates/**/config.bat
+distributables/**/config.bat
+
+# Template run.bat and tools .bat files are source code and should be tracked
+# (no exclusion needed - they're source files)
 
 # === PYTHON-SPECIFIC ===
 # Byte-compiled / optimized / DLL files

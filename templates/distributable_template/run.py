@@ -54,6 +54,22 @@ def main():
     tool_name = args.tool or detect_tool_name()
     print(f"🔧 Running tool: {tool_name}")
     
+    # Auto-discover input files if no arguments provided
+    if not remaining_args:
+        input_dir = current_dir / "input"
+        if input_dir.exists():
+            input_files = list(input_dir.glob("*.xlsx")) + list(input_dir.glob("*.csv"))
+            if input_files:
+                print(f"📂 Auto-discovered {len(input_files)} input files in input/ directory")
+                # Add input files as arguments
+                remaining_args = [str(f) for f in input_files]
+            else:
+                print("⚠️ No .xlsx or .csv files found in input/ directory")
+                print("💡 Place your data files in the input/ folder and run again")
+        else:
+            print("⚠️ No input/ directory found")
+            print("💡 Create an input/ folder and place your data files there")
+    
     # Get module path
     module_path = get_tool_module(tool_name)
     
@@ -69,6 +85,10 @@ def main():
             # Pass remaining arguments to the tool by updating sys.argv
             if remaining_args:
                 sys.argv = [sys.argv[0]] + remaining_args
+            else:
+                # If still no args, provide help info
+                print("💡 Usage: Place your data files in the input/ folder")
+                sys.argv = [sys.argv[0], "--help"]
             tool_main()
         else:
             print(f"ERROR: No main function found in {module_path}")

@@ -133,12 +133,9 @@ if exist "%EXPORT_DIR%\import_embed.bat" del "%EXPORT_DIR%\import_embed.bat" >nu
 echo ✅ Cleaned up unnecessary files
 
 :: ================================
-:: 📋 Generate tool-specific run.bat from config
+:: ✅ Template run.bat is already present and generic
 :: ================================
-echo 📋 Generating tool-specific run.bat from config...
-python "%SCRIPT_DIR%config_processor.py" run_bat "%CONFIG_PATH%" "%EXPORT_DIR%" "%TOOL_NAME%"
-
-echo ✅ Tool-specific run.bat generated
+echo ✅ Using template run.bat (no generation needed - template handles everything)
 
 :: ================================
 :: 📊 Show final structure

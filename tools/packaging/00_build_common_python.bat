@@ -83,6 +83,12 @@ if errorlevel 1 (
 del get-pip.py
 
 :: ================================
+:: 🔧 Enable site packages for pip to work
+:: ================================
+echo 🔧 Enabling site packages in python311._pth...
+powershell -Command "(Get-Content 'python311._pth') -replace '#import site', 'import site' | Set-Content 'python311._pth'"
+
+:: ================================
 :: 📦 Installing setuptools + wheel
 :: ================================
 echo 🔧 Installing setuptools and wheel...
