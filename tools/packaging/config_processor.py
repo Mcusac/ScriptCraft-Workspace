@@ -16,7 +16,7 @@ def load_config(config_path: Path) -> Dict[str, Any]:
         with open(config_path, 'r', encoding='utf-8') as f:
             return yaml.safe_load(f)
     except Exception as e:
-        print(f"❌ Error loading config from {config_path}: {e}")
+        print(f"ERROR: Error loading config from {config_path}: {e}")
         sys.exit(1)
 
 
@@ -57,13 +57,13 @@ set "COMMON_PACKAGES={common_packages_str}"
 set "TOOL_PACKAGES={tool_packages_str}"
 set "URL_TEMPLATE={url_template}"
 
-echo ✅ Configuration loaded successfully
-echo 🎯 Tool to ship: %TOOL_TO_SHIP%
-echo 📝 Description: %TOOL_DESCRIPTION%
-echo 🚀 Entry command: %ENTRY_COMMAND%
-echo 📦 Common packages: %COMMON_PACKAGES%
-echo 📦 Tool packages: %TOOL_PACKAGES%
-echo 🌐 URL template: %URL_TEMPLATE%
+echo SUCCESS: Configuration loaded successfully
+echo Tool to ship: %TOOL_TO_SHIP%
+echo Description: %TOOL_DESCRIPTION%
+echo Entry command: %ENTRY_COMMAND%
+echo Common packages: %COMMON_PACKAGES%
+echo Tool packages: %TOOL_PACKAGES%
+echo URL template: %URL_TEMPLATE%
 '''
     
     return config_bat_content
@@ -83,7 +83,7 @@ def main():
     config_path = Path(sys.argv[2])
     
     if action != "config_bat":
-        print(f"❌ Unsupported action: {action}")
+        print(f"ERROR: Unsupported action: {action}")
         print("Only 'config_bat' is supported - templates handle run.bat automatically")
         sys.exit(1)
     
@@ -101,8 +101,8 @@ def main():
         f.write(config_bat_content)
     
     tool_to_ship = config.get('packaging', {}).get('tool_to_ship', '')
-    print(f"✅ config.bat generated successfully for tool: {tool_to_ship}")
-    print(f"📁 Location: {output_path}")
+    print(f"SUCCESS: config.bat generated successfully for tool: {tool_to_ship}")
+    print(f"Location: {output_path}")
 
 
 if __name__ == "__main__":

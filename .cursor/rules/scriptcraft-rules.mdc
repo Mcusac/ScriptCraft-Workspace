@@ -1,0 +1,106 @@
+---
+description: Repo-specific standards for ScriptCraft Workspace (layout, data paths, imports, packaging). Global/account rules cover communication, KISS/DRY, formatting, and execution etiquette.
+alwaysApply: true
+---
+
+
+# Cursor Rules for ScriptCraft Workspace
+
+## Purpose
+Concise, DRY rules for how we build, run, and scale ScriptCraft. These rules guide Chat and Inline Edit. See Cursor Rules docs for mechanics and best practices: [Cursor Rules](https://docs.cursor.com/en/context/rules).
+
+## Scope
+This rule focuses on repository specifics: directory layout, centralized data paths, imports/APIs, configuration, logging locations, CLI/pipeline usage, packaging/release flow, and repo-specific anti-patterns. Global rules already set communication style, KISS/DRY/modularity/scalability, formatting, and command execution conventions.
+
+## Canonical Project Layout
+```
+ScriptCraft-Workspace/
+├── data/                     # Centralized data (single source of truth)
+│   ├── input/
+│   ├── output/
+│   ├── logs/
+│   └── domains/
+│       ├── Clinical/
+│       │   ├── raw_data/ processed_data/ merged_data/ old_data/
+│       │   ├── dictionary/ qc_output/ qc_logs/
+│       └── ...
+├── implementations/
+│   └── python-package/
+│       └── scriptcraft/     # Python package (published to PyPI)
+├── templates/
+│   └── workspace/           # Workspace scaffolding (e.g., config templates)
+├── tools/packaging/         # Legacy/air‑gapped packaging helpers (optional)
+├── config.yaml              # Workspace config (optional; env fallback supported)
+└── README.md
+```
+
+## Imports and APIs
+- Internal tools and scripts: `import scriptcraft.common as cu` (pandas‑style access).
+- Public/package APIs: use explicit imports/exports to keep interfaces stable.
+- Prefer relative imports within package modules; avoid circular imports.
+
+## Centralized Data Access
+- All processing reads/writes under `data/` only. No tool‑local data folders.
+- Use the path resolver from `scriptcraft.common.io.path_resolver`.
+  - Set `workspace_root=Path("data")` so `input/`, `output/`, `logs/`, and `domains/` resolve under `data/`.
+  - Example: `create_path_resolver(workspace_root=Path("data")).get_domain_paths("Clinical")`.
+- Do not hardcode paths; derive from resolver + `config.yaml`.
+
+## Configuration
+- Primary: `scriptcraft.common.core.config.Config`.
+- Load from `config.yaml` at workspace root when present; otherwise environment variables are supported for distributables.
+- Keep configuration descriptive and grouped; avoid tool‑specific config files.
+
+## Logging
+- Use `cu.log_and_print()` for user‑visible messages.
+- Use `scriptcraft.common.logging.core.setup_logger()` to initialize loggers.
+- Write logs under `data/logs/`; rotate with timestamps when appropriate.
+
+## CLI and Pipelines
+- Use the centralized CLI in `scriptcraft.common.cli` and the pipeline utilities in `scriptcraft.common.pipeline`.
+- Keep command names short and consistent; prefer console scripts defined in `pyproject.toml`.
+
+## Packaging and Distribution
+- Primary distribution is PyPI for the `scriptcraft-python` package.
+  - Console entry points provided: `scriptcraft`, `rhq-autofiller`, `data-comparer`, `auto-labeler`.
+  - Version source of truth: `scriptcraft/_version.py` (dynamic in `pyproject.toml`).
+- Use the release tooling under `scriptcraft.tools.release_manager` to bump versions, build, and publish.
+- Legacy/air‑gapped: `tools/packaging` and the distributable template remain available but are not the default path.
+- **Debug packaging issues**: Use environment overrides (`SC_EMBED_ROOT`), comprehensive logging to `data/logs/`, and robust path validation before operations.
+
+## Project Conventions
+- Keep package modules cohesive; avoid deep nesting; prefer early returns.
+- Public/package APIs should be explicitly typed and stable.
+
+## Testing and Quality
+- Validate imports, configuration loading, and path resolution before shipping.
+- Test with sample data under `data/` and ensure clean logs.
+
+## Anti‑Patterns (Avoid)
+- Hardcoded paths or tool‑specific data directories.
+- Duplicate argument parsers, logging, or config loaders.
+- Wildcard imports in public APIs (ok internally via `scriptcraft.common`).
+- Printing directly instead of using logging utilities.
+- Complex embedded PowerShell commands in batch files (use simple calls + batch error handling).
+- Silent path validation failures (always validate critical paths before use).
+
+## Quick Usage Snippets
+```python
+import scriptcraft.common as cu
+from pathlib import Path
+from scriptcraft.common.io.path_resolver import create_path_resolver
+
+logger = cu.setup_logger("my_tool")
+resolver = create_path_resolver(workspace_root=Path("data"))
+paths = resolver.get_domain_paths("Clinical")
+
+cu.log_and_print("🚀 Starting…")
+# read = cu.load_data(...)
+cu.log_and_print("✅ Done")
+```
+
+## Notes for Cursor Rules
+- Keep this file concise and DRY; prefer general, reusable guidance over tool‑specific rules.
+- Consider modular project rules under `.cursor/rules/` if this grows; see the Cursor Rules docs for rule types and scoping: [Cursor Rules](https://docs.cursor.com/en/context/rules).
+
+Remember: prioritize reuse (`scriptcraft.common`), centralized data under `data/`, and simple, scalable patterns.

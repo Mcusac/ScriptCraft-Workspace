@@ -48,7 +48,7 @@ packaging:
     tools_dir: implementations/python-package/scriptcraft/tools
     common_dir: implementations/python-package/scriptcraft/common
     templates_dir: templates/distributable_template
-    embed_builder_path: tools/py_embed_setup/build_embed_python.bat
+    embed_builder_path: py_embed_setup/build_embed_python.bat
 
 # === Tools for Packaging ===
 # Tool definitions used during packaging process
@@ -83,7 +83,7 @@ paths:
   tools_dir: "implementations\\python\\scriptcraft\\tools"
   common_dir: "implementations\\python\\scriptcraft\\common"
   templates_dir: "templates\\distributable_template"
-  embed_builder_path: "tools\\py_embed_setup\\build_embed_python.bat"
+  embed_builder_path: "py_embed_setup\\build_embed_python.bat"
 
 # === Pipeline Definitions ===
 # Pipelines for orchestrating multiple tools in sequence

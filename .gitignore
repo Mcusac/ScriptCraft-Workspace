@@ -50,9 +50,9 @@ shippables/
 !shippables/.gitkeep
 
 # Embedded Python build artifacts
-tools/py_embed_setup/embed_py311/
-tools/py_embed_setup/embed_py311.zip
-tools/py_embed_setup/build_embed.log
+py_embed_setup/embed_py311/
+py_embed_setup/embed_py311.zip
+py_embed_setup/build_embed.log
 
 # Template embedded Python (generated during build)
 templates/**/embed_py311/

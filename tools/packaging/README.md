@@ -22,8 +22,10 @@ tools/packaging/
 ├── 01_build_python.bat          # Component 1: Check Python environment
 ├── 02_setup_template.bat        # Component 2: Setup distributable template
 ├── 03_test_distributable.bat    # Component 3: Test the distributable
-├── logs/                        # Individual component logs
-└── temp/                        # Temporary build files
+└── config_processor.py          # Configuration processor utility
+
+data/
+└── logs/                        # Centralized logs folder (all component logs here)
 ```
 
 ## 🔧 Components
@@ -127,26 +129,24 @@ Tool-specific packages are defined in `config.yaml` under each tool's configurat
 ## 🐛 Troubleshooting
 
 ### Component 0 Fails
-- Check that `embed_py311.zip` exists in `tools/py_embed_setup/`
+- Check that `embed_py311.zip` exists in `py_embed_setup/` (at workspace root)
 - Verify internet connection for pip downloads
-- Check log: `tools/packaging/logs/00_build_common_python.txt`
-
-
+- Check log: `data/logs/00_build_common_python.txt`
 
 ### Component 1 Fails
 - Ensure Component 0 completed successfully
 - Check that common Python exists in template
-- Check log: `tools/packaging/logs/01_build_python.txt`
+- Check log: `data/logs/01_build_python.txt`
 
 ### Component 2 Fails
 - Ensure Component 1 completed successfully
 - Check that distributable template exists
-- Check log: `tools/packaging/logs/02_setup_template.txt`
+- Check log: `data/logs/02_setup_template.txt`
 
 ### Component 3 Fails
 - Ensure Components 1 and 2 completed successfully
 - Check that ScriptCraft package is properly installed
-- Check log: `tools/packaging/logs/03_test_distributable.txt`
+- Check log: `data/logs/03_test_distributable.txt`
 
 ## 📊 Benefits
 
@@ -161,13 +161,13 @@ Tool-specific packages are defined in `config.yaml` under each tool's configurat
 ### First Time Setup:
 1. **Set tool in config.yaml**
 2. **Run `package_all.bat`** (builds common Python + packages tool)
-3. **Check logs if any component fails**
+3. **Check logs in `data/logs/` if any component fails**
 4. **Distribute the created package**
 
 ### Subsequent Packaging:
 1. **Set tool in config.yaml**
 2. **Run `package_quick.bat`** (uses existing common Python - much faster!)
-3. **Check logs if any component fails**
+3. **Check logs in `data/logs/` if any component fails**
 4. **Distribute the created package**
 
 ### When to Use Each:
