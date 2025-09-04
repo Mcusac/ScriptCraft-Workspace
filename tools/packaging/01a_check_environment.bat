@@ -44,9 +44,9 @@ echo ===============================
 
 echo [DEBUG] About to check if template directory exists...
 echo [DEBUG] Starting template directory check...
-echo [DEBUG] About to test if statement...
-if exist "C:\Users\mdc0431\OneDrive - UNT System\Documents\Projects\ScriptCraft-Workspace\templates\distributable_template\embed_py311" echo [DEBUG] Template directory exists
-if not exist "C:\Users\mdc0431\OneDrive - UNT System\Documents\Projects\ScriptCraft-Workspace\templates\distributable_template\embed_py311" (
+echo [DEBUG] TEMPLATE_EMBED_DIR: %TEMPLATE_EMBED_DIR%
+if exist "%TEMPLATE_EMBED_DIR%" echo [DEBUG] Template directory exists
+if not exist "%TEMPLATE_EMBED_DIR%" (
 echo [DEBUG] Template directory does not exist
 echo ERROR: Common embedded Python not found
 exit /b 1
@@ -54,8 +54,8 @@ exit /b 1
 echo [DEBUG] Template directory check passed
 
 echo [DEBUG] About to check if python.exe exists...
-if exist "C:\Users\mdc0431\OneDrive - UNT System\Documents\Projects\ScriptCraft-Workspace\templates\distributable_template\embed_py311\python.exe" echo [DEBUG] Python executable exists
-if not exist "C:\Users\mdc0431\OneDrive - UNT System\Documents\Projects\ScriptCraft-Workspace\templates\distributable_template\embed_py311\python.exe" (
+if exist "%PYTHON%" echo [DEBUG] Python executable exists
+if not exist "%PYTHON%" (
 echo [DEBUG] Python executable does not exist
 echo ERROR: python.exe not found
 exit /b 1

@@ -6,12 +6,12 @@ setlocal EnableDelayedExpansion
 :: ================================
 set "SCRIPT_DIR=%~dp0"
 set "ROOT_DIR=%SCRIPT_DIR%..\.."
-set "LOG_FILE=%ROOT_DIR%\logs\01_build_python.txt"
+set "LOG_FILE=%ROOT_DIR%\data\logs\01_build_python.txt"
 
 :: ================================
 :: 📁 Ensure centralized logs folder
 :: ================================
-if not exist "%ROOT_DIR%\logs" mkdir "%ROOT_DIR%\logs"
+if not exist "%ROOT_DIR%\data\logs" mkdir "%ROOT_DIR%\data\logs"
 
 :: ================================
 :: 📝 Begin logging

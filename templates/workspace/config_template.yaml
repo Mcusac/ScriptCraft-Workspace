@@ -80,7 +80,7 @@ exclude_patterns:
   - "*.pyc"
   - "*.pyo"
   - "*.pyd"
-embed_builder_path: tools\py_embed_setup\build_embed_python.bat
+embed_builder_path: py_embed_setup\build_embed_python.bat
 open_log_after: true
 open_folder_after: false
 need_urls: true

@@ -1,0 +1,59 @@
+🚀 Running ScriptCraft Tool...
+🔧 Current Directory: C:\Users\mdc0431\OneDrive - UNT System\Documents\Projects\ScriptCraft-Workspace
+====================
+🕒 Run started: Fri 08/22/2025 10:04:16.02
+====================
+The system cannot find the drive specified.
+✅ Python found: C:\Users\mdc0431\OneDrive - UNT System\Documents\Projects\ScriptCraft-Workspace\templates\distributable_template\embed_py311\python.exe
+The system cannot find the drive specified.
+SUCCESS: Configuration loaded successfully
+Tool to ship: rhq_form_autofiller
+Description: 🏠 Automatically fills RHQ residential history forms using participant data
+Entry command: -m scriptcraft.tools.rhq_form_autofiller.main
+Common packages: setuptools wheel pandas numpy openpyxl python-docx pyyaml pytz python-dateutil selenium
+Tool packages: pyyaml pandas python-docx openpyxl selenium pytz
+URL template: https://iappsecqa.hosts.hsc.unt.edu/itredc/residential-history/{med_id}
+✅ Configuration loaded from config.bat
+The system cannot find the drive specified.
+📂 Input folder contents:
+ Volume in drive C is OS
+ Volume Serial Number is 9CAF-F877
+
+ Directory of C:\Users\mdc0431\OneDrive - UNT System\Documents\Projects\ScriptCraft-Workspace\templates\distributable_template\input
+
+08/22/2025  10:03 AM    <DIR>          .
+08/22/2025  09:55 AM    <DIR>          ..
+05/21/2025  03:50 PM                 0 .keep
+07/23/2025  02:27 PM            16,775 rhq_data.xlsx
+               2 File(s)         16,775 bytes
+               2 Dir(s)  255,525,687,296 bytes free
+The system cannot find the drive specified.
+🔄 Executing ...
+--------------------------------
+🔧 Running tool: rhq_form_autofiller
+📂 Auto-discovered 1 input files in input/ directory
+🛠️ Development environment detected
+🚀 Starting rhq_form_autofiller...
+✅ Configuration loaded from environment for tool: rhq_form_autofiller
+📝 📋 Configuration loaded from environment variables (distributable mode)
+🚀 Starting RHQ Form Autofiller...
+2025-08-22 10:04:17,696 - RHQ Form Autofiller - INFO - 🚀 Logger 'RHQ Form Autofiller' initialized with level INFO
+2025-08-22 10:04:17,696 - RHQ Form Autofiller - INFO - 📝 Log file: logs\rhq_form_autofiller.log
+Traceback (most recent call last):
+  File "C:\Users\mdc0431\OneDrive - UNT System\Documents\Projects\ScriptCraft-Workspace\templates\distributable_template\run.py", line 107, in <module>
+    main()
+  File "C:\Users\mdc0431\OneDrive - UNT System\Documents\Projects\ScriptCraft-Workspace\templates\distributable_template\run.py", line 92, in main
+    tool_main()
+  File "C:\Users\mdc0431\OneDrive - UNT System\Documents\Projects\ScriptCraft-Workspace\templates\distributable_template\embed_py311\Lib\site-packages\scriptcraft\tools\rhq_form_autofiller\main.py", line 403, in main
+    tool.run(
+  File "C:\Users\mdc0431\OneDrive - UNT System\Documents\Projects\ScriptCraft-Workspace\templates\distributable_template\embed_py311\Lib\site-packages\scriptcraft\tools\rhq_form_autofiller\main.py", line 125, in run
+    self._process_forms(data)
+  File "C:\Users\mdc0431\OneDrive - UNT System\Documents\Projects\ScriptCraft-Workspace\templates\distributable_template\embed_py311\Lib\site-packages\scriptcraft\tools\rhq_form_autofiller\main.py", line 178, in _process_forms
+    self._handle_login(data)
+  File "C:\Users\mdc0431\OneDrive - UNT System\Documents\Projects\ScriptCraft-Workspace\templates\distributable_template\embed_py311\Lib\site-packages\scriptcraft\tools\rhq_form_autofiller\main.py", line 199, in _handle_login
+    time.sleep(self.form_wait_time)  # Wait for page to load
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+KeyboardInterrupt
+^C--------------------------------
+
+✅ Process complete. Log saved to logs\run_log.txt

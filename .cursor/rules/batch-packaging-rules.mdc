@@ -1,0 +1,333 @@
+---
+alwaysApply: true
+---
+# ScriptCraft Packaging System Debug Rules
+
+## Purpose
+Rules learned from debugging the packaging system after the `py_embed_setup/` folder move. These rules prevent similar path resolution and batch scripting issues in the future.
+
+## Path Resolution Issues & Solutions
+
+### ✅ What We Did Right
+1. **Centralized path override system**: Added `SC_EMBED_ROOT` environment variable override
+2. **Comprehensive debug logging**: Added verbose path tracing to identify exact failure points  
+3. **Systematic debugging**: Used parallel tool calls to gather context efficiently
+4. **Root cause analysis**: Traced the actual technical issue rather than symptom-chasing
+
+### ❌ What Went Wrong
+1. **Insufficient initial path validation**: The original scripts didn't validate path existence robustly
+2. **Hidden PowerShell command failures**: Complex embedded commands made debugging difficult  
+3. **Batch syntax fragility**: `exit /b 1` inside `if...else` blocks caused parsing errors
+4. **Path resolution timing**: Used `Resolve-Path` on non-existent directories before creation
+
+## Technical Lessons Learned
+
+### Batch File Complexity - Keep It Simple!
+**CRITICAL LESSON**: Batch files break easily with complex syntax. Always choose the simplest approach.
+
+### Batch File Path Handling
+```batch
+# ❌ WRONG: Fragile with spaces and timing issues
+if not exist "%EMBED_ZIP%" (
+    echo Error
+    exit /b 1
+) else (
+    echo Success  # This breaks!
+)
+
+# ✅ CORRECT: Robust and simple
+if not exist "%EMBED_ZIP%" (
+    echo Error
+    exit /b 1
+)
+echo Success
+```
+
+### Complex Parentheses Blocks - AVOID!
+```batch
+# ❌ WRONG: Complex logging blocks cause mysterious failures
+(
+echo Starting process...
+for %%p in (!PACKAGES!) do (
+    echo Installing %%p
+    python -m pip install %%p
+)
+echo Done
+) > "%LOG_FILE%" 2>&1
+
+# ✅ CORRECT: Simple, reliable logging per command
+echo Starting process... > "%LOG_FILE%"
+echo Installing package1... >> "%LOG_FILE%"
+python -m pip install package1 >> "%LOG_FILE%" 2>&1
+echo Installing package2... >> "%LOG_FILE%"
+python -m pip install package2 >> "%LOG_FILE%" 2>&1
+echo Done >> "%LOG_FILE%"
+```
+
+### Variable Expansion in Loops - Very Fragile
+```batch
+# ❌ WRONG: Complex loop expansion often fails
+set "PACKAGES=pandas numpy openpyxl"
+for %%p in (!PACKAGES!) do (
+    echo Installing %%p
+    if errorlevel 1 exit /b 1
+)
+
+# ✅ CORRECT: Explicit, simple commands
+echo Installing pandas...
+python -m pip install pandas
+if errorlevel 1 exit /b 1
+
+echo Installing numpy...
+python -m pip install numpy
+if errorlevel 1 exit /b 1
+```
+
+### PowerShell Integration
+```batch
+# ❌ WRONG: Complex embedded error handling
+powershell -Command "try { Expand-Archive } catch { exit 1 }"
+
+# ✅ CORRECT: Simple command, batch error handling
+powershell -Command "Expand-Archive -LiteralPath '%ZIP%' -DestinationPath '%DIR%' -Force"
+if errorlevel 1 (
+    echo ERROR: Extraction failed
+    exit /b 1
+)
+```
+
+### File Existence Checking
+```batch
+# ❌ WRONG: Can fail with complex paths
+if not exist "%FILE%" echo Missing
+
+# ✅ CORRECT: More robust with dir command
+dir "%FILE%" >nul 2>&1 && (
+    echo Found
+) || (
+    echo Missing
+    exit /b 1
+)
+```
+
+## Debug Strategy Rules
+
+### 1. Add Debug Early and Verbose
+- Add comprehensive debug output BEFORE making changes
+- Print all critical variables: paths, environment overrides, working directory
+- Use `dir` commands to verify path existence and contents
+- Log command execution and error levels immediately
+
+### 2. Test Path Resolution Incrementally  
+```batch
+echo [DEBUG] ROOT_DIR: %ROOT_DIR%
+echo [DEBUG] EMBED_ROOT_REL: %EMBED_ROOT_REL%  
+echo [DEBUG] EMBED_ROOT: %EMBED_ROOT%
+if exist "%EMBED_ROOT%" (
+    echo [DEBUG] EMBED_ROOT exists
+    dir "%EMBED_ROOT%"
+) else (
+    echo [DEBUG] EMBED_ROOT MISSING
+)
+```
+
+### 3. Simplify Complex Commands During Debug
+- Break complex PowerShell commands into simple calls
+- Use batch-level error handling instead of embedded try/catch
+- Test individual commands in isolation first
+
+### 4. Validate Assumptions with Direct Tests
+- Test file paths directly in PowerShell before debugging batch scripts
+- Use `Test-Path`, `Resolve-Path`, and `Get-Item` to confirm path visibility
+- Verify that spaces and special characters aren't causing issues
+
+## Environment Override Patterns
+
+### Standard Override Structure
+```batch
+# Define default relative path
+set "RESOURCE_REL=%ROOT_DIR%\default\path"
+
+# Allow environment override
+if defined SC_RESOURCE_ROOT set "RESOURCE_REL=%SC_RESOURCE_ROOT%"
+
+# Canonicalize to absolute path
+for %%i in ("%RESOURCE_REL%") do set "RESOURCE=%%~fi"
+
+# Debug the resolution
+echo [DEBUG] SC_RESOURCE_ROOT: %SC_RESOURCE_ROOT%
+echo [DEBUG] RESOURCE_REL: %RESOURCE_REL%  
+echo [DEBUG] RESOURCE: %RESOURCE%
+```
+
+## PowerShell Path Handling
+
+### Use Literal Paths for Archive Operations
+```batch
+# ✅ CORRECT: Use -LiteralPath for paths with spaces
+powershell -Command "Expand-Archive -LiteralPath '%ZIP%' -DestinationPath '%DIR%' -Force"
+
+# ❌ WRONG: -Path can fail with complex paths  
+powershell -Command "Expand-Archive -Path '%ZIP%' -DestinationPath '%DIR%' -Force"
+```
+
+### Don't Resolve Non-Existent Paths
+```powershell
+# ❌ WRONG: Fails if destination doesn't exist yet
+$dest = (Resolve-Path 'new_directory').Path
+
+# ✅ CORRECT: Use literal string paths for new directories
+$dest = 'new_directory'
+```
+
+## Logging and Error Recovery
+
+### Centralized Logging Rules
+- All packaging logs go to `data/logs/` (not tool-local logs)
+- Use component-specific log files: `00a_extract_python.txt`, `00b_setup_pip.txt`, etc.
+- Include timestamp and debug level information
+- Log both to console AND file for real-time + persistent debugging
+
+### Error Context Rules
+- Always log the exact command that failed
+- Include environment state (working directory, key variables)  
+- Log error codes and their meaning
+- Provide actionable recovery steps in error messages
+
+## Code Maintenance Rules
+
+### Keep Debug Code Toggleable
+```batch
+# Use environment variable to control debug verbosity
+if defined SC_DEBUG_PACKAGING (
+    echo [DEBUG] Verbose path information...
+    dir "%EMBED_ROOT%"
+)
+```
+
+### Document Path Dependencies  
+- Comment WHY paths are structured as they are
+- Document any assumptions about folder existence timing
+- Note which paths must exist vs. which are created by scripts
+
+### Test with Edge Cases
+- Paths with spaces (already covered in workspace)
+- Very long paths (Windows limitation)
+- Network paths vs. local paths  
+- Empty vs. missing directories
+
+## What Actually Works in Batch Files
+
+### ✅ Reliable Patterns
+1. **Simple `if exist` checks** - Always work reliably
+2. **Basic `set` commands** - No issues with simple variable assignment  
+3. **Direct command execution** - `python -m pip install package`
+4. **Simple `cd /d` commands** - Reliable directory changes
+5. **Basic `xcopy` and `rd` commands** - File operations work well
+6. **PowerShell with `-LiteralPath`** - Reliable for archives
+7. **Individual `echo` statements** - Much more reliable than complex blocks
+
+### ❌ Patterns That Break Easily
+1. **Complex parentheses blocks** - Cause mysterious "syntax incorrect" errors
+2. **`&&` and `||` operators** - Very fragile, especially with parentheses
+3. **Variable expansion in loops** - `!variable!` expansion often fails
+4. **Nested `if...else` blocks** - Error-prone syntax
+5. **Complex PowerShell embedded commands** - Hard to debug when they fail
+6. **External function calls** - Batch functions across files don't work reliably
+
+### Reliable Logging Pattern
+```batch
+# ✅ CORRECT: Simple, bulletproof logging
+set "LOG_FILE=%LOG_DIR%\component.txt"
+
+echo Component Name > "%LOG_FILE%"
+echo ============= >> "%LOG_FILE%"
+echo %DATE% %TIME% >> "%LOG_FILE%"
+echo. >> "%LOG_FILE%"
+
+echo Starting validation... >> "%LOG_FILE%"
+echo Starting validation...
+
+if not exist "%PYTHON%" (
+    echo ERROR: Python not found >> "%LOG_FILE%"
+    echo ERROR: Python not found
+    exit /b 1
+)
+
+echo Python found: %PYTHON% >> "%LOG_FILE%"
+echo Python found: %PYTHON%
+
+echo Installing package... >> "%LOG_FILE%"
+echo Installing package...
+python -m pip install package >> "%LOG_FILE%" 2>&1
+if errorlevel 1 (
+    echo ERROR: Installation failed >> "%LOG_FILE%"
+    echo ERROR: Installation failed
+    exit /b 1
+)
+
+echo SUCCESS: Component completed >> "%LOG_FILE%"
+echo SUCCESS: Component completed
+```
+
+## Anti-Patterns to Avoid
+
+### 1. Silent Path Failures
+```batch
+# ❌ WRONG: No validation of critical paths
+set "PYTHON=%EMBED_DIR%\python.exe"
+
+# ✅ CORRECT: Validate before use
+set "PYTHON=%EMBED_DIR%\python.exe"
+if not exist "%PYTHON%" (
+    echo ❌ ERROR: Python executable not found at: %PYTHON%
+    exit /b 1
+)
+```
+
+### 2. Complex Nested Commands
+```batch
+# ❌ WRONG: Hard to debug when it fails
+powershell -Command "if (Test-Path '%ZIP%') { Expand-Archive '%ZIP%' '%DIR%' } else { throw 'File not found' }"
+
+# ✅ CORRECT: Separate validation and execution
+if not exist "%ZIP%" (
+    echo ❌ ERROR: ZIP file not found: %ZIP%
+    exit /b 1
+)
+powershell -Command "Expand-Archive -LiteralPath '%ZIP%' -DestinationPath '%DIR%' -Force"
+```
+
+### 3. Hardcoded Path Assumptions
+```batch
+# ❌ WRONG: Assumes specific folder structure
+set "EMBED_DIR=C:\ScriptCraft\py_embed_setup\embed_py311"
+
+# ✅ CORRECT: Derive from configurable root
+set "EMBED_ROOT_REL=%ROOT_DIR%\py_embed_setup"
+if defined SC_EMBED_ROOT set "EMBED_ROOT_REL=%SC_EMBED_ROOT%"
+set "EMBED_DIR=%EMBED_ROOT%\embed_py311"
+```
+
+## Integration with ScriptCraft Rules
+
+These packaging debug rules complement the main ScriptCraft rules:
+- **Centralized Data**: All logs under `data/logs/` (consistent with main rules)
+- **Path Resolution**: Use `scriptcraft.common.io.path_resolver` patterns where applicable
+- **Configuration**: Support both `config.yaml` and environment variable overrides
+- **DRY Principle**: Avoid duplicate path resolution logic across components
+
+## Quick Reference Checklist
+
+When debugging packaging issues:
+- [ ] Add comprehensive debug output first
+- [ ] Test path resolution with `dir` commands  
+- [ ] Verify file existence before PowerShell operations
+- [ ] Use `-LiteralPath` for archive operations
+- [ ] Simplify complex embedded commands
+- [ ] Check batch syntax around `if...else` and `exit /b`
+- [ ] Test environment variable overrides
+- [ ] Validate assumptions with direct PowerShell commands
+- [ ] Check centralized logs in `data/logs/`
+
+This document should be updated as we encounter new packaging system edge cases or develop better debugging strategies.
