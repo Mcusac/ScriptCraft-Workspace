@@ -144,6 +144,9 @@ python validate_before_upload.py
 - ❌ **Reimplementing existing functionality** - Leverage existing tools and pipelines
 - ❌ **Creating scripts folders** - Use the tool system for all functionality
 - ❌ **Hardcoded tool logic** - Make tools configurable and reusable
+- ❌ **Creating duplicate files for automation** - Fix existing tools instead of creating new ones
+- ❌ **Jumping to new solutions** - Always analyze and fix existing tools first
+- ❌ **Building workarounds** - Make tools fully automated by design
 
 ## 📋 File Type Standards
 
