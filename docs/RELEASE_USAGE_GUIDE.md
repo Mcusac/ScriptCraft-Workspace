@@ -11,10 +11,10 @@ This guide contains **tested and verified** release patterns that work correctly
 ### **1. Git Operations (Most Common)**
 ```bash
 # Check git status
-scriptcraft-release git-status
+python -m scriptcraft.cli.release_cli git-status
 
 # Fully automated git sync (commits + pushes)
-scriptcraft-release git-sync
+python -m scriptcraft.cli.release_cli git-sync
 ```
 **What git-sync does:**
 - ✅ Syncs submodules automatically
@@ -25,10 +25,10 @@ scriptcraft-release git-sync
 ### **2. PyPI Operations**
 ```bash
 # Test PyPI upload (safe testing)
-scriptcraft-release pypi-test
+python -m scriptcraft.cli.release_cli pypi-test
 
 # Release to PyPI (production)
-scriptcraft-release pypi-release
+python -m scriptcraft.cli.release_cli pypi-release
 ```
 **What pypi-release does:**
 - ✅ Builds package automatically
@@ -39,7 +39,7 @@ scriptcraft-release pypi-release
 ### **3. Full Release Workflow**
 ```bash
 # Complete release (PyPI + Git)
-scriptcraft-release full-release
+python -m scriptcraft.cli.release_cli full-release
 ```
 **What full-release does:**
 - ✅ Tests PyPI upload first
