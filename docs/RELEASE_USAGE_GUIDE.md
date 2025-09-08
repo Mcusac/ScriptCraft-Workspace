@@ -6,97 +6,128 @@ This guide contains **tested and verified** release patterns that work correctly
 
 ---
 
-## 🚀 **Quick Start - Most Common Use Cases**
+## 🚀 **Quick Start - Industry Standard Console Commands**
 
-### **1. Standard Patch Release (Most Common)**
+### **1. Git Operations (Most Common)**
 ```bash
-# From workspace root or python-package directory
-python -c "from scriptcraft.tools.release_manager import ReleaseManager; ReleaseManager().run(mode='python_package', version_type='patch', auto_push=True)"
+# Check git status
+scriptcraft-release git-status
+
+# Fully automated git sync (commits + pushes)
+scriptcraft-release git-sync
 ```
-**What this does:**
-- ✅ Bumps version (e.g., 1.6.0 → 1.6.1)
-- ✅ Updates `_version.py`
-- ✅ Builds package
-- ✅ Uploads to PyPI
-- ✅ Commits with message: "🐛 Bug Fix Release: ScriptCraft Python v1.6.1"
-- ✅ Creates git tag v1.6.1
+**What git-sync does:**
+- ✅ Syncs submodules automatically
+- ✅ Commits any uncommitted changes
 - ✅ Pushes commits and tags to remote
+- ✅ Works in any git repository
 
-### **2. Minor Release (New Features)**
+### **2. PyPI Operations**
 ```bash
-python -c "from scriptcraft.tools.release_manager import ReleaseManager; ReleaseManager().run(mode='python_package', version_type='minor', auto_push=True)"
-```
-**What this does:**
-- ✅ Bumps version (e.g., 1.6.0 → 1.7.0)
-- ✅ Uses commit message: "✨ Feature Release: ScriptCraft Python v1.7.0"
+# Test PyPI upload (safe testing)
+scriptcraft-release pypi-test
 
-### **3. Major Release (Breaking Changes)**
-```bash
-python -c "from scriptcraft.tools.release_manager import ReleaseManager; ReleaseManager().run(mode='python_package', version_type='major', auto_push=True)"
+# Release to PyPI (production)
+scriptcraft-release pypi-release
 ```
-**What this does:**
-- ✅ Bumps version (e.g., 1.6.0 → 2.0.0)
-- ✅ Uses commit message: "🚀 Major Release: ScriptCraft Python v2.0.0"
+**What pypi-release does:**
+- ✅ Builds package automatically
+- ✅ Uploads to PyPI
+- ✅ Creates git tags
+- ✅ Pushes to remote
+
+### **3. Full Release Workflow**
+```bash
+# Complete release (PyPI + Git)
+scriptcraft-release full-release
+```
+**What full-release does:**
+- ✅ Tests PyPI upload first
+- ✅ Releases to PyPI
+- ✅ Syncs git repository
+- ✅ Complete automated workflow
 
 ---
 
 ## 🔧 **Advanced Usage Patterns**
 
-### **4. Custom Commit Message**
+### **4. Using Pipelines (Alternative)**
 ```bash
-python -c "from scriptcraft.tools.release_manager import ReleaseManager; ReleaseManager().run(mode='python_package', version_type='patch', auto_push=True, custom_message='🔧 Fix: Resolved Unicode encoding issues in subprocess calls')"
+# Use pipeline instead of individual tools
+scriptcraft-release pypi-test --pipeline
+scriptcraft-release git-sync --pipeline
 ```
 
-### **5. Git-Only Release (Skip PyPI)**
-```bash
-python -c "from scriptcraft.tools.release_manager import ReleaseManager; ReleaseManager().run(mode='python_package', version_type='patch', auto_push=True, skip_pypi=True)"
-```
-**Use this when:**
-- You want to tag a version without uploading to PyPI
-- Testing release process
-- Internal versioning
+### **5. Python API (For Custom Scripts)**
+```python
+# For custom automation scripts
+from scriptcraft.tools.git_workspace_tool import GitWorkspaceTool
+from scriptcraft.tools.pypi_release_tool import PyPIReleaseTool
 
-### **6. Re-upload Existing Version to PyPI**
+# Git operations
+git_tool = GitWorkspaceTool()
+git_tool.run(operation="sync")
+
+# PyPI operations
+pypi_tool = PyPIReleaseTool()
+pypi_tool.run(operation="test")
+```
+
+### **6. Legacy Release Manager (Still Supported)**
 ```bash
-python -c "from scriptcraft.tools.release_manager import ReleaseManager; ReleaseManager().run(mode='pypi')"
+# For complex version management
+python -c "from scriptcraft.tools.release_manager import ReleaseManager; ReleaseManager().run(mode='python_package', version_type='patch', auto_push=True)"
 ```
 **Use this when:**
-- PyPI upload failed but git operations succeeded
-- Need to re-upload same version
+- You need specific version bumping
+- Custom commit messages
+- Complex release workflows
 
 ---
 
 ## 📍 **Where to Run Commands**
 
-### **From Workspace Root** (Recommended)
+### **From Any Git Repository** (Industry Standard)
+```bash
+# Navigate to any git repository
+cd /path/to/your/project
+
+# Install ScriptCraft (one time)
+pip install scriptcraft-python
+
+# Use console commands anywhere
+scriptcraft-release git-sync
+scriptcraft-release pypi-test
+```
+
+### **From ScriptCraft Workspace**
 ```bash
 cd /path/to/ScriptCraft-Workspace
-python -c "from scriptcraft.tools.release_manager import ReleaseManager; ReleaseManager().run(mode='python_package', version_type='patch', auto_push=True)"
+scriptcraft-release git-sync
+scriptcraft-release pypi-release
 ```
 
-### **From Python Package Directory**
-```bash
-cd /path/to/ScriptCraft-Workspace/implementations/python-package
-python -c "from scriptcraft.tools.release_manager import ReleaseManager; ReleaseManager().run(mode='python_package', version_type='patch', auto_push=True)"
-```
-
-**Both locations work correctly** - the release manager automatically detects the correct paths.
+**Console commands work everywhere** - they automatically detect the project structure.
 
 ---
 
-## ⚠️ **Critical Parameters**
+## ⚠️ **Important Notes**
 
-### **`auto_push=True` (REQUIRED)**
-**Always include this parameter!** Without it:
-- ❌ Commits are created locally but not pushed
-- ❌ Tags are created locally but not pushed
-- ❌ Remote repository won't be updated
+### **Console Commands are Fully Automated**
+**No parameters needed!** Console commands automatically:
+- ✅ Commit and push changes
+- ✅ Handle version management
+- ✅ Sync submodules
+- ✅ Upload to PyPI
 
-### **`version_type` (REQUIRED)**
-Must be one of:
-- `patch` - Bug fixes (1.6.0 → 1.6.1)
-- `minor` - New features (1.6.0 → 1.7.0)
-- `major` - Breaking changes (1.6.0 → 2.0.0)
+### **Installation Required**
+```bash
+# Install ScriptCraft globally
+pip install scriptcraft-python
+
+# Commands work in any directory after installation
+scriptcraft-release --help
+```
 
 ---
 
@@ -106,31 +137,30 @@ Must be one of:
 ```bash
 # 1. Make your changes
 # 2. Test your changes
-# 3. Run release
-python -c "from scriptcraft.tools.release_manager import ReleaseManager; ReleaseManager().run(mode='python_package', version_type='patch', auto_push=True)"
+# 3. Sync git changes
+scriptcraft-release git-sync
 
-# 4. Verify on PyPI
+# 4. Test PyPI upload
+scriptcraft-release pypi-test
+
+# 5. Release to PyPI
+scriptcraft-release pypi-release
+
+# 6. Verify on PyPI
 pip install scriptcraft-python --upgrade
-
-# 5. Verify on GitHub
-# Check: https://github.com/Mcusac/ScriptCraft-Python/releases
 ```
 
-### **Emergency Hotfix Workflow**
+### **Simple Git Sync Workflow**
 ```bash
-# 1. Create hotfix branch
-git checkout -b hotfix/critical-bug
+# For any git repository (most common use case)
+cd /path/to/your/project
+scriptcraft-release git-sync
+```
 
-# 2. Make critical fix
-# ... make changes ...
-
-# 3. Release immediately
-python -c "from scriptcraft.tools.release_manager import ReleaseManager; ReleaseManager().run(mode='python_package', version_type='patch', auto_push=True, custom_message='🚨 Hotfix: Critical bug fix')"
-
-# 4. Merge back to main
-git checkout main
-git merge hotfix/critical-bug
-git push origin main
+### **Full Release Workflow**
+```bash
+# Complete automated release
+scriptcraft-release full-release
 ```
 
 ---

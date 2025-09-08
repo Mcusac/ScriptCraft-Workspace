@@ -111,12 +111,12 @@ scriptcraft data_content_comparer
 # Run a pipeline
 scriptcraft dictionary_pipeline
 
-# Use release CLI
-scriptcraft-release pypi-test
-scriptcraft-release git-sync
-
-# Use release manager directly (RECOMMENDED)
-python -c "from scriptcraft.tools.release_manager import ReleaseManager; ReleaseManager().run(mode='python_package', version_type='patch', auto_push=True)"
+# Release operations (INDUSTRY STANDARD)
+scriptcraft-release pypi-test              # Test PyPI upload
+scriptcraft-release pypi-release           # Release to PyPI
+scriptcraft-release git-sync               # Sync Git repository
+scriptcraft-release git-status             # Check Git status
+scriptcraft-release full-release           # Full release workflow
 
 # See docs/RELEASE_USAGE_GUIDE.md for comprehensive release examples
 ```
