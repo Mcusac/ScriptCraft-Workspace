@@ -32,7 +32,7 @@ def get_workspace_config(args):
     root_config_path = Path("config.yaml")
     if root_config_path.exists():
         try:
-            with open(root_config_path, 'r') as f:
+            with open(root_config_path, 'r', encoding='utf-8') as f:
                 base_config = yaml.safe_load(f)
             
             # If it has pipelines, it's a framework config we can use directly

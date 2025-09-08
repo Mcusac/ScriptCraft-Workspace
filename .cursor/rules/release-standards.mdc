@@ -1,0 +1,310 @@
+---
+description: Release and deployment standards for ScriptCraft
+alwaysApply: true
+---
+
+# Release Standards
+
+## Release Types
+
+### 1. Python Package Release
+PyPI distribution with console scripts and proper versioning.
+
+**Process:**
+1. **Validate**: Run all tests and integrity checks
+2. **Version**: Bump version in `_version.py`
+3. **Build**: Create distribution packages
+4. **Test**: Verify package works correctly
+5. **Upload**: Deploy to PyPI
+
+**Tools:**
+- `python validate_before_upload.py`
+- `python -m build`
+- `python -m twine upload dist/*`
+
+### 2. Git Repository Release
+Tagged releases with proper versioning and changelog.
+
+**Process:**
+1. **Check Status**: Ensure clean working directory
+2. **Create Tag**: Tag current commit with version
+3. **Push**: Push commits and tags to remote
+
+**Tools:**
+- `git status --porcelain`
+- `git tag v{version}`
+- `git push --tags`
+
+### 3. Documentation Release
+Automated documentation deployment.
+
+**Process:**
+1. **Build Docs**: Generate documentation
+2. **Deploy**: Deploy to hosting platform
+
+**Tools:**
+- `mkdocs build`
+- `mkdocs gh-deploy`
+
+### 4. Full Release
+Combined package + git + documentation release.
+
+**Process:**
+1. **Package Release**: Follow Python package process
+2. **Git Release**: Follow git repository process
+3. **Docs Release**: Follow documentation process
+
+## Release Tools
+
+### Generic Release Tool
+Workspace-agnostic tool that can be used anywhere.
+
+**Usage:**
+```bash
+# Python package release
+python scripts/release.py --type python --version 1.7.0
+
+# Git repository release
+python scripts/release.py --type git --version 1.7.0
+
+# Full release
+python scripts/release.py --type full --version 1.7.0
+
+# Dry run
+python scripts/release.py --type python --dry-run
+```
+
+**Features:**
+- ✅ Works in any Python project
+- ✅ Supports dry run mode
+- ✅ Automatic version detection
+- ✅ Comprehensive validation
+- ✅ Error handling and rollback
+
+### Release Pipelines
+Composable release workflows using the pipeline system.
+
+**Usage:**
+```python
+from scriptcraft.pipelines.release_pipelines import create_python_package_pipeline
+
+# Create and run pipeline
+pipeline = create_python_package_pipeline()
+pipeline.run()
+```
+
+**Features:**
+- ✅ Composable workflows
+- ✅ Step-by-step execution
+- ✅ Detailed logging
+- ✅ Error handling
+- ✅ Resumable operations
+
+### Universal Release Script
+Simple script that works in any Python project.
+
+**Usage:**
+```bash
+# Copy to any Python project
+cp scripts/release.py /path/to/your/project/
+
+# Run release
+python release.py --type python --version 1.0.0
+```
+
+**Features:**
+- ✅ No dependencies on ScriptCraft
+- ✅ Works with any Python project
+- ✅ Supports multiple release types
+- ✅ Automatic version detection
+- ✅ Dry run support
+
+## Version Management
+
+### Version Source of Truth
+- **Primary**: `scriptcraft/_version.py`
+- **Dynamic**: Referenced in `pyproject.toml`
+- **Consistent**: Must match across all files
+
+### Version Bumping
+```python
+# Current version
+__version__ = "1.6.0"
+
+# Bump patch version
+__version__ = "1.6.1"
+
+# Bump minor version
+__version__ = "1.7.0"
+
+# Bump major version
+__version__ = "2.0.0"
+```
+
+### Version Rules
+- ✅ Use semantic versioning (MAJOR.MINOR.PATCH)
+- ✅ Update version in `_version.py` only
+- ✅ Verify version consistency before release
+- ✅ Tag git commits with version
+- ❌ Don't hardcode versions in multiple files
+- ❌ Don't skip version updates
+
+## Pre-Release Validation
+
+### Validation Checklist
+- ✅ All tests pass
+- ✅ Import patterns work
+- ✅ Package builds successfully
+- ✅ Console scripts are available
+- ✅ Version is consistent
+- ✅ Documentation is accurate
+- ✅ Dependencies are up to date
+
+### Validation Script
+```bash
+# Run comprehensive validation
+python validate_before_upload.py
+
+# Manual validation steps
+python tests/test_import_patterns.py
+python tests/test_package_integrity.py
+python -m build --wheel
+python -c "import scriptcraft; print(scriptcraft.__version__)"
+```
+
+### Validation Rules
+- ✅ Run validation before every release
+- ✅ Fix all validation failures before release
+- ✅ Test in both dev and distributable environments
+- ✅ Verify console scripts work
+- ❌ Don't release with failing tests
+- ❌ Don't skip validation steps
+
+## Build Process
+
+### Package Building
+```bash
+# Clean previous builds
+rm -rf build/ dist/ *.egg-info/
+
+# Build package
+python -m build
+
+# Verify build
+ls -la dist/
+```
+
+### Build Requirements
+- ✅ Clean build directory before building
+- ✅ Build both wheel and source distribution
+- ✅ Verify build artifacts
+- ✅ Test built package
+- ❌ Don't build with uncommitted changes
+- ❌ Don't skip build verification
+
+## Upload Process
+
+### PyPI Upload
+```bash
+# Upload to PyPI
+python -m twine upload dist/*
+
+# Upload to test PyPI first
+python -m twine upload --repository testpypi dist/*
+```
+
+### Upload Rules
+- ✅ Test upload to test PyPI first
+- ✅ Verify upload success
+- ✅ Check package on PyPI website
+- ✅ Test installation from PyPI
+- ❌ Don't upload without validation
+- ❌ Don't upload broken packages
+
+## Release Documentation
+
+### Changelog
+- ✅ Document all changes
+- ✅ Group changes by type (Added, Changed, Fixed, Removed)
+- ✅ Include version and date
+- ✅ Link to issues and pull requests
+
+### Release Notes
+- ✅ Highlight major changes
+- ✅ Include migration instructions
+- ✅ Document breaking changes
+- ✅ Provide examples
+
+### Documentation Rules
+- ✅ Update documentation with each release
+- ✅ Keep examples current
+- ✅ Update version information
+- ✅ Review all documentation
+- ❌ Don't release without updated docs
+- ❌ Don't leave outdated examples
+
+## Rollback Procedures
+
+### Package Rollback
+```bash
+# Remove package from PyPI (if possible)
+# Revert version in _version.py
+# Create new release with previous version
+```
+
+### Git Rollback
+```bash
+# Revert commits
+git revert <commit-hash>
+
+# Delete tags
+git tag -d v{version}
+git push origin :refs/tags/v{version}
+```
+
+### Rollback Rules
+- ✅ Have rollback plan ready
+- ✅ Test rollback procedures
+- ✅ Document rollback steps
+- ✅ Communicate rollback to users
+- ❌ Don't release without rollback plan
+- ❌ Don't ignore rollback procedures
+
+## Release Monitoring
+
+### Post-Release Checks
+- ✅ Verify package installation
+- ✅ Test console scripts
+- ✅ Check documentation
+- ✅ Monitor for issues
+- ✅ Update release notes
+
+### Monitoring Rules
+- ✅ Monitor for 24 hours after release
+- ✅ Respond to issues quickly
+- ✅ Document any problems
+- ✅ Update procedures based on issues
+- ❌ Don't ignore post-release issues
+- ❌ Don't skip monitoring
+
+## Release Automation
+
+### CI/CD Integration
+- ✅ Automate validation tests
+- ✅ Automate build process
+- ✅ Automate upload process
+- ✅ Automate documentation updates
+- ❌ Don't skip manual validation
+- ❌ Don't automate without testing
+
+### Automation Rules
+- ✅ Test automation thoroughly
+- ✅ Have manual override capability
+- ✅ Monitor automated processes
+- ✅ Document automation procedures
+- ❌ Don't automate without validation
+- ❌ Don't skip manual checks
+
+---
+
+**Remember**: Reliable releases are essential for user trust and project success. Follow these standards to ensure consistent, high-quality releases every time.

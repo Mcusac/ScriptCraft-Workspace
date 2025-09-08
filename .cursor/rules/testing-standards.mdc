@@ -1,0 +1,292 @@
+---
+description: Testing standards and requirements for ScriptCraft
+alwaysApply: true
+---
+
+# Testing Standards
+
+## Test Categories
+
+### 1. Import Tests (`test_import_patterns.py`)
+Verify all documented import patterns work correctly.
+
+**Required Tests:**
+- ✅ Basic package import: `import scriptcraft`
+- ✅ Common utilities import: `import scriptcraft.common as cu`
+- ✅ Specific imports: `from scriptcraft.common import BaseTool, Config`
+- ✅ Tool imports: `from scriptcraft.tools.automated_labeler import AutomatedLabeler`
+- ✅ Tool discovery: `from scriptcraft.tools import get_available_tools`
+- ✅ Pipeline imports: `from scriptcraft.pipelines import BasePipeline`
+
+**Test Requirements:**
+- All imports must work without errors
+- Tool instantiation must succeed
+- Tool discovery must find expected tools
+- Configuration loading must work with fallbacks
+
+### 2. Package Integrity Tests (`test_package_integrity.py`)
+Verify package structure and basic functionality.
+
+**Required Tests:**
+- ✅ Package version consistency
+- ✅ Required files exist (pyproject.toml, README.md, etc.)
+- ✅ Console scripts are configured
+- ✅ Dependencies can be imported
+- ✅ Package structure is correct
+- ✅ Tool instantiation works
+
+**Test Requirements:**
+- Version must be consistent across all files
+- All required files must exist
+- Console scripts must be properly configured
+- All dependencies must be available
+- Package structure must match expected layout
+
+### 3. Tool-Specific Tests
+Individual tests for each tool.
+
+**Required Tests:**
+- ✅ Tool instantiation
+- ✅ Tool execution with sample data
+- ✅ Error handling
+- ✅ Configuration access
+- ✅ CLI argument parsing
+
+**Test Requirements:**
+- Tools must instantiate without errors
+- Tools must handle invalid input gracefully
+- Tools must log appropriate messages
+- Tools must save results correctly
+
+## Test Structure
+
+### File Organization
+```
+tests/
+├── test_config.py              # Centralized test configuration (DRY)
+├── unified_test_runner.py      # Single test runner (DRY)
+├── conftest.py                 # Shared test fixtures
+├── pytest.ini                 # Pytest configuration
+├── requirements-test.txt       # Testing dependencies
+├── unit/                       # Unit tests for individual components
+│   ├── test_common/           # Common utilities tests
+│   ├── test_pipelines/        # Pipeline tests
+│   └── test_tools/            # Base tool tests
+├── integration/               # Integration tests for workflows
+├── performance/               # Performance and benchmark tests
+└── tools/                     # Tool-specific tests
+    ├── test_automated_labeler.py
+    ├── test_data_content_comparer.py
+    └── ...
+
+implementations/python-package/tests/
+├── test_import_patterns.py     # Package import validation
+└── test_package_integrity.py   # Package integrity tests
+```
+
+### DRY Compliance Rules
+- ✅ **Use centralized TestConfig** - Never hardcode paths in test files
+- ✅ **Use unified test runner** - Single runner for all test categories
+- ✅ **Consistent path resolution** - All tests use TestConfig.PACKAGE_ROOT
+- ✅ **Clear separation of concerns** - Package tests vs workspace tests
+- ❌ **Don't duplicate path resolution** - Use TestConfig instead
+- ❌ **Don't create multiple test runners** - Use unified runner
+- ❌ **Don't hardcode workspace paths** - Use TestConfig.WORKSPACE_ROOT
+
+### Test Naming
+- **Files**: `test_*.py` (pytest convention)
+- **Functions**: `test_*` (pytest convention)
+- **Classes**: `Test*` (pytest convention)
+- **Descriptive**: Use clear, descriptive names
+
+### Test Structure
+```python
+def test_tool_instantiation():
+    """Test that tool can be instantiated."""
+    tool = MyTool()
+    assert tool.name == "My Tool"
+    assert hasattr(tool, 'run')
+
+def test_tool_execution():
+    """Test tool execution with sample data."""
+    tool = MyTool()
+    # Create sample data
+    sample_data = create_sample_data()
+    
+    # Test execution
+    result = tool.run(input_paths=[sample_data], output_dir="test_output")
+    
+    # Verify results
+    assert result is not None
+    assert Path("test_output").exists()
+```
+
+## Test Data
+
+### Sample Data Creation
+```python
+def create_sample_data():
+    """Create sample data for testing."""
+    data = pd.DataFrame({
+        'id': [1, 2, 3],
+        'value': ['A', 'B', 'C']
+    })
+    
+    # Save to temporary file
+    temp_file = Path("temp_sample.csv")
+    data.to_csv(temp_file, index=False)
+    return temp_file
+
+def cleanup_test_data():
+    """Clean up test data files."""
+    for pattern in ["temp_*", "test_output"]:
+        for path in Path(".").glob(pattern):
+            if path.is_file():
+                path.unlink()
+            elif path.is_dir():
+                shutil.rmtree(path)
+```
+
+### Test Data Rules
+- ✅ Create sample data programmatically
+- ✅ Use temporary files for test data
+- ✅ Clean up test data after tests
+- ✅ Use realistic but minimal data
+- ❌ Don't use real data files
+- ❌ Don't leave test artifacts
+
+## Test Execution
+
+### Running Tests
+```bash
+# Run all tests
+python -m pytest tests/
+
+# Run specific test categories
+python tests/test_import_patterns.py
+python tests/test_package_integrity.py
+
+# Run with coverage
+python -m pytest tests/ --cov=scriptcraft
+
+# Run in verbose mode
+python -m pytest tests/ -v
+```
+
+### Test Requirements
+- ✅ All tests must pass before release
+- ✅ Tests must run in both dev and distributable environments
+- ✅ Tests must not require external dependencies
+- ✅ Tests must be deterministic and repeatable
+- ❌ Don't skip tests without good reason
+- ❌ Don't write tests that depend on external state
+
+## Validation Tests
+
+### Pre-Release Validation
+```bash
+# Run validation script
+python validate_before_upload.py
+
+# Manual validation steps
+python tests/test_import_patterns.py
+python tests/test_package_integrity.py
+python -m build --wheel
+python -c "import scriptcraft; print(scriptcraft.__version__)"
+```
+
+### Validation Requirements
+- ✅ All import patterns must work
+- ✅ Package must build successfully
+- ✅ Console scripts must be available
+- ✅ Version must be consistent
+- ✅ Documentation must be accurate
+- ❌ Don't release with failing tests
+- ❌ Don't release with inconsistent versions
+
+## Test Coverage
+
+### Coverage Requirements
+- **Minimum**: 80% line coverage
+- **Target**: 90% line coverage
+- **Critical**: 100% coverage for core utilities
+
+### Coverage Measurement
+```bash
+# Run tests with coverage
+python -m pytest tests/ --cov=scriptcraft --cov-report=html
+
+# View coverage report
+open htmlcov/index.html
+```
+
+### Coverage Rules
+- ✅ Test all public APIs
+- ✅ Test error handling paths
+- ✅ Test edge cases and boundary conditions
+- ✅ Test configuration loading and fallbacks
+- ❌ Don't test private implementation details
+- ❌ Don't write tests just to increase coverage
+
+## Continuous Integration
+
+### Automated Testing
+- ✅ Run tests on every commit
+- ✅ Run tests on multiple Python versions
+- ✅ Run tests on multiple operating systems
+- ✅ Run validation tests before release
+- ❌ Don't skip tests in CI
+- ❌ Don't ignore test failures
+
+### Test Environment
+- ✅ Use isolated test environments
+- ✅ Install dependencies from requirements files
+- ✅ Use consistent Python versions
+- ✅ Clean up after tests
+- ❌ Don't rely on system-installed packages
+- ❌ Don't leave test artifacts
+
+## Test Maintenance
+
+### Regular Tasks
+- ✅ Update tests when APIs change
+- ✅ Add tests for new features
+- ✅ Remove obsolete tests
+- ✅ Review test coverage regularly
+- ❌ Don't let tests become outdated
+- ❌ Don't ignore test failures
+
+### Test Quality
+- ✅ Write clear, readable tests
+- ✅ Use descriptive test names
+- ✅ Include docstrings for complex tests
+- ✅ Group related tests in classes
+- ❌ Don't write overly complex tests
+- ❌ Don't duplicate test logic
+
+## Debugging Tests
+
+### Test Debugging
+```python
+# Add debug output
+def test_tool_execution():
+    tool = MyTool()
+    print(f"Tool name: {tool.name}")
+    print(f"Tool config: {tool.config}")
+    
+    # Test with debug info
+    result = tool.run(input_paths=["test_data.csv"], output_dir="test_output")
+    print(f"Result: {result}")
+```
+
+### Debugging Rules
+- ✅ Add debug output when tests fail
+- ✅ Use descriptive error messages
+- ✅ Test individual components separately
+- ✅ Use breakpoints for complex debugging
+- ❌ Don't leave debug code in production tests
+- ❌ Don't ignore test failures
+
+---
+
+**Remember**: Good tests are essential for maintaining code quality and preventing regressions. Follow these standards to ensure reliable, maintainable test suites.

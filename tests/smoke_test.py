@@ -10,9 +10,9 @@ import sys
 from pathlib import Path
 import traceback
 
-# Add the project root to the path
-project_root = Path(__file__).parent.parent
-sys.path.insert(0, str(project_root))
+# Use centralized test configuration
+from test_config import TestConfig
+project_root = TestConfig.WORKSPACE_ROOT
 
 
 def test_imports():

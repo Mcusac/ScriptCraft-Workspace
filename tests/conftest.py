@@ -10,9 +10,9 @@ import pandas as pd
 import shutil
 from typing import Generator
 
-# Add the package submodule to the Python path
-PACKAGE_PATH = Path(__file__).parent.parent / "implementations" / "python-package"
-sys.path.insert(0, str(PACKAGE_PATH))
+# Use centralized test configuration
+from test_config import TestConfig
+PACKAGE_PATH = TestConfig.PACKAGE_ROOT
 
 @pytest.fixture
 def test_data_dir() -> Path:

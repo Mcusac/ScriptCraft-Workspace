@@ -11,9 +11,10 @@ from pathlib import Path
 
 def main():
     """Run tests with proper configuration."""
-    # Get the workspace root
-    workspace_root = Path(__file__).parent.parent
-    tests_dir = workspace_root / "tests"
+    # Use centralized test configuration
+    from test_config import TestConfig
+    workspace_root = TestConfig.WORKSPACE_ROOT
+    tests_dir = TestConfig.TESTS_ROOT
     
     # Change to workspace root
     original_cwd = Path.cwd()

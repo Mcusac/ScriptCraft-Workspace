@@ -11,6 +11,8 @@ ScriptCraft provides a unified framework for data processing, quality control, a
 - **🔄 Pipeline Orchestration**: Multi-step workflows for complex data processing
 - **📦 Packaging System**: Easy distribution of tools to end users
 - **🎯 Research Focus**: Specialized tools for clinical and biomarker data processing
+- **🚀 Release Management**: Automated PyPI and Git release workflows
+- **⚙️ Config-Driven**: Single source of truth configuration system
 
 ## 🛡️ Security & Privacy
 
@@ -59,6 +61,12 @@ pip install -e .
 - **Automated Labeler**: Generate labels and documentation from schemas
 - **Feature Change Checker**: Track feature changes across releases
 
+### Release Management
+- **PyPI Release Tool**: Automated PyPI package testing and release
+- **Git Workspace Tool**: Git repository management and operations
+- **Git Submodule Tool**: Git submodule synchronization and management
+- **Generic Release Tool**: Flexible release workflow orchestration
+
 ### Workflows
 - **Dictionary Workflow**: Complete dictionary processing pipeline
 
@@ -68,7 +76,7 @@ pip install -e .
 
 ```python
 import scriptcraft.common as cu
-from scriptcraft.tools import DataContentComparer
+from scriptcraft.tools.data_content_comparer import DataContentComparer
 
 # Initialize tool
 comparer = DataContentComparer()
@@ -83,20 +91,40 @@ comparer.run(
 ### Using Pipelines
 
 ```python
-from scriptcraft.pipelines import run_pipeline
+from scriptcraft.pipelines.git_pipelines import create_pypi_test_pipeline
 
-# Run a complete workflow
-run_pipeline("dictionary_pipeline", {
-    "dictionary": "dictionary.xlsx",
-    "raw_data": "data.csv"
-})
+# Create and run a pipeline
+pipeline = create_pypi_test_pipeline()
+pipeline.run()
 ```
 
 ### Command Line Usage
 
+#### Industry-Standard CLI (Recommended)
+```bash
+# List available tools and pipelines
+scriptcraft list
+
+# Run a specific tool
+scriptcraft data_content_comparer
+
+# Run a pipeline
+scriptcraft dictionary_pipeline
+
+# Use release CLI
+scriptcraft-release pypi-test
+scriptcraft-release git-sync
+
+# Use release manager directly (RECOMMENDED)
+python -c "from scriptcraft.tools.release_manager import ReleaseManager; ReleaseManager().run(mode='python_package', version_type='patch', auto_push=True)"
+
+# See docs/RELEASE_USAGE_GUIDE.md for comprehensive release examples
+```
+
+#### Legacy run_all.py (Still Supported)
 ```bash
 # Run a specific tool
-python -m scriptcraft.tools.data_content_comparer input1.csv input2.csv
+python run_all.py --tool data_content_comparer
 
 # Run a pipeline
 python run_all.py --pipeline dictionary_pipeline
@@ -141,13 +169,34 @@ tools:
 
 ## 📦 Packaging & Distribution
 
-Tools can be packaged for distribution using the built-in packaging system:
+ScriptCraft provides multiple distribution methods:
 
+### PyPI Distribution
+```bash
+# Install from PyPI
+pip install scriptcraft-python
+
+# Use CLI commands
+scriptcraft-release pypi-test
+scriptcraft rhq_form_autofiller
+
+# Use release manager for version bumps
+python -c "from scriptcraft.tools.release_manager import ReleaseManager; ReleaseManager().run(mode='python_package', version_type='patch', auto_push=True)"
+```
+
+### Local Packaging
 ```bash
 # Package a tool for distribution
-packaging.bat
+python run_all.py --tool rhq_form_autofiller
 
 # The packaged tool will be available in distributables/
+```
+
+### Development Installation
+```bash
+# Install in development mode
+cd implementations/python-package
+pip install -e .
 ```
 
 ## 🧪 Testing
