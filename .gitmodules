@@ -1,3 +1,6 @@
 [submodule "implementations/python-package"]
 	path = implementations/python-package
 	url = https://github.com/Mcusac/ScriptCraft-Python
+[submodule "implementations/kaggle-ml-comp-scripts"]
+	path = implementations/kaggle-ml-comp-scripts
+	url = https://github.com/Mcusac/kaggle-ml-comp-scripts
