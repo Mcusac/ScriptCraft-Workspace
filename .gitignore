@@ -233,6 +233,25 @@ dmypy.json
 **/output/**/*
 !**/output/.gitkeep
 
+# === WORKSPACE (COMBINED) ===
+# Keep archived scripts, but ignore active scratch work and artifacts
+workspace/logs/
+workspace/working/
+workspace/for_paper/
+
+# Workspace inputs often include datasets (do not commit)
+workspace/input/**
+!workspace/input/.gitkeep
+!workspace/input/domains/.gitkeep
+
+# Workspace archive should be code + docs only (ignore common artifacts)
+workspace/archive/**/*.npz
+workspace/archive/**/health_report.json
+workspace/archive/**/*.{pth,pt,pkl,pickle,parquet,h5,hdf5,sqlite,sqlite3,db,zip}
+
+# Jupyter notebooks are usually local scratch; keep out of git by default
+*.ipynb
+
 # Generated label files
 Labels.docx
 **/Labels.docx

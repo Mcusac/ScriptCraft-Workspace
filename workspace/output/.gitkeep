@@ -1,0 +1,8 @@
+# This file preserves the output directory structure
+# 
+# The output directory is used for:
+# - Generated reports and documentation
+# - Tool output files
+# - Processed results that don't contain sensitive data
+# 
+# Actual output files are ignored by .gitignore for security. 

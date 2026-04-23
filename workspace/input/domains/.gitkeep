@@ -1,0 +1,9 @@
+# This directory is intentionally empty for security reasons
+# 
+# Domain-specific data files (Clinical, Biomarkers, Genomics, Imaging)
+# are excluded from version control to protect sensitive research data.
+# 
+# The directory structure is maintained for tool functionality,
+# but actual data files should never be committed.
+#
+# See .gitignore for complete exclusion patterns. 

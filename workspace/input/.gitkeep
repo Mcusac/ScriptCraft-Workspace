@@ -1,0 +1,8 @@
+# This file preserves the input directory structure
+# 
+# The input directory is used for:
+# - Tool-specific input files
+# - Temporary data files needed for processing
+# - Form data files (like RHQ data)
+# 
+# Actual input files are ignored by .gitignore for security. 
