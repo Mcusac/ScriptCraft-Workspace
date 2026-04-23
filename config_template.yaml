@@ -1,0 +1,131 @@
+# ScriptCraft Framework Configuration Template
+# This is a SAFE template for public repositories
+# Copy this to config.yaml and customize with your actual settings
+
+# === Framework Configuration ===
+framework:
+  version: "2.0.0"
+  active_workspace: "data"
+  workspace_base_path: "."
+  # Available workspaces (for reference)
+  available_workspaces:
+    - "data"
+    # - "future_workspace_1"
+    # - "future_workspace_2"
+
+# Framework-level packaging settings
+packaging:
+  tool_to_ship: "rhq_form_autofiller"
+  output_dir: "distributables"
+  verbose_mode: false
+  open_log_after: true
+  open_folder_after: false
+  need_urls: true
+  exclude_patterns:
+    - "__pycache__"
+    - "tests" 
+    - "doc"
+    - "_vendor"
+    - "*.pyc"
+    - "*.pyo"
+    - "*.pyd"
+  
+  # Common packages installed in all embedded Python environments
+  common_packages:
+    - "setuptools"
+    - "wheel"
+    - "pandas"
+    - "numpy"
+    - "openpyxl"
+    - "python-docx"
+    - "pyyaml"
+    - "pytz"
+    - "python-dateutil"
+    - "selenium"
+
+  # Framework paths configuration
+  paths:
+    tools_dir: implementations/python-package/scriptcraft/tools
+    common_dir: implementations/python-package/scriptcraft/common
+    templates_dir: templates/distributable_template
+    embed_builder_path: py_embed_setup/build_embed_python.bat
+
+# === Tools for Packaging ===
+# Tool definitions used during packaging process
+tools:
+  rhq_form_autofiller:
+    description: "🏠 Automatically fills RHQ residential history forms using participant data"
+    tool_name: rhq_form_autofiller
+    entry_command: -m scriptcraft.tools.rhq_form_autofiller.main
+    packages: [pyyaml, pandas, python-docx, openpyxl, selenium, pytz]
+    url_template: "https://your-form-server.com/residential-history/{med_id}"  # REPLACE WITH YOUR URL
+    auto_login: true
+    browser_timeout: 60
+    form_wait_time: 10
+    supported_languages: ["en", "es"]
+    default_language: "en"
+
+  data_content_comparer:
+    description: "📊 Compares data content between releases to identify changes and differences"
+    tool_name: data_content_comparer
+    entry_command: -m scriptcraft.tools.data_content_comparer.main
+    packages: [pyyaml, pandas, numpy, pytz, python-dateutil, openpyxl]
+
+  automated_labeler:
+    description: "🏷️ Automatically generates labels and documentation from data schemas"
+    tool_name: automated_labeler
+    entry_command: -m scriptcraft.tools.automated_labeler.main
+    packages: [pyyaml, pandas, python-docx, openpyxl]
+
+# === Framework Paths Configuration ===
+# Updated paths for new structure
+paths:
+  tools_dir: "implementations\\python\\scriptcraft\\tools"
+  common_dir: "implementations\\python\\scriptcraft\\common"
+  templates_dir: "templates\\distributable_template"
+  embed_builder_path: "py_embed_setup\\build_embed_python.bat"
+
+# === Pipeline Definitions ===
+# Pipelines for orchestrating multiple tools in sequence
+pipelines:
+  # Dictionary Pipeline - chains the three dictionary tools
+  dictionary_pipeline:
+    description: "📖 Complete dictionary processing: clean → validate → check data"
+    steps:
+      - name: "Dictionary Cleaner"
+        func: "scriptcraft.tools.dictionary_cleaner.tool.run_dictionary_cleaner"
+        log: "dictionary_cleaner.log"
+        input_key: "dictionary"
+        check_exists: true
+        tags: ["dictionary", "clean"]
+      - name: "Dictionary Validator"
+        func: "scriptcraft.tools.dictionary_validator.tool.run_dictionary_validator"
+        log: "dictionary_validator.log"
+        input_key: "dictionary"
+        check_exists: true
+        tags: ["dictionary", "validate"]
+      - name: "Dictionary Driven Checker"
+        func: "scriptcraft.tools.dictionary_driven_checker.tool.run_dictionary_driven_checker"
+        log: "dictionary_checker.log"
+        input_key: "raw_data"
+        check_exists: true
+        tags: ["dictionary", "check"]
+
+  # Test Pipeline - for quick testing of tools
+  test:
+    description: "🧪 Quick test pipeline for development and debugging"
+    steps:
+      - name: "RHQ Form Autofiller Test"
+        func: "scriptcraft.tools.rhq_form_autofiller.main.main_runner"
+        log: "rhq_autofiller_test.log"
+        input_key: "rhq_inputs"
+        run_mode: "global"
+        check_exists: false
+        tags: ["test", "rhq"]
+      - name: "Schema Detector Test"
+        func: "scriptcraft.tools.schema_detector.tool.SchemaDetector"
+        log: "schema_detector_test.log"
+        input_key: "raw_data"
+        run_mode: "domain"
+        check_exists: false
+        tags: ["test", "schema"] 
