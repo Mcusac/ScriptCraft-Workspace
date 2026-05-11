@@ -1,377 +1,69 @@
-# ScriptCraft Workspace .gitignore
+# ============================================================
+# ROOT WORKSPACE .gitignore
+# Only governs the workspace repo itself
+# ============================================================
 
-# === SENSITIVE DATA AND WORKSPACES ===
-# Exclude all workspace directories (contain user-specific data and configs)
-# Note: data/ directory contains workspace data - exclude sensitive files but keep structure
+# =========================
+# OS / EDITOR
+# =========================
+.DS_Store
+Thumbs.db
 
-# Exclude all domain-specific data (contains sensitive research data)
-data/domains/
-!data/domains/.gitkeep
-
-# Input/Output directories (may contain sensitive data)
-data/input/
-!data/input/.gitkeep
-data/output/
-!data/output/.gitkeep
-
-# Logs directory (contains runtime logs with potentially sensitive info)
-data/logs/
-!data/logs/.gitkeep
-logs/*
-!logs/.gitkeep
-
-# QC output directories within domains (already covered by domains/ but being explicit)
-**/qc_output/
-**/qc_logs/
-
-# === CONFIGURATION FILES ===
-# Main configuration file (may contain sensitive settings)
-config.yaml
-
-# All user configuration files in any location
-**/config.yaml
-!**/sample_config.yaml
-!**/config_template.yaml
-
-# Credential files
-**/credentials.txt
-**/credentials.json
-**/credentials.yaml
-**/.env
-**/.env.local
-
-# === BUILD AND DISTRIBUTION FILES ===
-# Distributable packages (contain embedded Python and built tools)
-distributables/
-!distributables/.gitkeep
-
-# Legacy shippables directory (if still exists)
-shippables/
-!shippables/.gitkeep
-
-# Embedded Python build artifacts
-py_embed_setup/embed_py311/
-py_embed_setup/embed_py311.zip
-py_embed_setup/build_embed.log
-
-# Template embedded Python (generated during build)
-templates/**/embed_py311/
-
-# Backup files
-tools/backups/
-templates/backups/
-
-# Generated and binary files
-*.exe
-
-# Generated config.bat files (auto-generated from config.yaml)
-templates/**/config.bat
-distributables/**/config.bat
-
-# Template run.bat and tools .bat files are source code and should be tracked
-# (no exclusion needed - they're source files)
-
-# === PYTHON-SPECIFIC ===
-# Byte-compiled / optimized / DLL files
-__pycache__/
-*.py[cod]
-*$py.class
-
-# C extensions
-*.so
-
-# Distribution / packaging
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-pip-wheel-metadata/
-share/python-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-MANIFEST
-
-# PyInstaller
-*.manifest
-*.spec
-
-# Installer logs
-pip-log.txt
-pip-delete-this-directory.txt
-
-# Unit test / coverage reports
-htmlcov/
-.tox/
-.nox/
-.coverage
-.coverage.*
-.cache
-nosetests.xml
-coverage.xml
-*.cover
-*.py,cover
-.hypothesis/
-.pytest_cache/
-
-# Translations
-*.mo
-*.pot
-
-# Django stuff:
-*.log
-local_settings.py
-db.sqlite3
-db.sqlite3-journal
-
-# Flask stuff:
-instance/
-.webassets-cache
-
-# Scrapy stuff:
-.scrapy
-
-# Sphinx documentation
-docs/_build/
-
-# PyBuilder
-target/
-
-# Jupyter Notebook
-.ipynb_checkpoints
-
-# IPython
-profile_default/
-ipython_config.py
-
-# pyenv
-.python-version
-
-# pipenv
-Pipfile.lock
-
-# PEP 582
-__pypackages__/
-
-# Celery stuff
-celerybeat-schedule
-celerybeat.pid
-
-# SageMath parsed files
-*.sage.py
-
-# Environments
-.env
-.venv
-env/
-venv/
-ENV/
-env.bak/
-venv.bak/
-
-# Spyder project settings
-.spyderproject
-.spyproject
-
-# Rope project settings
-.ropeproject
-
-# mkdocs documentation
-/site
-
-# mypy
-.mypy_cache/
-.dmypy.json
-dmypy.json
-
-# Pyre type checker
-.pyre/
-
-# === DATA FILES ===
-# Excel data files (may contain sensitive research data)
-*.xlsx
-*.xls
-*.csv
-# !**/test_*.xlsx
-# !**/test_*.csv
-!**/sample_*.xlsx
-!**/sample_*.csv
-!**/template_*.xlsx
-!**/example_*.xlsx
-
-# Excel temporary files
-~$*.xlsx
-~$*.xls
-~$*.csv
-
-# Word temporary files
-~$*.docx
-~$*.doc
-
-# Database files
-*.db
-*.sqlite
-*.sqlite3
-
-# === GENERATED DOCUMENTATION AND OUTPUTS ===
-# Generated Word documents (except templates)
-*.docx
-!**/template*.docx
-!**/Template*.docx
-!templates/**/*.docx
-
-# Output files
-**/output/**/*
-!**/output/.gitkeep
-
-# === WORKSPACE (COMBINED) ===
-# Keep archived scripts, but ignore active scratch work and artifacts
-workspace/logs/
-workspace/working/
-workspace/for_paper/
-
-# Workspace inputs often include datasets (do not commit)
-workspace/input/**
-!workspace/input/.gitkeep
-!workspace/input/domains/.gitkeep
-
-# Workspace archive should be code + docs only (ignore common artifacts)
-workspace/archive/**/*.npz
-workspace/archive/**/health_report.json
-workspace/archive/**/*.{pth,pt,pkl,pickle,parquet,h5,hdf5,sqlite,sqlite3,db,zip}
-
-# Jupyter notebooks are usually local scratch; keep out of git by default
-*.ipynb
-
-# Generated label files
-Labels.docx
-**/Labels.docx
-
-# Zip files (usually contain packaged data)
-*.zip
-!tools/py_embed_setup/*.zip
-
-# === IDE AND EDITOR FILES ===
-# VSCode
 .vscode/
 !.vscode/settings.json
 !.vscode/tasks.json
 !.vscode/launch.json
-!.vscode/extensions.json
 
-# Cursor IDE rules file (contains personal preferences)
-.cursorrules
-
-# PyCharm
 .idea/
 
-# Sublime Text
-*.sublime-project
-*.sublime-workspace
-
-# Vim
-*.swp
-*.swo
-*~
-
-# Emacs
-*~
-\#*\#
-/.emacs.desktop
-/.emacs.desktop.lock
-*.elc
-auto-save-list
-tramp
-.\#*
-
-# === OPERATING SYSTEM FILES ===
-# Windows
-Thumbs.db
-ehthumbs.db
-Desktop.ini
-$RECYCLE.BIN/
-*.cab
-*.msi
-*.msix
-*.msm
-*.msp
-*.lnk
-
-# macOS
-.DS_Store
-.AppleDouble
-.LSOverride
-Icon
-._*
-.DocumentRevisions-V100
-.fseventsd
-.Spotlight-V100
-.TemporaryItems
-.Trashes
-.VolumeIcon.icns
-.com.apple.timemachine.donotpresent
-.AppleDB
-.AppleDesktop
-Network Trash Folder
-Temporary Items
-.apdisk
-
-# Linux
-*~
-.fuse_hidden*
-.directory
-.Trash-*
-.nfs*
-
-# === TEMPORARY AND CACHE FILES ===
+# =========================
+# ROOT RUNTIME / TEMP
+# =========================
+*.log
 *.tmp
 *.temp
-*.cache
 *.bak
-*.backup
-*.old
-*.orig
-*.working
-*.processing
-*_temp.*
 
-# === SELENIUM WEBDRIVER FILES ===
-# Chrome driver files
-chromedriver*
-geckodriver*
-msedgedriver*
+# =========================
+# WORKSPACE DATA
+# =========================
 
-# === PROJECT-SPECIFIC FILES ===
-# Packaging logs
-packaging_log.txt
+workspace/logs/
+workspace/working/
+workspace/for_paper/
 
-# Test and debug files
-test_*.py
-debug_*.py
-scratch_*.py
-fix_imports.py
+workspace/input/**
+!workspace/input/.gitkeep
+!workspace/input/domains/.gitkeep
 
-# Keep test_restructure.py - it's a valuable validation tool
+# Generated artifacts
+workspace/archive/**/*.npz
+workspace/archive/**/health_report.json
+workspace/archive/**/*.{pth,pt,pkl,pickle,parquet,h5,hdf5,sqlite,sqlite3,db,zip}
 
-# Personal notes and documentation
-NOTES.md
-TODO.md
-PERSONAL_*.md
+# =========================
+# SENSITIVE CONFIG
+# =========================
+config.yaml
+.env
+.env.local
 
-# Supplement data files (contain actual data)
-**/supplements/**
-!**/supplements/.gitkeep
+# =========================
+# DISTRIBUTABLES
+# =========================
+distributables/
+shippables/
 
-# Template files with actual content
-**/Folder\ Label\ Template.docx
-**/Template*.docx
-**/template*.xlsx 
+# =========================
+# GENERATED OUTPUTS
+# =========================
+logs/
+output/
+
+# =========================
+# SUBMODULES / IMPLEMENTATIONS
+# Let nested projects control themselves
+# =========================
+
+# DO NOT place Python/package ignores here
+# DO NOT ignore implementations/**
