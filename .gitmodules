@@ -2,3 +2,6 @@
 	path = implementations/python/python-package
 	url = https://github.com/Mcusac/ScriptCraft-Python
 	branch = main
+[submodule "implementations/minecraft/AlienCraft"]
+	path = implementations/minecraft/AlienCraft
+	url = https://github.com/Mcusac/AlienCraft.git
