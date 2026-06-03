@@ -10,8 +10,8 @@ from pathlib import Path
 from typing import Dict, Any, List
 
 
-def load_config(config_path: Path) -> Dict[str, Any]:
-    """Load configuration from YAML file."""
+def load_yaml_config(config_path: Path) -> Dict[str, Any]:
+    """Load YAML config as an untyped dict."""
     try:
         with open(config_path, 'r', encoding='utf-8') as f:
             return yaml.safe_load(f)
@@ -88,7 +88,7 @@ def main():
         sys.exit(1)
     
     # Load configuration
-    config = load_config(config_path)
+    config = load_yaml_config(config_path)
     
     template_dir = Path(sys.argv[3])
     timestamp = sys.argv[4] if len(sys.argv) > 4 else "Unknown"
