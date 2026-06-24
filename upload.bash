@@ -59,7 +59,7 @@ echo "========================================"
 push_repo "$WORKSPACE_ROOT/implementations/minecraft/AlienCraft"
 push_repo "$WORKSPACE_ROOT/implementations/python/python-package"
 
-Push workspace last so updated submodule SHAs are captured
+# Push workspace last so updated submodule SHAs are captured
 
 push_repo "$WORKSPACE_ROOT"
 

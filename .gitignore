@@ -60,6 +60,19 @@ shippables/
 logs/
 output/
 
+# Ephemeral AlienCraft governance session dumps (belong under
+# implementations/minecraft/AlienCraft/docs/working/architecture/)
+/ANALYSIS_INDEX.md
+/CODEBASE_GOVERNANCE_ANALYSIS.md
+/CRITICAL_MISPLACEMENTS.md
+/EXECUTIVE_SUMMARY.md
+/LAYER_*_DEPENDENCY_ANALYSIS.md
+/L2_L3_*_SESSION.md
+/STEP_*_GOVERNANCE*.md
+/analyze_dependencies.py
+/analyze_responsibilities.py
+/final_analysis.py
+
 # =========================
 # SUBMODULES / IMPLEMENTATIONS
 # Let nested projects control themselves
