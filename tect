@@ -1,0 +1,2877 @@
+I am worried we may be causing issues while cleaning up hardcoded things. Iam not certain we ended up with same level imports and other dependency rule breaking instances
+
+
+
+# Hardcoded values migration (working)
+
+
+
+**Status:** Planning — run [PLAYTEST-FH-02](../references/architecture/BACKLOG.md) before starting parasite config work.  
+
+**Authority:** [architecture-governance.mdc](../../.cursor/rules/architecture-governance.mdc) config contract  
+
+**Archive when:** First migration cluster merged and playtest green
+
+
+
+---
+
+
+
+## Goal
+
+
+
+Replace Java-hardcoded gameplay tuning in `layer_2_systems` / `layer_3_minecraft` with validated classpath JSON loaded via `layer_1_infrastructure`.
+
+
+
+---
+
+
+
+## Migration order
+
+
+
+1. **Inventory** — list literals, owners, and consumers (table below).
+
+2. **JSON schema** — define keys; add loader + `ConfigContractException` on missing required fields.
+
+3. **Config helper** — infra L4 accessor consumed by systems (no direct loader imports from L2).
+
+4. **Wire consumers** — systems/minecraft read helper only.
+
+5. **Delete Java literals** — remove `HostEffectConfigInitializer` maps, etc.
+
+6. **Verify** — `.\dev\bin\verify.ps1`
+
+7. **Playtest** — BACKLOG `PLAYTEST-FH-01/02` for parasite changes
+
+
+
+---
+
+
+
+## Inventory (seed)
+
+
+
+| Cluster | Files | Consumer | Target |
+
+|---------|-------|----------|--------|
+
+| Host effect profiles | `layer_2_systems/.../HostEffectConfig.java`, `HostEffectConfigInitializer.java` | `HostEffectManager` | Per-`HostType` effect lists in classpath JSON |
+
+| Attachment tuning | `AttachmentConfigHelper` (infra) | `FacehuggerAttachmentManager`, `FacehuggerTickWorkflow` | Already JSON-backed — verify no stray literals |
+
+| Territory / nest | `TerritoryBootstrap` TODOs | Queen nest rules | Defer until nest cluster refactor |
+
+
+
+### HostEffectConfig detail
+
+
+
+- **Current:** Static `Map<HostType, HostTypeConfig>` populated in `HostEffectConfigInitializer` with effect key, duration, amplifier, renew flags.
+
+- **Risk:** Changing effect profiles requires Java recompile.
+
+- **NDE:** Loader stays infra L3; `HostEffectManager` (L1) reads via helper at L4 or new parasite config accessor.
+
+
+
+---
+
+
+
+## NDE constraints
+
+
+
+- Loaders and parsers: `layer_1_infrastructure` only.
+
+- Systems workflows: consume validated helpers — no `net.minecraft` in systems for config I/O.
+
+- Package placement: enforced by `placement-formula` + `nde-strict` on Java moves — no manifest files.
+
+
+
+---
+
+
+
+## Playtest regression matrix
+
+
+
+| ID | When to run |
+
+|----|-------------|
+
+| PLAYTEST-FH-01 | After any facehugger attach/implant/spent change |
+
+| PLAYTEST-FH-02 | After persistence or spent-timer changes; **required before this migration starts** |
+
+
+
+---
+
+
+
+## Out of scope (this workstream)
+
+
+
+- Animation TODOs (visual only)
+
+- Queen nest territorial rules (separate BACKLOG cluster)
+
+- Bulk `TO-DO.md` rewrite
+
+
+
+# Hardcoded Data Migration Roadmap
+
+
+
+**Naming (2026-07-10):** Use this hierarchy in docs and PRs. Avoid calling Migration Wave 1 a "phase" — it is a **migration batch**, not a planning tier like Project A.
+
+
+
+```
+
+Project A — Schema Verification          (complete)
+
+        |
+
+        v
+
+Migration Wave 1                         (runtime SSOT convergence — in progress)
+
+        |
+
+        +--------> Project B — Host Effects Infrastructure
+
+        |
+
+        +--------> Project C — Lifecycle Infrastructure
+
+        |
+
+        +--------> Project D — AI Priority Resolver
+
+```
+
+
+
+| ID | Name | Scope |
+
+|----|------|-------|
+
+| **Project A** | Schema Verification | Audit only — ownership, bypasses, deletion map |
+
+| **Migration Wave 1** | Runtime SSOT batch 1 | Entity size, attachment fallbacks, block hardness, infra fixes |
+
+| **Project B** | Host Effects Infrastructure | `HostEffectConfigLoader`, retire `HostEffectConfigInitializer` |
+
+| **Project C** | Lifecycle Infrastructure | `LifecycleConfig` consumers, `EntityFormResolver` from JSON |
+
+| **Project D** | AI Priority Resolver | `goal_priorities` from entity storage in composition strategies |
+
+
+
+**Execution tracker:** [MIGRATION_WAVE_1.md](./MIGRATION_WAVE_1.md)
+
+
+
+**Prerequisites:** [PROJECT_A_DELETION_MAP.md](./PROJECT_A_DELETION_MAP.md)
+
+
+
+---
+
+
+
+## Pre-wave gate: level rebalance (before Wave 2+)
+
+
+
+Run before each migration wave that removes Java-hardcoded deps:
+
+
+
+```powershell
+
+cd implementations/minecraft/AlienCraft
+
+python dev/verify/gate.py all                    # blocking: placement-formula, nde-strict
+
+python dev/verify/gate.py nde-policy-report      # advisory: reference-graph placement
+
+python dev/verify/gate.py level-rebalance-report # advisory: import-proxy placement
+
+```
+
+
+
+### What the gates actually measure
+
+
+
+| Gate | Basis | Current (post–Wave 1) |
+
+|------|--------|------------------------|
+
+| `placement-formula` (blocking) | Explicit `import` statements only | **0 over, 0 under** — green |
+
+| `nde-policy-report` (advisory) | Reference graph (types, extends, reflection) | **1 over, 26 under** |
+
+| `import-hygiene` (advisory) | Unqualified same-layer types hiding deps | **55** hints |
+
+
+
+**Do not treat blocking green as “levels are settled.”** As JSON SSOT removes bypass imports, files *can* move down — but import-proxy will not flag them as over-placed until hidden deps are deleted.
+
+
+
+### Demotion pattern (Wave 1 proved this)
+
+
+
+Storage-only accessors belong at **L1** (`layer_1_infrastructure.level_1.*`):
+
+
+
+| Moved in Wave 1 | Was | Now |
+
+|-----------------|-----|-----|
+
+| `AttachmentConfigHelper` | L4 | L1 |
+
+| `NestingConfigHelper` | (new) | L1 |
+
+
+
+### Candidates before Wave 2 (semantic audit)
+
+
+
+| File | Level | Category | Action |
+
+|------|-------|----------|--------|
+
+| `ConfigAccessHelper` | L4 | B — demote after effect loader bypass gone | Target L1 when only reads storage |
+
+| `EntityConfigLoaderAdapter` | L4 | C — loader orchestration | Keep until loader chain flattens |
+
+| `ConfigLoaderRegistrationHelper` | L4 | C | Keep with registry bootstrap |
+
+| `GoalHookBootstrap` | L10 | C — composition tier | Intentional bootstrap ladder; reference graph flags it (method-ref edge to L9 may be invisible) |
+
+| `ModRegistrationBootstrap` / `SystemWiringBootstrap` | L12 / L11 | C | Composition ordering — not JSON accessors |
+
+
+
+### Hidden-dep debt (blocks demotion signals)
+
+
+
+`import-hygiene` shows L0/L1 files referencing L3 loaders **without imports** (e.g. `JsonParsingHelper`, `StaticConfigLoader`, `EntityConfigParser`). Until those bypass paths are deleted, placement formula keeps parents artificially high.
+
+
+
+**Recommendation:** Make level rebalance a **Wave 2 entry criterion** alongside DEL ownership — demote storage helpers as each bypass is removed, not as a separate big-bang move.
+
+
+
+# Migration Wave 1 — Runtime SSOT Convergence
+
+
+
+**Former name:** Phase 1  
+
+**Status:** In progress (core DEL items wired; verify green)  
+
+**Rule:** Delete old authorities after wiring storage — see [deletion map](./PROJECT_A_DELETION_MAP.md)
+
+
+
+**Resource discovery:** Use filesystem inventory (`Get-ChildItem -Recurse` on `src/main/resources/data/weylandyutani/`), not `git status` or truncated search. Git tracks changes, not presence. Wave 1 wires Java consumers to existing classpath JSON — it does not author missing configs.
+
+
+
+---
+
+
+
+## Scope (this wave)
+
+
+
+| DEL | Task | Status |
+
+|-----|------|--------|
+
+| DEL-001 | `EntityInit` → `EntityRegistrationHelper` + `EntitySizeHelper` | **Done** |
+
+| DEL-002 | Delete `XenomorphAttachmentConstants` | **Done** |
+
+| DEL-003 | `AttachmentConfigHelper` storage-only (L1) | **Done** |
+
+| DEL-004/005 | Parser gameplay defaults removed | **Done** |
+
+| DEL-006 | Block `gameplay` schema + `BlockInit` from storage | **Done** |
+
+| DEL-007/008 | Queen `nesting` JSON + consumer wiring | **Done** |
+
+| DEL-014 | `SpecimenPodWorkflow` → block JSON `validation_interval_ticks` | **Done** |
+
+| DEL-015 | `FacehuggerAttachmentPolicy.DEFAULT_FOLLOW_RANGE` removed | **Done** |
+
+| DEL-017 | `EntityInitRefs` → `level_5.init.EntityInit` | **Done** |
+
+| DEL-016 | `EntityConfig` DTO gameplay defaults audit | Pending |
+
+
+
+## Out of scope (later waves)
+
+
+
+| Work | Owner |
+
+|------|-------|
+
+| Host effect table migration | Project B — Host Effects Infrastructure |
+
+| Maturation threshold migration | Project C — Lifecycle Infrastructure |
+
+| AI `goal_priorities` in composition | Project D — AI Priority Resolver |
+
+| Sound registry from `visual.*_sound` | Presentation wave |
+
+
+
+---
+
+
+
+## Entry criteria
+
+
+
+Met — see [PROJECT_A_SCHEMA_GAP_REPORT.md](./PROJECT_A_SCHEMA_GAP_REPORT.md) §7.
+
+
+
+---
+
+
+
+## Verification
+
+
+
+```powershell
+
+$env:JAVA_HOME = "C:\Users\mdc0431\.jdks\temurin-21"
+
+cd implementations/minecraft/AlienCraft/weyland-yutani-core
+
+.\gradlew.bat compileJava
+
+cd ..
+
+.\dev\bin\verify.ps1
+
+.\gradlew.bat test
+
+```
+
+
+
+**Last run (2026-07-10):** `compileJava` PASS · `verify.ps1` PASS (full NDE green) · `test` 45/61 pass (16 fail — mostly tests that expect pre-loaded `EntityConfigStorage` or full boundary services without test fixtures).
+
+
+
+# Project A — Bypass Inventory
+
+
+
+**Date:** 2026-07-10  
+
+**Method:** Static trace — consumer → config source (storage vs Java constant vs enum)  
+
+**Deletion targets:** [PROJECT_A_DELETION_MAP.md](./PROJECT_A_DELETION_MAP.md)
+
+
+
+---
+
+
+
+## Summary counts
+
+
+
+| Category | Bypass count | Severity |
+
+|----------|--------------|----------|
+
+| Entity registration size | 8 entities | **Critical** |
+
+| Attachment tuning | 4 call sites + helper | **Critical** |
+
+| Sound registry | 1 registry + enum | **High** |
+
+| Queen nesting geometry | 2 constants + 1 helper | **High** |
+
+| AI goal priorities | 6+ composition classes | **High** |
+
+| Maturation thresholds | 1 resolver | **Medium** (Project C) |
+
+| Host effects | 1 initializer | **Medium** (Project B) |
+
+| Block hardness | 6+ blocks in init | **Medium** (Phase 1) |
+
+| Motion tracker | 1 policy class | **Low** (Phase 2) |
+
+
+
+---
+
+
+
+## Detailed trace
+
+
+
+### Entity size bypass
+
+
+
+| Consumer | File | Current source | Expected source |
+
+|----------|------|----------------|-----------------|
+
+| Ovomorph registration | `layer_3_minecraft/.../EntityInit.java` | `.sized(0.875f, 1.1875f)` | `EntityConfigStorage` → `entity_size` |
+
+| Facehugger | same | hardcoded literals | storage |
+
+| Chestburster | same | hardcoded literals | storage |
+
+| Growth | same | hardcoded literals | storage |
+
+| Drone | same | hardcoded literals | storage |
+
+| Praetor | same | hardcoded literals | storage |
+
+| Queen | same | hardcoded literals | storage |
+
+| Human | same | hardcoded literals | storage |
+
+
+
+**Note:** `EntityRegistrationHelper` exists but is **not** used by `EntityInit`.
+
+
+
+---
+
+
+
+### Attachment bypass
+
+
+
+**Keep vs delete:** Retain `AttachmentConfigHelper` as a **storage accessor** (`getConfigValue(extractor)`). Delete **fallback behavior** and `LifecycleConfig` default delegation — not the helper class.
+
+
+
+**Current (bad):**
+
+
+
+```
+
+JSON → Parser → DTO → AttachmentConfigHelper → if missing: return 2.0 / 0.8 / LifecycleConfig default
+
+```
+
+
+
+**Target (good):**
+
+
+
+```
+
+JSON → Contract → DTO → Storage → AttachmentConfigHelper.get*(config) → Consumer
+
+```
+
+
+
+| Consumer | Current source | Expected |
+
+|----------|----------------|----------|
+
+| `FacehuggerAttachmentManager` | `AttachmentConfigHelper.getMaxDistance()` etc. | `EntityConfigStorage` facehugger via helper (no fallback) |
+
+| `FacehuggerTickWorkflow` | helper with fallbacks | storage-only helper |
+
+| `FacehuggerEntity` | helper with fallbacks | storage-only helper |
+
+| `NeoForgeFacehuggerSpentTransitionAdapter` | helper with fallbacks | storage-only helper |
+
+| `AttachmentConfigHelper` fallback branches | literals `2.0`, `0.8`; `LifecycleConfig.getDefault*()` | **Delete fallbacks** (DEL-003) — fail contract if JSON missing |
+
+
+
+| Constant source | Values | Duplicates JSON keys | Delete in |
+
+|-----------------|--------|----------------------|-----------|
+
+| `XenomorphAttachmentConstants` | 600, 200, 2.0, 0.8, 100, 40, 20 | `implantation_delay`, attachment fields | Phase 1 (DEL-002) |
+
+
+
+---
+
+
+
+### Sound bypass
+
+
+
+| Consumer | Current source | Expected |
+
+|----------|----------------|----------|
+
+| `XenomorphSoundRegistry` | `XenomorphType.getAmbientSoundKey()` | `visual.ambient_sound` from storage |
+
+| Runtime hurt/death | enum / type methods | `visual.hurt_sound`, `visual.death_sound` |
+
+
+
+---
+
+
+
+### Queen nesting bypass
+
+
+
+| Consumer | Current source | Expected |
+
+|----------|----------------|----------|
+
+| `NestBlockScanHelper` | `NestStructureScanOffsets.SCAN_RADIUS` (4) | queen JSON `nesting.scan_radius` |
+
+| `NestTerritoryStageRules` | `DEFAULT_NEST_RADIUS` (16) | queen JSON `nesting.nest_radius` |
+
+| `QueenTerritory` / validators | mixed domain constants | territory system JSON + queen JSON |
+
+
+
+---
+
+
+
+### AI priority bypass (literal `addGoal` priority integers)
+
+
+
+| Class | Pattern | Expected |
+
+|-------|---------|----------|
+
+| `QueenCompositionStrategy` | literal priorities | `goal_priorities` map |
+
+| `DroneSwarmGoalRegistrar` | literal priorities | drone JSON |
+
+| `StandardTargetingHelper` | literal priorities | per-type JSON |
+
+| `StealthTargetingGoal` | embedded range/priority | entity JSON + behavior params |
+
+| `StrategicCommanderAI` | literals | queen JSON |
+
+| `Chestburster` composition | escape goal priority | chestburster JSON |
+
+
+
+Parser **does** populate `config.aiGoals.goalPriorities` — composition strategies **do not read it** today.
+
+
+
+---
+
+
+
+### Maturation / host / block / item bypass
+
+
+
+| Consumer | Java-owned | Target JSON |
+
+|----------|------------|-------------|
+
+| `EntityFormResolver` | 25, 50, 75, 90, 60 thresholds | `systems/maturation.json` |
+
+| `MaturationSystem` | 0.75, 600 | maturation or entity lifecycle |
+
+| `HostEffectConfigInitializer` | per-HostType maps | `systems/host_effects.json` |
+
+| `BlockInit` | destroyTime, blastResistance per block | `blocks/*.json` gameplay |
+
+| `SpecimenPodWorkflow` | VALIDATION_INTERVAL_TICKS=100 | specimen_pod_controller JSON |
+
+| `MotionTrackerDetectionPolicy` | radius, cooldown, max | `items/motion_tracker.json` |
+
+
+
+---
+
+
+
+## Storage-only compliance targets
+
+
+
+After migrations, grep gates should return **zero** for:
+
+
+
+```
+
+XenomorphAttachmentConstants\.(DEFAULT_ATTACHMENT|DEFAULT_IMPLANTATION|DEFAULT_ATTACHMENT_DISTANCE|DEFAULT_FACE_HEIGHT)
+
+NestStructureScanOffsets
+
+EntityInit\.register.*\.sized\(
+
+getAmbientSoundKey\(\)
+
+addGoal\(\s*[0-9]+\s*,
+
+```
+
+
+
+(Exclude test fixtures and deprecated shim layer marked `@Deprecated` during R1.)
+
+
+
+---
+
+
+
+## Bootstrap / loader gaps (not bypasses but block storage path)
+
+
+
+| Reference | Status |
+
+|-----------|--------|
+
+| `ConfigLoaderBootstrap` → `LifecycleConfig` | Class missing |
+
+| `ConfigLoaderBootstrap` → `TerritoryConfig` | Class missing |
+
+| `ConfigLoaderBootstrap` → `HostEffectConfigLoader` | Class missing |
+
+| `AttachmentConfigHelper` → `LifecycleConfig` | Class missing |
+
+
+
+These prevent full loader chain validation until Project B/C infrastructure lands.
+
+
+
+# Project A — Contract Deltas
+
+
+
+**Date:** 2026-07-10  
+
+**Target:** `EntityConfigContracts`, `EntityConfigValidator`, future `ConfigurationOwnershipTest`
+
+
+
+---
+
+
+
+## Current contract coverage
+
+
+
+`EntityConfigContracts` today enforces:
+
+
+
+- Universal: `health`, `behavior_type`, `movement` (6 keys), `transition_modifiers` (4 keys)
+
+- Per-type `special_abilities` key lists (OVOMORPH, FACEHUGGER, CHESTBURSTER, GROWTH, DRONE, PRAETOR, QUEEN)
+
+
+
+**Not contracted today:** `entity_size`, `attachment_parameters`, `gestation_parameters`, `goal_priorities`, `follow_range`, `implantation_delay`, `nesting`, `hatching` (except via special_abilities overlap), `damage`, `spawning`, `visual` non-empty checks.
+
+
+
+---
+
+
+
+## Proposed contract additions
+
+
+
+### Universal (all `XenomorphType` lifecycle configs)
+
+
+
+| Key | Rule | Rationale |
+
+|-----|------|-----------|
+
+| `entity_size.width` | required, > 0 | Eliminate `EntityInit` bypass |
+
+| `entity_size.height` | required, > 0 | Same |
+
+| `visual.model` | required, non-empty | SSOT for rendering |
+
+| `visual.texture` | required, non-empty | SSOT for rendering |
+
+| `damage` | required, >= 0 | Combat tuning |
+
+| `follow_range` | required, >= 0 | Targeting / attachment |
+
+
+
+### Facehugger-only
+
+
+
+| Key | Rule |
+
+|-----|------|
+
+| `attachment_parameters.max_distance` | required, > 0 |
+
+| `attachment_parameters.face_height_multiplier` | required, 0 < x <= 1 |
+
+| `implantation_delay` | required, > 0 |
+
+| `gestation_parameters.duration` | required, > 0 |
+
+| `gestation_parameters.spawn_effects.spawn_entity` | required, non-empty |
+
+
+
+**Reject:** root `attachment_duration` if `attachment_parameters` present (single tree).
+
+
+
+### Ovomorph-only
+
+
+
+| Key | Rule |
+
+|-----|------|
+
+| `hatching.hatch_time` | required, > 0 |
+
+| `hatching.spawn_entity` | required |
+
+| `lifecycle.can_mature` | required boolean |
+
+| `lifecycle.maturation_time` | required when `can_mature` true |
+
+
+
+### Queen-only
+
+
+
+| Key | Rule |
+
+|-----|------|
+
+| `nesting.scan_radius` | required, > 0 (replaces `NestStructureScanOffsets`) |
+
+| `nesting.nest_radius` | required, > 0 |
+
+| `special_abilities` | existing keys + validate numeric values in JSON |
+
+
+
+### Drone / praetor / chestburster / growth
+
+
+
+| Type | Addition |
+
+|------|----------|
+
+| DRONE | `special_abilities.swarm_speed_multiplier` required |
+
+| CHESTBURSTER | `movement.escape_speed` or nested movement key for escape adapter |
+
+| GROWTH | `lifecycle.mature_to` required |
+
+| PRAETOR | extend `special_abilities` if praetor-specific tuning added |
+
+
+
+### Project D — `goal_priorities` (entity-owned, see decision log)
+
+
+
+| Key | Rule |
+
+|-----|------|
+
+| `ai_goals.goal_priorities` | required map for DRONE, QUEEN, PRAETOR, CHESTBURSTER |
+
+| Each priority key | integer 0–10, no duplicates within composition set |
+
+
+
+**Proposed keys (align with composition strategies):**
+
+
+
+- `float`, `melee`, `stroll`, `look`, `swarm`, `nest`, `command`, `stealth_target`, `escape`
+
+
+
+---
+
+
+
+## Parser changes (paired with contracts)
+
+
+
+| Change | Type |
+
+|--------|------|
+
+| Remove `implantation_delay` default 200 | Fail if missing on FACEHUGGER |
+
+| Remove `aggression_level` default 5 | Contract supplies per-type |
+
+| Remove `look_at_player_range` default 8.0 | Contract supplies |
+
+| Remove `behavior_type` default `"standard"` | Already contracted |
+
+| Deprecate root `maturation_time` parse | Lifecycle-only |
+
+| Remove `AttachmentConfigHelper` numeric fallbacks | Storage-only |
+
+
+
+---
+
+
+
+## `ConfigurationOwnershipTest` backlog
+
+
+
+Architectural invariant tests (separate from `ConfigContractTest`). Implement as `@Tag("ownership")` JUnit suite; gate in `verify.ps1` after Phase 1.
+
+
+
+### Named tests (plan Workstream 8)
+
+
+
+| Test name | Validates | Tied to | Post-migration |
+
+|-----------|-----------|---------|----------------|
+
+| `noGameplayDefaultsOnEntityConfigDto` | No balancing defaults on `EntityConfig` nested classes used at runtime | DEL-016, DTO audit §gap report | Phase 1+ |
+
+| `noParserFallbacksForRequiredKeys` | Required gameplay keys have no parser default in `EntityConfigParser` | DEL-004, parser §4 | Phase 1 |
+
+| `entitySizeFromStorageOnly` | Registration uses `EntityRegistrationHelper` + storage, not `EntityInit.sized()` | DEL-001, OWN-002 | Phase 1 |
+
+| `attachmentFromStorageOnly` | No `XenomorphAttachmentConstants` / helper fallback reads in L2/L3 | DEL-002, DEL-003, OWN-001 | Phase 1 |
+
+| `noStorageBypassInventoryEmpty` | Grep gates in bypass inventory return zero open items | All DEL rows | Phase 1–D complete |
+
+
+
+### Detailed assertions (OWN-IDs)
+
+
+
+| Test ID | Assertion |
+
+|---------|-----------|
+
+| OWN-001 | No `layer_2` / `layer_3` class reads attachment distance from `XenomorphAttachmentConstants` |
+
+| OWN-002 | No entity registration uses literal `.sized(` in `EntityInit` — must use `EntityRegistrationHelper` |
+
+| OWN-003 | No `XenomorphType` method returns gameplay sound path used by runtime registry |
+
+| OWN-004 | Queen nesting scan uses `EntityConfigStorage` / queen JSON, not `NestStructureScanOffsets` |
+
+| OWN-005 | `EntityFormResolver` thresholds loaded from config storage, not literals (post Project C) |
+
+| OWN-006 | Block destroy time read from `BlockConfigStorage`, not `BlockInit` literals (post Phase 1) |
+
+| OWN-007 | AI goal registration reads priorities from `goal_priorities` map, not literal `addGoal(N)` (post Project D) |
+
+| OWN-008 | `HostEffectConfigInitializer` tables empty — data only in JSON loaders (post Project B) |
+
+
+
+---
+
+
+
+## Per-type contract → consumer mapping (Workstream 2)
+
+
+
+Maps current `EntityConfigContracts` keys to Java consumers still using literals or bypassing storage.
+
+
+
+| Type | Contract keys today | Primary consumers | Literal / bypass gap |
+
+|------|---------------------|-------------------|----------------------|
+
+| OVOMORPH | `proximity_detection` | `OvomorphHatchWorkflow`, egg AI | `entity_size` vs `EntityInit`; hatching from JSON OK |
+
+| FACEHUGGER | *(default branch — none)* | `FacehuggerAttachmentManager`, `FacehuggerTickWorkflow` | Need contract: `attachment_parameters`, `gestation_parameters`; helper fallbacks |
+
+| CHESTBURSTER | 4 `special_abilities` keys | `ChestbursterEscapeGoalRegistrar`, escape navigation | `addGoal(N)` priorities; movement escape keys |
+
+| GROWTH | `passive_stroll_speed_multiplier` | Growth AI / maturation handlers | `entity_size` bypass; lifecycle from JSON partial |
+
+| DRONE | `patrol_interval` | `DroneCompositionStrategy`, `DroneSwarmGoalRegistrar` | Swarm `* 1.5` literals; `goal_priorities` not read |
+
+| PRAETOR | 3 strategic multipliers | Strategic commander AI (`_PLANNED` goals) | Priorities literal; multipliers in JSON if present |
+
+| QUEEN | 17 `special_abilities` incl. `nest_radius` | `QueenCompositionStrategy`, `NestBlockScanHelper` | `NestStructureScanOffsets` bypasses `nest_radius` key; `addGoal(0–3)` literals |
+
+| HUMAN | *(default — empty)* | Human entity AI | Minimum: health, visual, `behavior_type`, movement |
+
+
+
+**Proposed contract tests** (`ConfigContractTest` — not yet implemented):
+
+
+
+| Test | Type | Assert |
+
+|------|------|--------|
+
+| `facehuggerRequiresAttachmentParameters` | FACEHUGGER | missing `attachment_parameters` throws |
+
+| `facehuggerRequiresGestationParameters` | FACEHUGGER | missing `gestation_parameters` throws |
+
+| `chestbursterRequiresGoalPriorities` | CHESTBURSTER | missing `goal_priorities` throws (post Project D contract) |
+
+| `queenRequiresNestingSection` | QUEEN | missing `nesting.scan_radius` throws |
+
+| `ovomorphRequiresHatching` | OVOMORPH | missing `hatching.hatch_time` throws |
+
+| `allTypesRequireEntitySize` | all lifecycle | missing `entity_size` throws (universal delta) |
+
+
+
+**Proposed validation tests** (`EntityConfigValidationTest` — extend after contracts):
+
+
+
+| Test | Assert |
+
+|------|--------|
+
+| `entitySizeMatchesRegistrationIntent` | JSON `entity_size` equals value used by registration helper (post Phase 1) |
+
+| `facehuggerAttachmentMatchesStorage` | Helper reads match JSON with no fallback path |
+
+| `queenNestingKeysPresent` | `nesting` map non-null for QUEEN |
+
+| `humanConfigLoadsFromCanonicalPath` | HUMAN resolves `entity/human/human.json` not xenomorph path |
+
+
+
+---
+
+
+
+## Species variant contracts
+
+
+
+`SpeciesVariantConfig` parser exists; **no** `EntityConfigContracts` equivalent.
+
+
+
+**Proposed:** `SpeciesVariantContracts` with required: `variant_id`, `host_type`, `health_multiplier`, `speed_multiplier`, `damage_multiplier`.
+
+
+
+---
+
+
+
+## Block config contracts (Phase 1 prerequisite)
+
+
+
+Extend `LoadedBlockVisualConfig` → `LoadedBlockConfig`:
+
+
+
+```json
+
+{
+
+  "visual": { "texture_key": "resin" },
+
+  "gameplay": {
+
+    "destroy_time": 2.0,
+
+    "blast_resistance": 6.0,
+
+    "requires_tool": true
+
+  }
+
+}
+
+```
+
+
+
+Add `BlockConfigContracts.validate(LoadedBlockConfig, blockName)` — required before hardness migration.
+
+
+
+### Block `gameplay` — allowed vs forbidden
+
+
+
+**Allowed (state/tuning):** `destroy_time`, `blast_resistance`, `requires_tool`, `flammability`, `validation_interval_ticks` (pod controller).
+
+
+
+**Forbidden (behavior — code/systems only):** `on_break_spawn_*`, entity spawn tables, FSM transitions, nest/parasite trigger flags.
+
+
+
+See [PROJECT_A_DECISION_LOG.md](./PROJECT_A_DECISION_LOG.md) D5 for rationale. Rejected owners: `combat.json`, entity JSON.
+
+
+
+# Project A — Decision Log
+
+
+
+**Date:** 2026-07-10  
+
+**Rule:** No TBD items — all schema fork decisions resolved for downstream projects.
+
+
+
+---
+
+
+
+## D1 — Entity JSON: extend existing files vs new top-level files
+
+
+
+**Decision:** **Extend existing per-type entity JSON** under `data/weylandyutani/entity/`. Do not introduce parallel `entity_tuning/` or per-system entity fragments.
+
+
+
+**Rationale:** `EntityConfig` DTO and parser already model attachment, gestation, nesting, and AI. Single loader path (`EntityConfigLoader` → storage) preserves governance.
+
+
+
+**Exception:** Systems-wide maturation thresholds (`EntityFormResolver`) belong in **`systems/maturation.json`** (new file, Project C) — not duplicated on every entity.
+
+
+
+---
+
+
+
+## D2 — Host effects: `hosts.json` vs `host_effects.json`
+
+
+
+**Decision:** **`host_effects.json`** as separate file under `data/weylandyutani/systems/`, loaded by **`HostEffectConfigLoader`** (class must be implemented).
+
+
+
+**Rationale:**
+
+- `hosts.json` owns **host type classification** and variant mapping (mob name → `HostType`).
+
+- Effect tables are large, effect-key-centric, and shared across systems — mixing them pollutes host typing.
+
+- `HostEffectConfigInitializer` Java tables migrate wholesale into `host_effects.json`.
+
+
+
+**Shape (proposed):**
+
+
+
+```json
+
+{
+
+  "host_effects": {
+
+    "HUMAN": { "on_implant": [...], "while_attached": [...] },
+
+    "CREEPER": { ... }
+
+  }
+
+}
+
+```
+
+
+
+---
+
+
+
+## D3 — Maturation tuning: `systems/maturation.json` vs extend `combat.json`
+
+
+
+**Decision:** **`systems/maturation.json`** (new), not `combat.json`.
+
+
+
+**Rationale:**
+
+- `CombatConfigLoader` currently exposes only `enabled` — combat.json is not a mature tuning surface.
+
+- Maturation (`EntityFormResolver` thresholds, stage gates, urgency multipliers) is lifecycle domain, not damage formulas.
+
+- Project C owns loader + contracts for maturation without overloading combat ownership.
+
+
+
+**Keys (proposed):** `stage_thresholds`, `promotion_rules`, `urgency_multiplier`, `default_maturation_ticks`.
+
+
+
+---
+
+
+
+## D4 — Motion tracker
+
+
+
+**Decision:** **`data/weylandyutani/items/motion_tracker.json`** (new file, item-owned config).
+
+
+
+**Rationale:** Detection radius, cooldown, and max tracked entities are item gameplay tuning, not entity or system-wide combat. Item registration loads via dedicated small loader (Phase 2+).
+
+
+
+---
+
+
+
+## D5 — Block hardness / destroy time
+
+
+
+**Decision:** **Extend per-block JSON** with `gameplay` section; extend `BlockConfigParser` and `LoadedBlockConfig` DTO.
+
+
+
+**Rationale:** Hardness is per-block state; `BlockConfigLoader` already loads one JSON per block. Texture-only schema is insufficient for Phase 1.
+
+
+
+**Not chosen:** Central `blocks_gameplay.json` — violates per-block ownership and loader pattern.
+
+
+
+### Allowed in `blocks/{name}.json` `gameplay` (state/tuning)
+
+
+
+- `destroy_time`
+
+- `blast_resistance`
+
+- `requires_tool`
+
+- `flammability`
+
+- `validation_interval_ticks` (specimen pod controller only)
+
+
+
+### Forbidden in block JSON (behavior — stays in code/systems)
+
+
+
+- `on_break_spawn_*` — entity spawn on break belongs in event/behavior systems
+
+- Entity spawn tables, mob lists
+
+- FSM transitions, nest logic, parasite lifecycle triggers
+
+- Any field that encodes **what happens** rather than **numeric block properties**
+
+
+
+**Example — good:**
+
+
+
+```json
+
+{
+
+  "visual": { "texture_key": "resin_block" },
+
+  "gameplay": {
+
+    "destroy_time": 2.0,
+
+    "blast_resistance": 6.0,
+
+    "requires_tool": true
+
+  }
+
+}
+
+```
+
+
+
+**Example — reject:**
+
+
+
+```json
+
+{
+
+  "gameplay": {
+
+    "on_break_spawn_facehugger": true
+
+  }
+
+}
+
+```
+
+
+
+Same category as entity size: schema exists for tuning; consumers must read storage, not `BlockInit` literals.
+
+
+
+---
+
+
+
+## D6 — Project D Gate 0: AI goal priority ownership
+
+
+
+**Decision:** **Entity-owned** — priorities live in `ai_goals.goal_priorities` on each species entity JSON.
+
+
+
+**Rationale:**
+
+1. Parser already supports `goal_priorities` map (`EntityConfigParser` L213–218).
+
+2. Composition strategies are **per-species** (queen vs drone vs chestburster) — priorities are species gameplay, not algorithm.
+
+3. `ai_behaviors/*.json` remains for **behavior algorithm parameters** (stealth multipliers, standard parameters), not NeoForge goal slot integers.
+
+4. `GoalPriorityResolver` (Project D) reads entity storage first; behavior JSON may only supply overrides if explicitly keyed — default path is entity JSON.
+
+
+
+**Rejected:** Behavior-owned priorities in `ai_behaviors/` — would split one species across two files and complicate `ConfigurationOwnershipTest`.
+
+
+
+---
+
+
+
+## D7 — Attachment parameter tree
+
+
+
+**Decision:** **Nested `attachment_parameters` only** for distance/face-height/damage; root `attachment_duration` **deprecated** in favor of explicit field in `attachment_parameters` or top-level `implantation_delay` / duration keys documented in facehugger checklist.
+
+
+
+**Action:** Remove duplicate root `attachment_duration` from parser after facehugger JSON ships.
+
+
+
+---
+
+
+
+## D8 — `maturation_time` location
+
+
+
+**Decision:** **`lifecycle.maturation_time` only** — remove root-level `maturation_time` parsing to eliminate overwrite ambiguity.
+
+
+
+---
+
+
+
+## D9 — Missing infrastructure classes
+
+
+
+**Decision:** Implement missing Java loaders to match **existing** JSON:
+
+
+
+| Class | JSON on classpath |
+
+|-------|-------------------|
+
+| `HostEffectConfigLoader` | `systems/host_effects.json` |
+
+| `LifecycleConfig` | `systems/lifecycle.json` |
+
+| `TerritoryConfig` | `systems/territory.json` |
+
+
+
+Until implemented, `ConfigLoaderBootstrap` references are **blocking** — mod tests fail; clean compile may succeed only from stale cache.
+
+
+
+---
+
+
+
+## D10 — `XenomorphType.getConfigPath()` / HUMAN path
+
+
+
+**Decision:** Fix loader path logic: **HUMAN** uses `entity/human/human.json`, not `entity/xenomorph/human/human.json`. Implement in Phase 1 wiring (code change), not JSON.
+
+
+
+---
+
+
+
+## Phase readiness (summary)
+
+
+
+| Project | Ready? | Prerequisite |
+
+|---------|--------|--------------|
+
+| JSON alignment | Yes | Checklists + deletion map |
+
+| Phase 1 (entity/block SSOT wiring) | Yes (tracks) | Deletion map DEL-001–008; infra DEL-017 |
+
+| Project B | **Blocked** | Implement `HostEffectConfigLoader` (D2, D9) |
+
+| Project C | **Blocked** | Implement `LifecycleConfig` (D3, D9) |
+
+| Project D | Partial | D6 — wire `goal_priorities` consumers |
+
+| Motion tracker migration | Yes | D4 |
+
+
+
+See [PROJECT_A_SCHEMA_GAP_REPORT.md](./PROJECT_A_SCHEMA_GAP_REPORT.md) §6–7 for per-track table and Phase 1 entry criteria.
+
+
+
+# Project A — Deletion Map
+
+
+
+**Date:** 2026-07-10  
+
+**Purpose:** Authoritative **delete-not-add** register for hardcoded-data migration  
+
+**Related:** [PROJECT_A_BYPASS_INVENTORY.md](./PROJECT_A_BYPASS_INVENTORY.md) · [PROJECT_A_OWNERSHIP_BOUNDARIES.md](./PROJECT_A_OWNERSHIP_BOUNDARIES.md)
+
+
+
+---
+
+
+
+## Rule
+
+
+
+> Migration succeeds when old sources are **deleted**, not when JSON is **added**.  
+
+> Two authorities for the same field = failed migration.
+
+
+
+Migration Wave 1 is **runtime convergence** on approved SSOT paths, not authoring more configs.
+
+
+
+---
+
+
+
+## Deletion register
+
+
+
+| ID | Old source | Field(s) | Replacement path | Project | R1 deprecate | R2 delete | Verification |
+
+|----|------------|----------|------------------|---------|--------------|-----------|--------------|
+
+| DEL-001 | `EntityInit.sized(w,h)` literals | hitbox width/height | `EntityConfigStorage` → `EntityRegistrationHelper` → `EntityType.Builder.sized()` | Migration Wave 1 | Wire helper | Remove all 8 `.sized()` literals | `OWN-002`; grep `EntityInit.*\.sized\(` |
+
+| DEL-002 | `XenomorphAttachmentConstants` | `DEFAULT_ATTACHMENT_DURATION`, `DEFAULT_IMPLANTATION_DELAY`, `DEFAULT_ATTACHMENT_DISTANCE`, `DEFAULT_FACE_HEIGHT_RATIO`, `DEFAULT_SPENT_WANDER_TIME`, `DEFAULT_DEATH_ANIMATION_TIME` | `facehugger.json` attachment/gestation/`implantation_delay` | Migration Wave 1 | `@Deprecated` on constants | Delete class or strip gameplay fields | `OWN-001`; grep constants |
+
+| DEL-003 | `AttachmentConfigHelper` **fallback branches** | `2.0`, `0.8`, `LifecycleConfig.getDefault*()` delegation | Storage-only `getConfigValue(extractor)` — **keep helper class** | Migration Wave 1 | Mark fallback paths | Remove fallback literals | `OWN-004`; no `return 2.0` / `return 0.8` |
+
+| DEL-004 | `EntityConfigParser` gameplay defaults | `implantation_delay` 200, `aggression_level` 5, `look_at_player_range` 8.0, spawn 5/1/1, `face_height_multiplier` 0.8 | Contract-required keys; fail at load | Migration Wave 1 | Document | Remove parser defaults | `noParserFallbacksForRequiredKeys` |
+
+| DEL-005 | Root `maturation_time` parser field | duplicate path | `lifecycle.maturation_time` only | Migration Wave 1 | Deprecate root parse | Remove root field | Contract rejects both |
+
+| DEL-006 | `BlockInit` literals | `destroyTime`, `blastResistance` per block | `blocks/{name}.json` `gameplay.destroy_time`, `gameplay.blast_resistance` | Migration Wave 1 | Wire `BlockConfigStorage` | Delete init literals | `OWN-006` |
+
+| DEL-007 | `NestStructureScanOffsets.SCAN_RADIUS` | scan radius (4) | `queen.json` `nesting.scan_radius` via storage | Migration Wave 1 | Deprecate constant | Delete class | `OWN-004` |
+
+| DEL-008 | `NestTerritoryStageRules.DEFAULT_NEST_RADIUS` | nest radius (16) | `queen.json` `nesting.nest_radius` via storage | Migration Wave 1 | Deprecate constant | Delete or narrow to algorithm-only | Queen nesting tests |
+
+| DEL-009 | `XenomorphType.get*SoundKey()` / path builders | ambient/hurt/death sound paths | `visual.*_sound` via `EntityConfigStorage` | Phase 3 | Deprecate methods | Delete enum sound switches | `OWN-003`; grep `getAmbientSoundKey` |
+
+| DEL-010 | `EntityFormResolver` threshold literals | 25, 50, 75, 90, 60 | `systems/lifecycle.json` via `LifecycleConfig` | Project C | Wire loader | Delete literals | `OWN-005` |
+
+| DEL-011 | `HostEffectConfigInitializer` tables | per-`HostType` effect lists | `systems/host_effects.json` via `HostEffectConfigLoader` | Project B | Empty initializer | Delete initializer | `OWN-008` |
+
+| DEL-012 | AI composition `addGoal(N)` literals | goal slot integers | `ai_goals.goal_priorities` via storage + `GoalPriorityResolver` | Project D | Read map first | Remove literals | `OWN-007`; grep `addGoal\(\s*[0-9]` |
+
+| DEL-013 | `MotionTrackerDetectionPolicy` literals | radius, cooldown, max entities | `items/motion_tracker.json` | Phase 2 | Item loader | Delete policy literals | Item config tests |
+
+| DEL-014 | `SpecimenPodWorkflow` | `VALIDATION_INTERVAL_TICKS=100` | `blocks/specimen_pod_controller.json` gameplay | Migration Wave 1 | Wire block storage | Delete constant | Block contract |
+
+| DEL-015 | `FacehuggerAttachmentPolicy.DEFAULT_FOLLOW_RANGE` | follow range 16 | `facehugger.json` `follow_range` | Migration Wave 1 | Deprecate | Delete | Entity contract |
+
+| DEL-016 | `EntityConfig` DTO gameplay defaults | nested defaults on attachment/gestation/AI | Contract + JSON only | Phase 1+ | Audit DTO | Remove balancing defaults | `noGameplayDefaultsOnEntityConfigDto` |
+
+| DEL-017 | `EntityInitRefs` wrong FQN | `level_3.init.EntityInit` | `level_5.init.EntityInit` | Phase 1 infra | Fix reference | — | Mod tests green |
+
+
+
+---
+
+
+
+## Loader implementation (not deletion — prerequisite)
+
+
+
+These classes are **absent** but referenced from [`ConfigLoaderBootstrap`](../../weyland-yutani-core/src/main/java/com/weylandyutani/layer_3_minecraft/level_3/lifecycle/ConfigLoaderBootstrap.java). Implement before Projects B/C can delete Java tables:
+
+
+
+| Class | JSON on classpath | Owner project | Blocks deletion of |
+
+|-------|-------------------|---------------|-------------------|
+
+| `LifecycleConfig` | `systems/lifecycle.json` | Project C (+ Phase 1 infra for helper) | DEL-003, DEL-010 |
+
+| `TerritoryConfig` | `systems/territory.json` | Project C / territory wiring | Territory constant reads |
+
+| `HostEffectConfigLoader` | `systems/host_effects.json` | Project B | DEL-011 |
+
+
+
+---
+
+
+
+## Migration anti-pattern (reject)
+
+
+
+```
+
+add JSON
+
++
+
+leave Java authority
+
+=
+
+two sources (FAILED)
+
+```
+
+
+
+Correct sequence:
+
+
+
+```
+
+1. Wire consumer → storage
+
+2. Verify runtime reads JSON path
+
+3. R1 deprecate old source
+
+4. R2 delete old source
+
+```
+
+
+
+---
+
+
+
+## Cross-reference
+
+
+
+| Artifact | Role |
+
+|----------|------|
+
+| [PROJECT_A_BYPASS_INVENTORY.md](./PROJECT_A_BYPASS_INVENTORY.md) | Consumer trace (what bypasses today) |
+
+| [PROJECT_A_OWNERSHIP_BOUNDARIES.md](./PROJECT_A_OWNERSHIP_BOUNDARIES.md) | Who may own each field (+ forbidden owners) |
+
+| [PROJECT_A_SCHEMA_GAP_REPORT.md](./PROJECT_A_SCHEMA_GAP_REPORT.md) | Phase 1 entry criteria + per-track readiness |
+
+
+
+# Project A — JSON Authoring Checklist
+
+
+
+**Date:** 2026-07-10  
+
+**Use:** **Align existing JSON** to approved schema and [deletion map](./PROJECT_A_DELETION_MAP.md). Author only **missing keys** called out below.
+
+
+
+> Presence of classpath JSON is not proof of configuration. Consumers must read storage; see [gap report](./PROJECT_A_SCHEMA_GAP_REPORT.md) false-completion warning.
+
+
+
+Path pattern: `/data/weylandyutani/entity/{category}/{config_key}.json`  
+
+**On disk (2026-07-10):** all 8 lifecycle JSON structures exist under `entity/xenomorph/human/`; canonical human at `entity/human/human.json`. **Runtime alignment not done.**
+
+
+
+---
+
+
+
+## Legend
+
+
+
+- **R** = required (contract + gameplay)
+
+- **O** = optional / type-specific
+
+- **—** = omit section for this type
+
+
+
+---
+
+
+
+## Lifecycle types
+
+
+
+### OVOMORPH (`ovomorph.json` — exists, needs alignment)
+
+
+
+| Section / key | Status |
+
+|---------------|--------|
+
+| `health`, `speed`, `damage`, `shadow_size` | R |
+
+| `entity_size` | R — **fix:** match intended gameplay (currently 0.5×0.5 vs Java 0.875×1.1875) |
+
+| `visual.model`, `visual.texture` | R |
+
+| `hatching.*` | R |
+
+| `lifecycle.can_mature`, `lifecycle.maturation_time`, `lifecycle.mature_to` | R |
+
+| `ai_goals.behavior_type` | R (`ovomorph` or `passive`) |
+
+| `ai_goals.movement.*` | R (6 keys) |
+
+| `ai_goals.special_abilities` | R per contract keys |
+
+| `client_parameters.transition_modifiers` | R |
+
+| `spawning.*` | O |
+
+| `attachment_parameters` | — |
+
+| `gestation_parameters` | — |
+
+| `goal_priorities` | — |
+
+
+
+### FACEHUGGER (`facehugger.json` — **exists**)
+
+
+
+| Section / key | Status |
+
+|---------------|--------|
+
+| Core stats | Present |
+
+| `follow_range` | Present (16) |
+
+| `implantation_delay` | Present — still duplicated with parser default |
+
+| `attachment_parameters` | **Present** — helper fallbacks still bypass storage |
+
+| `gestation_parameters` | **Missing** — add before gestation migration |
+
+| `ai_goals.goal_priorities` | **Present** — composition does not consume yet |
+
+| `entity_size` | Present (0.6×0.4) — **conflicts** with `EntityInit` 0.75×0.5 |
+
+
+
+### CHESTBURSTER (`chestburster.json` — **exists**)
+
+
+
+| Section / key | Status |
+
+|---------------|--------|
+
+| Core stats + `entity_size` | Present — verify vs `EntityInit` |
+
+| `lifecycle.*` | Present |
+
+| `ai_goals.movement.*` | Present — verify escape-related keys |
+
+| `ai_goals.special_abilities` | Present per contract |
+
+| `ai_goals.goal_priorities` | **Missing or incomplete** — add `escape`, `melee`, `float` |
+
+
+
+### GROWTH (`growth.json` — **exists**)
+
+
+
+| Section / key | Status |
+
+|---------------|--------|
+
+| Core stats | Present |
+
+| `lifecycle.mature_to` | Verify present |
+
+| `lifecycle.maturation_time` | Verify present |
+
+| `ai_goals` | Present |
+
+| `entity_size` | Present — verify vs `EntityInit` |
+
+
+
+### DRONE (`drone.json` — **exists**)
+
+
+
+| Section / key | Status |
+
+|---------------|--------|
+
+| Core stats | Present |
+
+| `ai_goals.special_abilities.swarm_speed_multiplier` | Verify / add if missing |
+
+| `ai_goals.goal_priorities` | **Missing or incomplete** — swarm, stroll, look, melee |
+
+| `spawning.*` | O if spawnable |
+
+| `entity_size` | Present — verify vs `EntityInit` |
+
+
+
+### PRAETOR (`praetor.json` — **exists**)
+
+
+
+| Section / key | Status |
+
+|---------------|--------|
+
+| Core stats | Present |
+
+| `ai_goals.goal_priorities` | **Missing or incomplete** |
+
+| `ai_goals.special_abilities` | Present per contract |
+
+| `entity_size` | Present — verify vs `EntityInit` |
+
+
+
+### QUEEN (`queen.json` — **exists**)
+
+
+
+| Section / key | Status |
+
+|---------------|--------|
+
+| Core stats | Present |
+
+| `nesting.scan_radius` | **Missing** — add (replaces `NestStructureScanOffsets`) |
+
+| `nesting.nest_radius` | **Missing** — add |
+
+| `ai_goals.goal_priorities` | **Missing** — add for Project D |
+
+| `entity_size` | Present — verify vs `EntityInit` 1.0×3.5 |
+
+
+
+### HUMAN (`entity/human/human.json` — **exists**)
+
+
+
+| Section / key | Status |
+
+|---------------|--------|
+
+| Core stats | Present |
+
+| `visual` | Present |
+
+| `ai_goals.behavior_type` | Present — verify `human` or `standard` |
+
+| Minimal movement | Present |
+
+| Xenomorph-specific sections | — |
+
+| Loader path | **Verify** canonical `entity/human/` not `xenomorph/human/human.json` stray copy |
+
+
+
+---
+
+
+
+## Species variants (`entity/xenomorph/mob-based/{folder}/{name}.json`)
+
+
+
+| Variant | Folder | File | Required keys |
+
+|---------|--------|------|---------------|
+
+| Spider | `spider` | `spider.json` | `variant_id`, `host_type`, multipliers, `description` |
+
+| Creeper | `creeper` | `creeper.json` | same |
+
+| Wolf | `wolf` | `wolf.json` | same |
+
+| Enderman | `enderman` | `enderman.json` | same |
+
+
+
+---
+
+
+
+## Systems files
+
+
+
+| File | Required top-level | Notes |
+
+|------|-------------------|-------|
+
+| `systems/hosts.json` | `host_types` map | Exists — typing only |
+
+| `systems/host_effects.json` | `host_effects` map | Exists — loader class missing (Project B) |
+
+| `systems/combat.json` | `enabled` | Exists (minimal) |
+
+| `systems/lifecycle.json` | stage thresholds | Exists — loader class missing (Project C) |
+
+| `systems/territory.json` | territory tuning | Exists — loader class missing |
+
+| `effects/gestation.json` | effect metadata | Exists |
+
+
+
+---
+
+
+
+## Block files
+
+
+
+| File | Required today | Migration Wave 1 addition |
+
+|------|----------------|------------------|
+
+| `block_textures.json` | texture entries | — |
+
+| `blocks/resin_block.json` | `visual.texture_key` | `gameplay.destroy_time`, `blast_resistance` |
+
+| `blocks/spiny_block.json` | same | same |
+
+| `blocks/cocoon_block.json` | same | same |
+
+| `blocks/lab_machine.json` | same | same |
+
+| `blocks/specimen_glass.json` | same | same |
+
+| `blocks/specimen_pod_controller.json` | same | same + `validation_interval_ticks` |
+
+
+
+---
+
+
+
+## Authoring order (recommended)
+
+
+
+1. **Align** existing JSON to `entity_size` values that match intended gameplay (then wire `EntityRegistrationHelper`)
+
+2. Add **queen** `nesting` + `goal_priorities`
+
+3. Add **facehugger** `gestation_parameters`
+
+4. Tighten contracts + remove parser gameplay fallbacks
+
+5. Extend block JSON with `gameplay` section
+
+6. Implement missing loader classes (`LifecycleConfig`, `TerritoryConfig`, `HostEffectConfigLoader`)
+
+
+
+Do **not** enable strict contract mode until loader classes exist and `EntityInitRefs` points at `level_5.init.EntityInit`.
+
+
+
+# Project A — Ownership Boundaries
+
+
+
+**Date:** 2026-07-10  
+
+**Governance:** [architecture-governance.mdc](../../.cursor/rules/architecture-governance.mdc)
+
+
+
+---
+
+
+
+## Configuration ownership table
+
+
+
+| JSON file / section | Owns | Must NOT own |
+
+|---------------------|------|--------------|
+
+| `entity/{type}.json` | Species stats, size, visual, sounds, attachment, gestation, nesting, per-species AI priorities & movement | Cross-species algorithms, global maturation rules, host typing |
+
+| `entity/xenomorph/mob-based/*` | Host-variant multipliers and traits | Lifecycle stage logic |
+
+| `systems/hosts.json` | Mob name → `HostType`, variant strings | Effect durations, particle types |
+
+| `systems/host_effects.json` | Per-`HostType` effect lists | Entity combat stats |
+
+| `systems/maturation.json` | Stage thresholds, promotion rules, urgency | Per-entity visual |
+
+| `systems/combat.json` | Global combat system enable + shared combat tuning | Species size, AI priorities |
+
+| `effects/*.json` | Effect registry metadata (duration, amplifier caps) | Who receives effect (host file) |
+
+| `blocks/*.json` | Block visual key + gameplay hardness/resistance | Entity damage |
+
+| `items/motion_tracker.json` | Detection radius, cooldown, max targets | Entity follow_range |
+
+| `ai_behaviors/*.json` | Behavior **algorithm** parameters (stealth curves, speed multipliers) | NeoForge goal **priority integers** (entity-owned per D6) |
+
+
+
+---
+
+
+
+## Field-to-owner map (high-traffic)
+
+
+
+| Gameplay value | Authoritative owner | Current violation |
+
+|----------------|---------------------|-------------------|
+
+| Entity hitbox width/height | `entity_size` in entity JSON | `EntityInit.sized()` |
+
+| Facehugger max attach distance | `attachment_parameters.max_distance` | `AttachmentConfigHelper` + constants |
+
+| Facehugger face height ratio | `attachment_parameters.face_height_multiplier` | Helper fallback 0.8 |
+
+| Implantation delay ticks | `implantation_delay` on facehugger JSON | Parser default 200, constants |
+
+| Ambient/hurt/death sounds | `visual.*_sound` on entity JSON | `XenomorphType.getAmbientSoundKey()` |
+
+| Queen nest scan radius | `nesting.scan_radius` (new) | `NestStructureScanOffsets.SCAN_RADIUS` |
+
+| Queen nest territory radius | `nesting.nest_radius` (new) | `NestTerritoryStageRules.DEFAULT_NEST_RADIUS` |
+
+| Maturation stage thresholds | `systems/maturation.json` | `EntityFormResolver` literals |
+
+| Host implant effects | `systems/host_effects.json` | `HostEffectConfigInitializer` |
+
+| Block destroy time | `blocks/*.json` `gameplay.destroy_time` | `BlockInit` |
+
+| AI goal slot order | `ai_goals.goal_priorities` | `addGoal(4)` literals in strategies |
+
+| Motion tracker range | `items/motion_tracker.json` | `MotionTrackerDetectionPolicy` |
+
+
+
+---
+
+
+
+## Boundary violations (anti-patterns found)
+
+
+
+| ID | Violation | Layer | Fix phase |
+
+|----|-----------|-------|-----------|
+
+| BV-01 | Infrastructure helper applies gameplay fallback | L1 `AttachmentConfigHelper` | Phase 1 |
+
+| BV-02 | Minecraft init bypasses storage | L3 `EntityInit` | Phase 1 |
+
+| BV-03 | Domain enum encodes asset paths | L0 `XenomorphType` | Phase 3 |
+
+| BV-04 | Systems package holds scan offsets | L2 `NestStructureScanOffsets` | Phase 1 + queen JSON |
+
+| BV-05 | Systems resolver embeds thresholds | L2 `EntityFormResolver` | Project C |
+
+| BV-06 | Systems initializer embeds effect tables | L2 `HostEffectConfigInitializer` | Project B |
+
+| BV-07 | Block init embeds hardness | L3 `BlockInit` | Phase 1 |
+
+| BV-08 | AI composition hardcodes priorities | L2 strategies | Project D |
+
+
+
+---
+
+
+
+## Anti-creep rules (for authors and reviewers)
+
+
+
+1. **No second file for the same field** — if `entity_size` exists on entity JSON, Java must not also define size.
+
+2. **No parser gameplay defaults** — missing required key fails contract, not silent default (except documented asset fallbacks).
+
+3. **No cross-layer reads** — L3 entities read L1 storage only; no direct `XenomorphAttachmentConstants` in L2 workflows.
+
+4. **Behavior vs tuning** — JSON holds values; Java holds FSM and goal **algorithms**. Priority **numbers** are tuning (entity JSON).
+
+5. **Extend, don't fork** — new species fields go into existing entity schema sections; new **system** concepts get new `systems/*.json` files per decision log.
+
+6. **Storage-only path:** `JSON → Loader → Contract → Storage/Catalog → Consumer` — no helper shortcuts.
+
+7. **Negative ownership** — every new schema field PR must name both **owner** and **rejected owners** (see below).
+
+
+
+---
+
+
+
+## Negative ownership (forbidden owners)
+
+
+
+Every field has an authoritative owner **and** owners that must never hold that field. Rejecting convenience placement prevents schema creep.
+
+
+
+| Field | Authoritative owner | Forbidden owners |
+
+|-------|---------------------|------------------|
+
+| `entity_size` | entity JSON (`entity_size`) | `combat.json`, renderer/init (`EntityInit`), `BlockInit` |
+
+| `goal_priorities` | entity `ai_goals.goal_priorities` | `combat.json`, `ai_behaviors/*.json` |
+
+| `hardness` / `blast_resistance` | block `gameplay` section | `combat.json`, entity JSON |
+
+| Host infection / implant effects | `systems/host_effects.json` | entity JSON, `hosts.json` (typing only) |
+
+| Maturation stage thresholds | `systems/lifecycle.json` | per-entity JSON duplication, `combat.json` |
+
+| Motion tracker detection | `items/motion_tracker.json` | entity `follow_range`, `combat.json` |
+
+| Block break spawn behavior | event/behavior systems (code) | block `gameplay` JSON |
+
+| Attachment distance / face height | facehugger `attachment_parameters` | `LifecycleConfig` defaults, domain constants |
+
+| Entity sounds | entity `visual.*_sound` | `XenomorphType` enum switches |
+
+
+
+**Reviewer rule:** PRs adding config keys must state owner **and** at least one rejected owner in the description.
+
+
+
+---
+
+
+
+## Rejected placement examples (anti-creep)
+
+
+
+Explicitly reject these convenience placements — they caused prior architecture drift:
+
+
+
+| Proposed key / pattern | Why rejected | Correct owner |
+
+|------------------------|--------------|---------------|
+
+| `combat.motion_tracker` | Combat does not own item detection tuning | `items/motion_tracker.json` |
+
+| `entity.registry_id` | Registration IDs are code/infrastructure | NeoForge deferred registers |
+
+| `entity.renderer_model` | Renderer wiring is presentation layer | `visual.model` + client adapters |
+
+| `combat.goal_priority_defaults` | Priorities are species behavior | `ai_goals.goal_priorities` on entity JSON |
+
+| `hosts.json` effect durations | Host typing ≠ effect tables | `systems/host_effects.json` |
+
+| `blocks/*.json` `on_break_spawn_facehugger` | Break behavior is FSM/event logic | behavior systems + events |
+
+| Duplicate `entity_size` in `EntityInit` | Second authority for hitbox | entity JSON only |
+
+
+
+---
+
+
+
+## Project D Gate 0 (priority ownership)
+
+
+
+**Decision:** Entity-owned — `ai_goals.goal_priorities` on each species entity JSON.
+
+
+
+**Rejected:** Behavior-owned priorities in `ai_behaviors/*.json` (algorithm params only).
+
+
+
+Full rationale: [PROJECT_A_DECISION_LOG.md](./PROJECT_A_DECISION_LOG.md) D6.
+
+
+
+Full delete-not-add register: **[PROJECT_A_DELETION_MAP.md](./PROJECT_A_DELETION_MAP.md)** (authoritative).
+
+
+
+Summary: Phase 1 deletes init literals, helper fallbacks, block hardness literals, queen nesting constants, and parser gameplay defaults. Projects B/C/D delete initializer tables, maturation literals, and AI priority literals respectively. Phase 3 deletes enum sound path builders.
+
+
+
+# Project A — Schema Gap Report
+
+
+
+**Date:** 2026-07-10  
+
+**Scope:** `weyland-yutani-core` entity and systems configuration schema  
+
+**Parent:** [Hardcoded Data Migration Plan](../../.cursor/plans/hardcoded_data_migration_8272e197.plan.md)  
+
+**Status:** Audit complete (handoff tightened 2026-07-10) — documentation only; no code or JSON changes in Project A
+
+
+
+---
+
+
+
+## Executive findings
+
+
+
+> **JSON structures exist; runtime SSOT is not established.**  
+
+> Classpath JSON does not mean consumers read storage. Alternate authorities (init literals, helper fallbacks, missing loaders) remain active.
+
+
+
+**False-completion warning:**
+
+
+
+```
+
+JSON exists + incomplete contracts + consumer bypasses = false sense of done
+
+```
+
+
+
+The migration target is **removing alternate authorities**, not adding more files.
+
+
+
+| Area | State |
+
+|------|-------|
+
+| Classpath entity JSON | **8 lifecycle structures** under `entity/xenomorph/human/` (+ `entity/human/human.json`) — **alignment required** |
+
+| Species variants | **4** loader-manifest variants + extended mob-based tree — not all wired to runtime |
+
+| Systems JSON | Files on classpath (`hosts`, `host_effects`, `combat`, `lifecycle`, `territory`, …) — **loaders missing for several** |
+
+| Schema shape | Rich `EntityConfig` DTO + parser; contracts cover **subset** of fields |
+
+| Duplicate SSOT | **Confirmed** — JSON vs `EntityInit.sized()` vs helper/constant fallbacks |
+
+| Block hardness | **Schema gap** — block JSON is `visual.texture_key` only; hardness in `BlockInit` Java (same class as entity size bypass) |
+
+| Missing loader classes | `LifecycleConfig`, `TerritoryConfig`, `HostEffectConfigLoader` **imported but source absent** — **Phase 1 / B / C blockers** |
+
+| `EntityInitRefs` | Wrong FQN (`level_3.init` vs `level_5.init`) — **breaks mod tests**; Phase 1 infra |
+
+
+
+---
+
+
+
+## 1. Entity schema matrix (four-way diff)
+
+
+
+Legend: **C** = contract required, **P** = parser fallback, **D** = DTO default, **O** = in ovomorph.json
+
+
+
+| JSON path | DTO field | Parsed | Contract | P fallback | D default | In ovomorph | SSOT verdict |
+
+|-----------|-----------|--------|----------|------------|-----------|-------------|--------------|
+
+| `health` | `health` | Yes | C (>0) | No | No | Yes | **JSON** — OK if no Java duplicate |
+
+| `speed` | `speed` | Yes | C (>=0) | No | No | Yes | **JSON** |
+
+| `damage` | `damage` | Yes | No | No | No | Yes | **JSON** — add contract? |
+
+| `shadow_size` | `shadowSize` | Yes | No | No | No | Yes | **JSON** |
+
+| `follow_range` | `followRange` | Yes | No | No | No | Yes (0) | **JSON** — facehugger needs value |
+
+| `attachment_duration` | `attachmentDuration` | Yes | No | P: 0 | No | Yes (200) | **DUPLICATE** vs `attachment_parameters` / constants |
+
+| `implantation_delay` | `implantationDelay` | Yes | No | P: **200** | No | Yes (200) | **DUPLICATE** — same as `XenomorphAttachmentConstants` |
+
+| `maturation_time` (root) | `maturationTime` | Yes | No | P: 0 | No | No (root) | **OVERWRITE** — `lifecycle.maturation_time` wins when present |
+
+| `lifecycle.*` | lifecycle fields | Yes | No | various | No | Yes | **JSON** — root maturation duplicate path |
+
+| `spawning.*` | spawnWeight, etc. | Yes | No | P: 5/1/1 | D: 5/1/1 | Yes | **Governance risk** — parser+D defaults |
+
+| `entity_size.*` | `entitySize` | Yes | No | scale P:1.0 | No | Yes 0.5×0.5 | **DUPLICATE** — `EntityInit.sized()` bypasses |
+
+| `visual.*` | model, texture, sounds | Yes | No | many | D: player/steve | Yes | **DUPLICATE** — `XenomorphType` sound/path methods |
+
+| `client_parameters.*` | `clientParameters` | Yes | C (modifiers) | duration P:30 | D on modifiers | Yes | **JSON** — contract partial |
+
+| `hatching.*` | `hatching` | Yes | No | No | No | Yes | **JSON** — require for OVOMORPH |
+
+| `ai_goals.behavior_type` | `behaviorType` | Yes | C | P: "standard" | No | Yes | **JSON** |
+
+| `ai_goals.movement.*` | movement map | Yes | C (6 keys) | No | No | Yes | **JSON** |
+
+| `ai_goals.special_abilities.*` | map | Yes | per-type C | No | No | Yes | **JSON** |
+
+| `ai_goals.goal_priorities` | `goalPriorities` | Yes | **No** | No | No | No | **GAP** — Project D; literals in Java |
+
+| `ai_goals.aggression_level` | `aggressionLevel` | Yes | No | P: **5** | No | Yes (0) | Remove fallback; contract per type |
+
+| `ai_goals.look_at_player_range` | `lookAtPlayerRange` | Yes | No | P: **8.0** | No | Yes (0) | Remove fallback when required |
+
+| `attachment_parameters.*` | `attachmentParameters` | Yes | No | many P | D on nested | No in ovomorph | **SSOT target** for facehugger attachment |
+
+| `gestation_parameters.*` | `gestationParameters` | Yes | No | many P | nested D | No | **SSOT target** for facehugger gestation |
+
+| `nesting` | `nesting` map | Yes | No | No | No | No | **SSOT target** for queen — replace domain constants |
+
+| `combat` | `combat` map | Yes | No | No | No | No | Keep entity-local combat tuning only |
+
+| `sound_parameters.*` | `soundParameters` | Yes | No | No | No | Yes | **JSON** |
+
+
+
+### Confirmed duplicate semantics (action required)
+
+
+
+1. **`maturation_time`:** Parser sets root (L42) then **overwrites** from `lifecycle` (L58). **Decision:** single source = `lifecycle.maturation_time`; remove root parser field or reject both.
+
+2. **`attachment_duration` / `implantation_delay`:** Root fields + `attachment_parameters` + `XenomorphAttachmentConstants` + `AttachmentConfigHelper` fallbacks. **Decision:** facehugger JSON `attachment_parameters` + root duration fields **or** nested only — pick one tree.
+
+3. **`entity_size`:** JSON 0.5×0.5 vs `EntityInit` 0.875×1.1875 for ovomorph. **Decision:** `EntityRegistrationHelper` + delete init literals.
+
+
+
+---
+
+
+
+## 2. Java-owned gameplay inventory
+
+
+
+| Source | Values | Schema status | Intended owner / JSON home |
+
+|--------|--------|---------------|----------------------------|
+
+| `EntityInit.java` | `.sized(w,h)` per type | In schema (`entity_size`) | Species gameplay — **wire helper, delete literals** |
+
+| `XenomorphAttachmentConstants` | 600, 200, 2.0, 0.8, 100, 40, 20 | Partial in entity JSON | Facehugger entity JSON — **delete class** |
+
+| `AttachmentConfigHelper` | fallbacks 2.0, 0.8; `LifecycleConfig` refs | Schema exists; fallbacks violate governance | Facehugger JSON via storage only |
+
+| `XenomorphType` | sound switches, texture/model path builders | `visual.*` in schema | Entity JSON `visual` — **delete methods** |
+
+| `NestStructureScanOffsets` | SCAN_RADIUS=4 | Queen `special_abilities` keys exist in contracts | Queen entity JSON |
+
+| `NestTerritoryStageRules` | DEFAULT_NEST_RADIUS=16 | `nest_radius` in queen contract keys | Queen entity JSON |
+
+| `EntityFormResolver` | thresholds 25,50,75,90,60 | **Not in schema** | **New** `systems/maturation.json` (Project C) |
+
+| `MaturationSystem` | 0.75 urgency, 600 ticks | Partial (`lifecycle`) | Systems or entity lifecycle JSON |
+
+| `HostEffectConfigInitializer` | per-HostType effect tables | **Not in schema** | Extend `hosts.json` or `host_effects.json` (Project B) |
+
+| `MotionTrackerDetectionPolicy` | radius, cooldown, max entities | **Not in schema** | **New** `items/motion_tracker.json` |
+
+| `BlockInit.java` | destroyTime, blastResistance | **Not in block JSON DTO** | Extend `blocks/{name}.json` schema |
+
+| `SpecimenPodWorkflow` | VALIDATION_INTERVAL_TICKS=100 | **Not in block schema** | `blocks/specimen_pod_controller.json` |
+
+| AI `addGoal(N)` literals | priorities in registrars | `goal_priorities` parsed, not contracted | Entity JSON (Gate 0: entity-owned) |
+
+| `FacehuggerAttachmentPolicy` | DEFAULT_FOLLOW_RANGE=16 | `follow_range` in schema | Facehugger entity JSON |
+
+| `SwarmMovementGoal` / `SwarmTargetingGoal` | `* 1.5` | `special_abilities` pattern exists | Drone entity JSON |
+
+| `NeoForgeEscapeNavigationAdapter` | 3.0, 1.0 | movement / special_abilities | Chestburster entity JSON |
+
+| `QueenCompositionStrategy` | default stroll/look when absent | queen JSON fields | Queen entity JSON |
+
+
+
+---
+
+
+
+## 3. Systems config inventory
+
+
+
+| Loader | Path | DTO | Contracts | On disk | Java-owned gaps | Blocks |
+
+|--------|------|-----|-----------|---------|-----------------|--------|
+
+| `EntityConfigLoader` | `entity/{human\|xenomorph/human}/*.json` | `EntityConfig` | `EntityConfigContracts` | **8 lifecycle** | Consumer bypasses — see §5 | — |
+
+| `EntityConfigLoader` (variants) | `entity/xenomorph/mob-based/{folder}/*.json` | `SpeciesVariantConfig` | Minimal | **4 manifest** + extended tree | Extended paths not in loader manifest | Alignment |
+
+| `HostConfigLoader` | `systems/hosts.json` | `HostConfig` | host_types non-empty | **Yes** | — | — |
+
+| `HostEffectConfigLoader` | `systems/host_effects.json` | **Class missing** | Undefined | **Yes** | `HostEffectConfigInitializer` Java tables | **Project B** |
+
+| `EffectConfigLoader` | `effects/*.json` | effect DTO | per loader | **Yes** (`gestation`) | — | — |
+
+| `CombatConfigLoader` | `systems/combat.json` | `Settings(enabled)` | `enabled` required | **Yes** | Maturation not in combat (by design D3) | — |
+
+| `LifecycleConfig` | `systems/lifecycle.json` | **Class missing** | Undefined | **Yes** | `EntityFormResolver` literals | **Project C** |
+
+| `TerritoryConfig` | `systems/territory.json` | **Class missing** | Undefined | **Yes** | Domain territory constants | **Project C / territory** |
+
+| `BlockConfigLoader` | `block_textures.json`, `blocks/*.json` | `LoadedBlockVisualConfig` | file must exist | **6 blocks** | Hardness in `BlockInit`; no `gameplay` schema | Phase 1 |
+
+| `MobEntityConfigLoader` | mob-based paths | variant config | inherits parser | **4 manifest** | Same manifest as entity loader | — |
+
+| `AIBehaviorConfigLoader` | `data/weylandyutani/ai_behaviors/*.json` | `AIBehaviorConfig` | `behaviorType`, `speedMultipliers` at load | **10 files** | Must not own `goal_priorities` (Gate 0) | Project D related |
+
+
+
+### AIBehaviorConfigLoader audit
+
+
+
+| Aspect | Status |
+
+|--------|--------|
+
+| Path | `weylandyutani:ai_behaviors/{name}.json` via `BaseConfigLoader` |
+
+| Shipped files | `stealthy_hunter`, `standard`, `swarm_killer`, `hive_mother`, `strategic_commander`, `patient_egg`, `passive_development`, `escape_and_hide`, `defensive_villager`, `aggressive_queen` |
+
+| DTO fields | `behaviorType`, `description`, `speedMultipliers`, `stealthParameters`, `standardParameters` (maps) |
+
+| Catalog | `AIBehaviorConfigCatalog` (L1) — consumed by `BehaviorConfigHelper` |
+
+| Ownership boundary | Algorithm parameters only — **not** NeoForge goal priority integers |
+
+| Schema gap | No formal contract class; validation is warn-only in loader |
+
+| Default config names | Loader defaults: `stealthy_hunter`, `standard` only — other 8 rely on catalog scan |
+
+
+
+### Expected classpath files — status (2026-07-10)
+
+
+
+| Asset | On disk | Gap |
+
+|-------|---------|-----|
+
+| Lifecycle entity JSON (8) | **Yes** (`ovomorph` … `queen`, incl. stray `human.json` under xenomorph path) | Align sizes with `EntityInit`; add queen `nesting`; contract enforcement |
+
+| `entity/human/human.json` | **Yes** | Canonical human path |
+
+| Species variants (4 manifest) | **Yes** | Extended mob-based tree not in loader manifest |
+
+| `systems/hosts.json` | **Yes** | — |
+
+| `systems/host_effects.json` | **Yes** | Loader class missing |
+
+| `systems/combat.json` | **Yes** (minimal) | Maturation tuning → `lifecycle.json` |
+
+| `systems/lifecycle.json` | **Yes** | Loader class missing |
+
+| `systems/territory.json` | **Yes** | Loader class missing |
+
+| `effects/gestation.json` | **Yes** | — |
+
+| Block JSONs (6) | **Yes** | No `gameplay` hardness section |
+
+| `block_textures.json` | Verify at load | — |
+
+
+
+---
+
+
+
+## 4. Parser fallback classification
+
+
+
+### Gameplay required — remove fallback, add contract (high priority)
+
+
+
+| Parser location | Key / default | Risk |
+
+|-----------------|---------------|------|
+
+| L43 | `implantation_delay` default **200** | Masks missing facehugger JSON |
+
+| L48-50 | spawn_weight **5**, group 1/1 | Hidden spawn tuning |
+
+| L153 | `aggression_level` default **5** | Overrides explicit 0 in ovomorph if key omitted |
+
+| L137 | `look_at_player_range` default **8.0** | Silent tuning |
+
+| L154 | `behavior_type` default `"standard"` | Masks missing behavior_type |
+
+| L261 | `face_height_multiplier` default **0.8** | Duplicates attachment helper fallback |
+
+| Transition modifiers L125-128 | 1.0/0.6/1.3/1.6 | Contract requires — fallback redundant |
+
+
+
+### Asset resilience — allowed (document, not gameplay)
+
+
+
+| Key | Notes |
+
+|-----|-------|
+
+| `visual.texture_fallback` | Governance allows asset resilience |
+
+| `texture` default when visual missing | Should fail contract instead for required types |
+
+
+
+### Structural / optional — keep or require per type
+
+
+
+| Key | Notes |
+
+|-----|-------|
+
+| Empty string defaults for sounds | OK if contract requires non-empty for active types |
+
+| Paralysis booleans default true | Facehugger attachment UX — require in JSON when section present |
+
+| Gestation nested defaults | Require `gestation_parameters` block for facehugger |
+
+
+
+### Block parser
+
+
+
+`BlockConfigParser` — texture fallbacks only; **no gameplay fields parsed**. Hardness schema extension required before Phase 1.
+
+
+
+---
+
+
+
+## 4b. DTO default governance audit
+
+
+
+Java field defaults on `EntityConfig` and nested classes can act as silent gameplay fallbacks if consumers instantiate DTOs without loading JSON.
+
+
+
+| Class / field | Default value | Risk | Action |
+
+|---------------|---------------|------|--------|
+
+| `EntityConfig.model` | `"player"` | Asset fallback if visual missing | Fail contract; remove DTO default post-migration |
+
+| `EntityConfig.texture` | steve path | Same | Same |
+
+| `EntityConfig.spawnWeight` etc. | 5/1/1 | Duplicates parser defaults | Delete after contract |
+
+| `TransitionSpeedModifiersConfig` | 1.0/0.6/1.3/1.6 | Duplicates parser; contracted | Remove DTO defaults — JSON only |
+
+| `ClientParametersConfig.transitionDurationTicks` | 30 | Gameplay if used without JSON | Contract per type |
+
+| `AttachmentParametersConfig.faceHeightMultiplier` | 0.8 | Duplicates helper fallback | Delete — facehugger JSON only |
+
+| `AttachmentParametersConfig.lookAngle` | 30.0 | Same | Same |
+
+| `AttachmentParametersConfig.spentWanderTime` | 100 | Duplicates constants | Same |
+
+| `AttachmentParametersConfig.deathAnimationTime` | 40 | Same | Same |
+
+| `EntitySizeConfig.scale` | 1.0f | Low if width/height required | Contract `entity_size` |
+
+| `AIGoalsConfig` maps | empty HashMaps | Structural OK | Ensure not read as tuning when JSON absent |
+
+
+
+**Verdict:** DTO defaults on attachment, transition modifiers, and visual fields are **governance violations** if used as runtime gameplay. Target state: `noGameplayDefaultsOnEntityConfigDto` ownership test.
+
+
+
+---
+
+
+
+## 5. Consumer bypass summary
+
+
+
+See [PROJECT_A_BYPASS_INVENTORY.md](./PROJECT_A_BYPASS_INVENTORY.md) for full table.
+
+
+
+**Critical bypasses:**
+
+
+
+- `EntityInit` → hardcoded size (not `EntityConfigStorage`)
+
+- `XenomorphSoundRegistry` → `XenomorphType.getAmbientSoundKey()` (not `visual.ambient_sound`)
+
+- `AttachmentConfigHelper` → Java fallbacks when JSON null
+
+- `NestBlockScanHelper` → `NestStructureScanOffsets` (not queen JSON / storage)
+
+- Composition strategies → literal `addGoal` priorities (not `goal_priorities` map)
+
+
+
+---
+
+
+
+## 6. Phase readiness map
+
+
+
+### Per-track readiness (Phase 1 and blockers)
+
+
+
+| Track | Status | Blocker / next action |
+
+|-------|--------|----------------------|
+
+| Entity size wiring | **Ready** | Wire `EntityRegistrationHelper`; delete `EntityInit.sized()` per [deletion map](./PROJECT_A_DELETION_MAP.md) DEL-001 |
+
+| Attachment SSOT | **Ready** | Remove helper **fallbacks**; keep `AttachmentConfigHelper` as storage accessor (DEL-003) |
+
+| Block hardness schema + wiring | **Ready** | Extend parser/DTO; migrate `BlockInit` literals (DEL-006) |
+
+| `LifecycleConfig` loader | **Blocked** | Class missing; bootstrap references; blocks Project C + helper lifecycle defaults |
+
+| `TerritoryConfig` loader | **Blocked** | Class missing; blocks territory SSOT |
+
+| `HostEffectConfigLoader` | **Blocked** | Class missing; blocks Project B |
+
+| `EntityInitRefs` package fix | **Blocked** (infra) | Wrong FQN; fix in Phase 1 infra (DEL-017) |
+
+
+
+Phase 1 **entity/block consumer wiring** may proceed in parallel with loader implementation. **Projects B and C must not start** until their loaders are implemented.
+
+
+
+### Downstream projects
+
+
+
+| Downstream | Status | Blocker |
+
+|------------|--------|---------|
+
+| **JSON alignment** | **Ready** | Align existing JSON to schema + [deletion map](./PROJECT_A_DELETION_MAP.md) — not greenfield authoring |
+
+| **Phase 1** (converge runtime on SSOT) | **Ready** (entity/block tracks) | Loader infra + `EntityInitRefs` for full test green |
+
+| **Project B** (host effects) | **Blocked** | Implement `HostEffectConfigLoader`; then delete initializer |
+
+| **Project C** (maturation) | **Blocked** | Implement `LifecycleConfig`; wire `EntityFormResolver` |
+
+| **Project D** (AI priorities) | **Partially ready** | JSON partial; composition still uses literals |
+
+| **Phase 2** tuning | **Blocked** | Phase 1 consumer wiring |
+
+| **Phase 3** presentation | **Partially ready** | Sound registry bypasses `visual.*_sound` |
+
+
+
+---
+
+
+
+## 7. Phase 1 entry criteria
+
+
+
+Phase 1 = **force the runtime graph to converge on approved SSOT paths**, not write more configs.
+
+
+
+| Criterion | Status |
+
+|-----------|--------|
+
+| Entity schema ownership finalized | Done — decision log D1, D6–D8 |
+
+| Block schema ownership finalized | Done — decision log D5 (allowed/forbidden `gameplay`) |
+
+| AI priority ownership finalized | Done — D6 Gate 0 (entity-owned) |
+
+| Config fork decisions finalized | Done — D2–D4, D9 |
+
+| All bypasses mapped to project + deletion row | Done — [PROJECT_A_DELETION_MAP.md](./PROJECT_A_DELETION_MAP.md) |
+
+| Missing loaders **assigned** with owner project | Done — per-track table above |
+
+| Deletion map published | Done |
+
+| Mod test bootstrap fix (`EntityInitRefs`) | Documented; implement in Phase 1 infra |
+
+
+
+---
+
+
+
+## 8. Validation performed (2026-07-10)
+
+
+
+| Check | Result |
+
+|-------|--------|
+
+| `compileJava` (JDK 21) | **PASS** |
+
+| `dev/bin/verify.ps1` | **PASS** — full NDE gate green |
+
+| `gradlew test` (`ConfigContractTest`, `EntityConfigValidationTest`) | **FAIL** — mod bootstrap: `ClassNotFoundException: ...level_3.init.EntityInit` during `ModRegistrationBootstrap` static init (pre-existing; not introduced by Project A audit) |
+
+
+
+Recommend fixing `EntityInit` package reference before relying on contract tests in CI. Project A deliverables are documentation-only.
+
+
+
+**Handoff:** See [PROJECT_A_DELETION_MAP.md](./PROJECT_A_DELETION_MAP.md) for delete-not-add execution order.
+
+
+
+---
+
+
+
+## 9. Project A exit criteria (verification)
+
+
+
+| Criterion | Status | Evidence |
+
+|-----------|--------|----------|
+
+| Java gameplay values mapped to schema or **needs new schema** | **Pass** | §2 inventory; all parent-plan candidates tagged |
+
+| No unresolved duplicate SSOT (attachment, size, sounds, queen nesting) | **Pass** | §1 matrix + [decision log](./PROJECT_A_DECISION_LOG.md) D7, D8 |
+
+| Per-type checklist for all 8 `XenomorphType` | **Pass** | [JSON authoring checklist](./PROJECT_A_JSON_AUTHORING_CHECKLIST.md) |
+
+| Decision log: host effects, maturation, motion tracker, block hardness | **Pass** | D2–D5 — no TBD |
+
+| Parser fallbacks classified | **Pass** | §4 |
+
+| Missing infra classes + blocking relationships | **Pass** | §3, §6 per-track table, D9 |
+
+| Phase readiness map | **Pass** | §6 |
+
+| Ownership/boundaries complete | **Pass** | [ownership boundaries](./PROJECT_A_OWNERSHIP_BOUNDARIES.md) + negative ownership |
+
+| Bypass inventory complete | **Pass** | [bypass inventory](./PROJECT_A_BYPASS_INVENTORY.md) |
+
+| Project D Gate 0 documented | **Pass** | D6; entity-owned priorities |
+
+| Deletion map published | **Pass** | [deletion map](./PROJECT_A_DELETION_MAP.md) |
+
+| ConfigurationOwnershipTest proposals | **Pass** | [contract deltas](./PROJECT_A_CONTRACT_DELTAS.md) WS8 |
+
+| LAYER_1 reference pointer | **Pass** | [LAYER_1_INFRASTRUCTURE_REFERENCE.md](../references/architecture/LAYER_1_INFRASTRUCTURE_REFERENCE.md) |
+
+
+
+**Project A status:** **Complete** — handoff to Migration Wave 1 (runtime convergence), Projects B/C/D per readiness table.
+
+
+
+# Active workstreams
+
+
+
+| Stream | Doc | Status |
+
+|--------|-----|--------|
+
+| **Project A — Schema Verification** | [PROJECT_A_SCHEMA_GAP_REPORT.md](./PROJECT_A_SCHEMA_GAP_REPORT.md) (+ 7 sibling docs) | **Complete** — exit criteria §9 |
+
+| **Migration Wave 1** — runtime SSOT | [MIGRATION_WAVE_1.md](./MIGRATION_WAVE_1.md) | **In progress** — verify green; core DEL items wired |
+
+| Registry package audit | [registry-package-audit.md](./registry-package-audit.md) | **Complete** (Phase 2, 2026-07-10) — manifests deleted; composition hook retained |
+
+| Hardcoded values migration | [hardcoded-values-migration.md](./hardcoded-values-migration.md) | Planning — run PLAYTEST-FH-02 before parasite config work |
+
+
+
+Phase L / L3 levels-strict remediation is **complete** — see [archive](../archive/architecture/l3-levels-strict/README.md).
+
+
+
+**Living reference:** [references/architecture/ARCHITECTURE.md](../references/architecture/ARCHITECTURE.md) · [BACKLOG.md](../references/architecture/BACKLOG.md)
+
+
+
+**Rules:** `.cursor/rules/architecture-governance.mdc`
+
+
+
+When starting a new stream, add a row here; on completion move it to `docs/archive/`.
+
+
+
+
+
+I noticed that the NDE check was pointing out some instances of files being at the wrong level. They would likley be overplaced as we move data to JSON there will be less files and therefore less to depend on in the logic layers look into this before we do another migration wave
+
+
+
+Your instinct is right, but the picture is more nuanced than “NDE says files are at the wrong level.”
+
+
+
+## What NDE actually shows today
+
+
+
+**Blocking gates are green:** `placement-formula` reports **0 over / 0 under** on import statements. `verify.ps1` passes.
+
+
+
+**The shadow report is where the signal lives:** `nde-policy-report` (reference graph, advisory) shows:
+
+- **1 over-placed:** `GoalHookBootstrap` at L10 (reference graph only sees its L0 dep — the L9 method-ref may be invisible)
+
+- **26 under-placed:** mostly same-package `type_ref` edges (L0 file references co-located L0 type → graph wants L1) plus reflection edges like `EntityInitRefs` → `EntityInit` at L5
+
+
+
+So you may have been looking at the **policy reconciliation** output, not the blocking gate.
+
+
+
+## Why JSON migration changes the level story
+
+
+
+The placement formula only counts **explicit same-layer imports**. It does **not** see:
+
+
+
+- Same-package types used without imports (**55 `import-hygiene` hints**)
+
+- Reflection (`EntityInitRefs` → `level_5.init.EntityInit`)
+
+- Method references (`GoalHookBootstrap` → `XenomorphCompositionDispatch`)
+
+
+
+As Wave 1 removed bypasses, helpers **could** move down — but the gate won't flag them until those hidden deps are gone. Wave 1 already demonstrated the pattern:
+
+
+
+| Helper | Before | After |
+
+|--------|--------|-------|
+
+| `AttachmentConfigHelper` | L4 | **L1** |
+
+| `NestingConfigHelper` | — | **L1** |
+
+
+
+## Likely overplacement candidates (semantic, not gate-flagged yet)
+
+
+
+| File | Level | When to demote |
+
+|------|-------|----------------|
+
+| `ConfigAccessHelper` | L4 | After effect-config bypasses are gone → target L1 |
+
+| Other L1 `*ConfigHelper` at L1 | L1 | **Correct** — use as template |
+
+| `EntityConfigLoaderAdapter` / loaders at L3–L4 | L3–L4 | Keep until loader chain flattens |
+
+| Bootstrap ladder L10–L12 | L10–L12 | **Intentional** composition ordering, not JSON accessors |
+
+
+
+## Recommendation before Wave 2
+
+
+
+Add a **level rebalance step** to each wave's entry criteria:
+
+
+
+1. Run `nde-policy-report` + `import-hygiene` (not just blocking `placement-formula`)
+
+2. **Demote storage-only helpers to L1** as each DEL bypass is deleted (same pattern as Wave 1)
+
+3. **Don't big-bang move** the L10–L12 bootstrap chain — that's composition tiering, not data migration debt
+
+4. Clear `import-hygiene` hidden L3 loader refs (`JsonParsingHelper`, `StaticConfigLoader`, etc.) — those inflate required levels artificially
+
+
+
+I've added this as a **Pre-wave gate: level rebalance** section in `MIGRATION_ROADMAP.md`.
+
+
+
+Want me to run a full file-by-file demotion audit (top 15 with MOVE-L targets) as a pre–Wave 2 task?
