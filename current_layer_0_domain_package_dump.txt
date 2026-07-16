@@ -1,0 +1,2078 @@
+Root: C:\Users\mdc0431\dev\ScriptCraft-Workspace\implementations\minecraft\AlienCraft\weyland-yutani-core\src\main\java\com\weylandyutani\layer_0_domain
+====================================================================================================
+
+PACKAGE: level_0
+====================================================================================================
+
+FILE: package-info.java
+----------------------------------------------------------------------------------------------------
+/**
+ * Level 0 domain types with no same-layer dependencies.
+ */
+package com.weylandyutani.layer_0_domain.level_0;
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: level_0/ai
+====================================================================================================
+
+FILE: AIConstants.java
+----------------------------------------------------------------------------------------------------
+package com.weylandyutani.layer_0_domain.level_0.ai;
+
+/**
+ * Centralized AI constants shared across all species.
+ * Contains only technical constants that are truly shared.
+ * 
+ * DISTINCTION BETWEEN TECHNICAL AND GAMEPLAY CONSTANTS:
+ * - Technical Constants: Code-level values that should stay in Java (e.g., tick rates, API limits)
+ *   → These remain in this file
+ * - Gameplay Constants: Values that are data-driven from JSON configs (e.g., thresholds, multipliers)
+ *   → These are loaded from infrastructure config (e.g., SurvivalAIConfig)
+ * 
+ * REFACTORED: Removed ESCAPE_ATTEMPT_INTERVAL and STUCK_THRESHOLD_TICKS.
+ * These are now in SurvivalAIConfig, loaded from survival_ai.json.
+ * 
+ * FILE STATUS: STABLE
+ * 
+ * @author WeylandYutaniCorp
+ * @since 0.1.0
+ */
+public class AIConstants {
+    
+    // ============================================================================
+    // TECHNICAL CONSTANTS (Code-level, shared across all species)
+    // ============================================================================
+    
+    /**
+     * Minecraft ticks per second constant.
+     * Used for: Converting time calculations between ticks and real-world units
+     */
+    public static final int TICKS_PER_SECOND = 20; //TODO: This is only to do with minecraft. maybe move it to layer_3_minecraft?
+    
+    // Private constructor to prevent instantiation
+    private AIConstants() {
+        throw new UnsupportedOperationException("AIConstants is a utility class and cannot be instantiated");
+    }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: AIContext.java
+----------------------------------------------------------------------------------------------------
+package com.weylandyutani.layer_0_domain.level_0.ai;
+
+public enum AIContext {
+    IDLE,
+    COMBAT,
+    ATTACHMENT,
+    MATURATION,
+    NEST,
+    NORMAL,
+    STALKING,
+    CHASING,
+    FIGHTING
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: AIContextPolicy.java
+----------------------------------------------------------------------------------------------------
+package com.weylandyutani.layer_0_domain.level_0.ai;
+
+public final class AIContextPolicy {
+
+    private AIContextPolicy() {
+    }
+
+    public static AIContext fromAttachmentActive(boolean attached) {
+        return attached ? AIContext.ATTACHMENT : AIContext.IDLE;
+    }
+
+    public record ContextThresholds(
+            double fightingDistanceSq,
+            double chasingDistanceSq,
+            double stalkingDistanceSq
+    ) {
+    }
+
+    public record ContextInputs(
+            boolean hasTarget,
+            boolean targetAlive,
+            boolean crouching,
+            double distanceToTargetSq,
+            boolean recentlyHurt,
+            boolean pathfinding,
+            Double distanceToPathTargetSq
+    ) {
+    }
+
+    public record TransitionSpeedModifiers(
+            float normalModifier,
+            float stalkingModifier,
+            float chasingModifier,
+            float fightingModifier
+    ) {
+    }
+
+    public static AIContext classify(ContextInputs inputs, ContextThresholds thresholds) {
+        if (thresholds == null) {
+            throw new IllegalArgumentException("ContextThresholds is required");
+        }
+        if (inputs.hasTarget() && inputs.targetAlive()) {
+            if (inputs.distanceToTargetSq() <= thresholds.fightingDistanceSq()) {
+                return AIContext.FIGHTING;
+            }
+            if (inputs.distanceToTargetSq() <= thresholds.chasingDistanceSq()) {
+                return AIContext.CHASING;
+            }
+        }
+        if (inputs.crouching()) {
+            return AIContext.STALKING;
+        }
+        if (inputs.recentlyHurt()) {
+            return AIContext.COMBAT;
+        }
+        return AIContext.NORMAL;
+    }
+
+    public static float transitionSpeedModifier(AIContext context, TransitionSpeedModifiers modifiers) {
+        if (modifiers == null) {
+            throw new IllegalArgumentException("TransitionSpeedModifiers is required");
+        }
+        return switch (context) {
+            case STALKING -> modifiers.stalkingModifier();
+            case CHASING -> modifiers.chasingModifier();
+            case FIGHTING, COMBAT -> modifiers.fightingModifier();
+            default -> modifiers.normalModifier();
+        };
+    }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: AISignalType.java
+----------------------------------------------------------------------------------------------------
+package com.weylandyutani.layer_0_domain.level_0.ai;
+
+public enum AISignalType {
+    ALERT, FLEE, HUNT, NEST_BUILD,
+    HOST_TARGETED, HOST_RESERVED, HOST_ATTACHED
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: package-info.java
+----------------------------------------------------------------------------------------------------
+/**
+ * AI constants, context enums, policies, and coordination signals.
+ */
+package com.weylandyutani.layer_0_domain.level_0.ai;
+
+----------------------------------------------------------------------------------------------------
+
+FILE: PreferredFoodRules.java
+----------------------------------------------------------------------------------------------------
+package com.weylandyutani.layer_0_domain.level_0.ai;
+
+import java.util.List;
+//TODO: Fuzzy matching. "Pig" would also get piglins.
+/**
+ * Pure preferred-food matching (entity type key vs configured food names).
+ */
+public final class PreferredFoodRules {
+
+    private PreferredFoodRules() {}
+
+    public static boolean matches(String entityTypeKey, List<String> preferredFood) {
+        if (entityTypeKey == null || preferredFood == null || preferredFood.isEmpty()) {
+            return false;
+        }
+        String normalized = entityTypeKey.toLowerCase();
+        return preferredFood.stream().anyMatch(food -> normalized.contains(food.toLowerCase()));
+    }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: SuffocationRules.java
+----------------------------------------------------------------------------------------------------
+package com.weylandyutani.layer_0_domain.level_0.ai;
+
+/**
+ * Pure suffocation threshold rules (no Minecraft types).
+ */
+public final class SuffocationRules {
+
+    private SuffocationRules() {}
+
+    public static boolean isCriticalLowAir(int airSupply, int maxAirSupply, double criticalThreshold) {
+        if (maxAirSupply <= 0) {
+            return false;
+        }
+        return airSupply < maxAirSupply * criticalThreshold;
+    }
+
+    public static boolean isStuckWithLowAir(
+            int airSupply, int maxAirSupply, double lowThreshold, boolean stuckInBlocks) {
+        if (!stuckInBlocks || maxAirSupply <= 0) {
+            return false;
+        }
+        return airSupply < maxAirSupply * lowThreshold;
+    }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: SurvivalBehaviorRules.java
+----------------------------------------------------------------------------------------------------
+package com.weylandyutani.layer_0_domain.level_0.ai;
+
+/**
+ * Domain rules for survival behavior decisions.
+ *
+ * Contains pure survival logic shared across implementations.
+ * Does not depend on Minecraft, NeoForge, configuration loading,
+ * or infrastructure.
+ *
+ * FILE STATUS: NEW
+ *
+ * @author WeylandYutaniCorp
+ * @since 0.1.0
+ */
+public final class SurvivalBehaviorRules {
+
+    private SurvivalBehaviorRules() {
+        throw new UnsupportedOperationException(
+                "SurvivalBehaviorRules is a utility class and cannot be instantiated");
+    }
+
+
+    /**
+     * Determines whether suffocation should trigger escape behavior.
+     *
+     * @param airRatio current air ratio (0.0 - 1.0)
+     * @param currentlyStuck whether the entity is stuck
+     * @param criticalThreshold immediate escape threshold
+     * @param lowThreshold stuck escape threshold
+     *
+     * @return true if escape should occur
+     */
+    public static boolean shouldEscapeSuffocation(
+            double airRatio,
+            boolean currentlyStuck,
+            double criticalThreshold,
+            double lowThreshold) {
+
+        if (airRatio <= criticalThreshold) {
+            return true;
+        }
+
+        return currentlyStuck && airRatio <= lowThreshold;
+    }
+
+
+    /**
+     * Determines whether an escape attempt cooldown has expired.
+     *
+     * @param cooldownTicks remaining cooldown
+     *
+     * @return true when an escape attempt is allowed
+     */
+    public static boolean canAttemptEscape(int cooldownTicks) {
+        return cooldownTicks <= 0;
+    }
+
+
+    /**
+     * Determines whether an entity has exceeded its stuck threshold.
+     *
+     * @param stuckTicks current stuck duration
+     * @param threshold configured threshold
+     *
+     * @return true when entity is stuck
+     */
+    public static boolean isStuck(
+            int stuckTicks,
+            int threshold) {
+
+        return stuckTicks >= threshold;
+    }
+}
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: level_0/blocks
+====================================================================================================
+
+FILE: BlockBreakPolicy.java
+----------------------------------------------------------------------------------------------------
+package com.weylandyutani.layer_0_domain.level_0.blocks;
+
+public final class BlockBreakPolicy {
+    private BlockBreakPolicy() {}
+    public static boolean mayBreak(String blockId, boolean isQueen) {
+        return isQueen || !blockId.contains("obsidian");  // TODO: Obsidian is a hardcoded gameplay value (I think). May need to be data-driven.
+    }
+}
+
+
+----------------------------------------------------------------------------------------------------
+
+FILE: package-info.java
+----------------------------------------------------------------------------------------------------
+/**
+ * Xenomorph species DTOs, constants, and policies at level_0.
+ */
+package com.weylandyutani.layer_0_domain.level_0.blocks;
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: level_0/combat
+====================================================================================================
+
+FILE: CombatProfile.java
+----------------------------------------------------------------------------------------------------
+package com.weylandyutani.layer_0_domain.level_0.combat;
+
+/**
+ * Combat behavior profile for xenomorphs.
+ * Loaded from JSON per xenomorph form (drone, chestburster, queen).
+ * 
+ * @author WeylandYutaniCorp
+ * @since 0.1.0
+ */
+public class CombatProfile {
+    
+    private final String formId;
+    private final int baseAttackDamage;
+    private final double attackSpeed;
+    private final boolean canBreakBlocks;
+    private final int blockBreakTier;
+    private final double meleeRange;
+    
+    public CombatProfile(String formId, int baseAttackDamage, double attackSpeed, 
+                         boolean canBreakBlocks, int blockBreakTier, double meleeRange) {
+        this.formId = formId;
+        this.baseAttackDamage = baseAttackDamage;
+        this.attackSpeed = attackSpeed;
+        this.canBreakBlocks = canBreakBlocks;
+        this.blockBreakTier = blockBreakTier;
+        this.meleeRange = meleeRange;
+    }
+    
+    public String getFormId() {
+        return formId;
+    }
+    
+    public int getBaseAttackDamage() {
+        return baseAttackDamage;
+    }
+    
+    public double getAttackSpeed() {
+        return attackSpeed;
+    }
+    
+    public boolean canBreakBlocks() {
+        return canBreakBlocks;
+    }
+    
+    public int getBlockBreakTier() {
+        return blockBreakTier;
+    }
+    
+    public double getMeleeRange() {
+        return meleeRange;
+    }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: package-info.java
+----------------------------------------------------------------------------------------------------
+/**
+ * Combat profiles and block-break policy rules.
+ */
+package com.weylandyutani.layer_0_domain.level_0.combat;
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: level_0/effects
+====================================================================================================
+
+FILE: DomainEffectKey.java
+----------------------------------------------------------------------------------------------------
+package com.weylandyutani.layer_0_domain.level_0.effects;
+// TODO: This seems to speicifcally be mostly for the parasite and host but also has suffocation. could this be split up or named better?
+public enum DomainEffectKey {
+    FACEHUGGER_ATTACHMENT,
+    FACEHUGGER_IMPLANTATION,
+    GESTATION,
+    HOST_INFECTION,
+    SUFFOCATION
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: EffectApplyOptions.java
+----------------------------------------------------------------------------------------------------
+package com.weylandyutani.layer_0_domain.level_0.effects;
+// TODO: Review if this is actually helpful or just a waste of space.
+public record EffectApplyOptions(boolean ambient, boolean showParticles, boolean showIcon) {}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: package-info.java
+----------------------------------------------------------------------------------------------------
+/**
+ * Domain effect keys and apply options.
+ */
+package com.weylandyutani.layer_0_domain.level_0.effects;
+
+----------------------------------------------------------------------------------------------------
+
+FILE: StandardMobEffectKey.java
+----------------------------------------------------------------------------------------------------
+package com.weylandyutani.layer_0_domain.level_0.effects;
+// TODO: Should this be better named? Is this just a list of effects that can happen? Is this necessary?
+public enum StandardMobEffectKey {
+    BLINDNESS,
+    SLOWNESS,
+    WEAKNESS,
+    HUNGER,
+    POISON,
+    DIG_SLOWDOWN,
+    SLOW_FALLING,
+    LEVITATION
+}
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: level_0/entity
+====================================================================================================
+
+FILE: EntityKind.java
+----------------------------------------------------------------------------------------------------
+package com.weylandyutani.layer_0_domain.level_0.entity;
+
+public enum EntityKind {
+    PLAYER,
+    VILLAGER,
+    ANIMAL,
+    MOD_XENOMORPH,
+    OTHER
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: EntityThreatLevel.java
+----------------------------------------------------------------------------------------------------
+package com.weylandyutani.layer_0_domain.level_0.entity;
+
+public enum EntityThreatLevel { NONE, LOW, MEDIUM, HIGH, CRITICAL }
+
+----------------------------------------------------------------------------------------------------
+
+FILE: EntityType.java
+----------------------------------------------------------------------------------------------------
+package com.weylandyutani.layer_0_domain.level_0.entity;
+
+/**
+ * Generic interface for entity types across all species.
+ * Provides a common abstraction for entity type operations.
+ * 
+ * This interface allows common code to work with entity types without
+ * depending on specific species implementations (XenomorphType, HumanType, etc.).
+ * 
+ * FILE STATUS: NEW
+ * 
+ * @author WeylandYutaniCorp
+ * @since 0.1.8
+ */
+public interface EntityType {
+    
+    /**
+     * Gets the configuration key used in JSON files.
+     * This is the key used to look up entity configuration data.
+     * 
+     * @return The configuration key (e.g., "ovomorph", "human", "drone")
+     */
+    String getConfigKey();
+    
+    /**
+     * Gets the entity name used for registration.
+     * This is the name used when registering the entity type.
+     * 
+     * @return The entity name (e.g., "ovomorph", "human", "xenomorph_drone")
+     */
+    String getEntityName();
+    
+    /**
+     * Gets the display name for this entity type.
+     * Used for user-facing text and logging.
+     * 
+     * @return The display name (e.g., "Ovomorph", "Human", "Xenomorph Drone")
+     */
+    default String getName() {
+        return getEntityName();
+    }
+}
+
+
+----------------------------------------------------------------------------------------------------
+
+FILE: package-info.java
+----------------------------------------------------------------------------------------------------
+/**
+ * Entity type and threat-level taxonomy.
+ */
+package com.weylandyutani.layer_0_domain.level_0.entity;
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: level_0/lab
+====================================================================================================
+
+FILE: package-info.java
+----------------------------------------------------------------------------------------------------
+package com.weylandyutani.layer_0_domain.level_0.lab;
+
+----------------------------------------------------------------------------------------------------
+
+FILE: SpecimenPodState.java
+----------------------------------------------------------------------------------------------------
+package com.weylandyutani.layer_0_domain.level_0.lab;
+
+public enum SpecimenPodState {
+    UNFORMED,
+    FORMED;
+
+    public boolean isFormed() {
+        return this == FORMED;
+    }
+
+    public SpecimenPodState transitionOnValidate(boolean valid) {
+        return valid ? FORMED : UNFORMED;
+    }
+
+    public SpecimenPodState transitionOnBreak() {
+        return UNFORMED;
+    }
+}
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: level_0/parasite
+====================================================================================================
+
+FILE: AttachmentState.java
+----------------------------------------------------------------------------------------------------
+package com.weylandyutani.layer_0_domain.level_0.parasite;
+//TODO: I need to differentiate this file and InfectionStage.java more. I think they are too similar or overlapping.
+/**
+ * Represents the attachment state of a facehugger.
+ * Used to manage the lifecycle of facehugger attachment without mixing AI and business logic.
+ * 
+ * FILE STATUS: STABLE
+ * 
+ * @author WeylandYutaniCorp
+ * @since 0.1.2
+ */
+public enum AttachmentState {
+    /**
+     * Facehugger is not attached and is free to move
+     */
+    FREE,
+    
+    /**
+     * Facehugger is approaching target but not yet attached
+     */
+    APPROACHING,
+    
+    /**
+     * Facehugger is ready to attach (close enough to target)
+     */
+    READY_TO_ATTACH,
+    
+    /**
+     * Facehugger is currently attaching to the host
+     */
+    ATTACHING,
+    
+    /**
+     * Facehugger is attached and holding on during implantation delay
+     */
+    ATTACHED,
+    
+    /**
+     * Facehugger has completed implantation and is detaching
+     */
+    DETACHING,
+    
+    /**
+     * Facehugger is spent and wandering before death
+     */
+    SPENT_WANDERING
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: HostType.java
+----------------------------------------------------------------------------------------------------
+package com.weylandyutani.layer_0_domain.level_0.parasite;
+
+//TODO: Review if this is gameplay or techincal constants. That may determine if some of this should be in resources.
+/**
+ * Defines host types for xenomorph lifecycle systems.
+ * Determines which mobs are suitable hosts for xenomorph infection.
+ * 
+ * FILE STATUS: STABLE
+ * 
+ * @author WeylandYutaniCorp
+ * @since 0.0.1
+ */
+public enum HostType {
+    // Living biological hosts - suitable for xenomorphs
+    LIVING_BIOLOGICAL("living_biological", true, "Living biological organisms with organic tissue"),
+    
+    // Dead/undead hosts - suitable for specialized xenomorphs
+    UNDEAD("undead", true, "Undead creatures with decay-resistant tissue"),
+    
+    // Constructs/golems - suitable for specialized alien species (NOT xenomorphs)
+    CONSTRUCT("construct", false, "Constructed beings with inorganic components - unsuitable for xenomorphs"),
+    
+    // Unsuitable hosts for xenomorphs
+    INORGANIC("inorganic", false, "Purely inorganic materials - unsuitable for biological parasites"),
+    SPIRITUAL("spiritual", false, "Spiritual or ethereal entities - no physical form"),
+    ELEMENTAL("elemental", false, "Elemental beings - no biological structure");
+    
+    private final String key;
+    private final boolean suitableForXenomorph;
+    private final String description;
+    
+    HostType(String key, boolean suitableForXenomorph, String description) {
+        this.key = key;
+        this.suitableForXenomorph = suitableForXenomorph;
+        this.description = description;
+    }
+    
+    public String getKey() {
+        return key;
+    }
+    
+    public boolean isSuitableForXenomorph() {
+        return suitableForXenomorph;
+    }
+    
+    public String getDescription() {
+        return description;
+    }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: InfectionStage.java
+----------------------------------------------------------------------------------------------------
+package com.weylandyutani.layer_0_domain.level_0.parasite;
+//TODO: I need to differentiate this file and AttachmentState.java more. I think they are too similar or overlapping.
+
+public enum InfectionStage { NONE, ATTACHED, IMPLANTING, IMPLANTED }
+
+----------------------------------------------------------------------------------------------------
+
+FILE: MaturationTimed.java
+----------------------------------------------------------------------------------------------------
+package com.weylandyutani.layer_0_domain.level_0.parasite;
+//TODO: Determie if this is actually a maturation timer or just a generic timer.
+public interface MaturationTimed { int getMaturationTimer(); void setMaturationTimer(int ticks); }
+
+----------------------------------------------------------------------------------------------------
+
+FILE: package-info.java
+----------------------------------------------------------------------------------------------------
+/**
+ * Host type taxonomy for parasite lifecycle.
+ */
+package com.weylandyutani.layer_0_domain.level_0.parasite;
+
+----------------------------------------------------------------------------------------------------
+
+FILE: ParasiteFormPolicy.java
+----------------------------------------------------------------------------------------------------
+package com.weylandyutani.layer_0_domain.level_0.parasite;
+
+/**
+ * Parasite form attachment and transformation policy.
+ * Defines rules for facehugger attachment, gestation, and form transitions.
+ * 
+ * @author WeylandYutaniCorp
+ * @since 0.1.0
+ */
+public class ParasiteFormPolicy {
+    
+    private final int gestationTicksMin;
+    private final int gestationTicksMax;
+    private final float attachmentSuccessRate;
+    private final boolean allowMultipleAttachments;
+    private final int maxConcurrentGestations;
+    
+    public ParasiteFormPolicy(int gestationTicksMin, int gestationTicksMax, 
+                             float attachmentSuccessRate, boolean allowMultipleAttachments,
+                             int maxConcurrentGestations) {
+        this.gestationTicksMin = gestationTicksMin;
+        this.gestationTicksMax = gestationTicksMax;
+        this.attachmentSuccessRate = attachmentSuccessRate;
+        this.allowMultipleAttachments = allowMultipleAttachments;
+        this.maxConcurrentGestations = maxConcurrentGestations;
+    }
+    
+    public int getGestationTicksMin() {
+        return gestationTicksMin;
+    }
+    
+    public int getGestationTicksMax() {
+        return gestationTicksMax;
+    }
+    
+    public float getAttachmentSuccessRate() {
+        return attachmentSuccessRate;
+    }
+    
+    public boolean allowsMultipleAttachments() {
+        return allowMultipleAttachments;
+    }
+    
+    public int getMaxConcurrentGestations() {
+        return maxConcurrentGestations;
+    }
+}
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: level_0/queen
+====================================================================================================
+
+FILE: EggLayingPolicy.java
+----------------------------------------------------------------------------------------------------
+package com.weylandyutani.layer_0_domain.level_0.queen;
+
+public final class EggLayingPolicy {
+    private EggLayingPolicy() {}
+
+    public static boolean canLayEgg(int existingEggs, int maxEggs) {
+        return existingEggs < maxEggs;
+    }
+
+    public static boolean isChunkBelowEggLimit(int chunkEggCount, int maxEggsPerChunk) {
+        return chunkEggCount < maxEggsPerChunk;
+    }
+}
+
+
+----------------------------------------------------------------------------------------------------
+
+FILE: NestBlueprint.java
+----------------------------------------------------------------------------------------------------
+package com.weylandyutani.layer_0_domain.level_0.queen;
+
+public final class NestBlueprint {
+    private NestBlueprint() {}
+    public static int footprintRadius(int phase) { return 4 + phase; }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: NestOrHive.java
+----------------------------------------------------------------------------------------------------
+package com.weylandyutani.layer_0_domain.level_0.queen;
+
+/**
+ * Domain nest vs hive stage used when restoring queen territory from save data.
+ */
+public enum NestOrHive {
+    NEST,
+    HIVE;
+
+    public static NestOrHive forExpanding(boolean expandingToHive) {
+        return expandingToHive ? HIVE : NEST;
+    }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: NestProfile.java
+----------------------------------------------------------------------------------------------------
+package com.weylandyutani.layer_0_domain.level_0.queen;
+
+/**
+ * Queen nesting footprint profile.
+ * Defines nest expansion radius and building speed per form.
+ * Loaded from entity JSON per xenomorph form.
+ * 
+ * @author WeylandYutaniCorp
+ * @since 0.1.0
+ */
+public class NestProfile {
+    
+    private final String formId;
+    private final int nestInnerRadius;
+    private final int maxExpansionRadius;
+    private final int blocksBuildPerTick;
+    private final double expansionCostPerBlock;
+    
+    public NestProfile(String formId, int nestInnerRadius, int maxExpansionRadius,
+                       int blocksBuildPerTick, double expansionCostPerBlock) {
+        this.formId = formId;
+        this.nestInnerRadius = nestInnerRadius;
+        this.maxExpansionRadius = maxExpansionRadius;
+        this.blocksBuildPerTick = blocksBuildPerTick;
+        this.expansionCostPerBlock = expansionCostPerBlock;
+    }
+    
+    public String getFormId() {
+        return formId;
+    }
+    
+    public int getNestInnerRadius() {
+        return nestInnerRadius;
+    }
+    
+    public int getMaxExpansionRadius() {
+        return maxExpansionRadius;
+    }
+    
+    public int getBlocksBuildPerTick() {
+        return blocksBuildPerTick;
+    }
+    
+    public double getExpansionCostPerBlock() {
+        return expansionCostPerBlock;
+    }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: NestStructureFeatures.java
+----------------------------------------------------------------------------------------------------
+package com.weylandyutani.layer_0_domain.level_0.queen;
+
+/**
+ * Detected nest-structure features used for progress scoring.
+ */
+public record NestStructureFeatures(
+        boolean foundation,
+        boolean walls,
+        boolean decorations,
+        boolean centerResin) {
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: NestStructureScanOffsets.java
+----------------------------------------------------------------------------------------------------
+package com.weylandyutani.layer_0_domain.level_0.queen;
+
+/**
+ * Pure relative block offsets for nest-structure scan patterns (no Minecraft types).
+ */
+public final class NestStructureScanOffsets {
+
+    private NestStructureScanOffsets() {
+    }
+
+    /**
+     * Horizontal offsets in the foundation plane ({@code y = 0} relative to nest center).
+     */
+    public static int[][] foundationRingOffsets(int scanRadius) {
+        return squareRing(scanRadius, true);
+    }
+
+    /**
+     * Perimeter offsets used for wall detection ({@code y = 1} relative), edges of the square only.
+     */
+    public static int[][] wallPerimeterOffsets(int scanRadius) {
+        return squareRing(scanRadius, false);
+    }
+
+    /**
+     * Full horizontal square offsets for decoration / nearby-block probes ({@code y} supplied by caller).
+     */
+    public static int[][] horizontalSquareOffsets(int scanRadius) {
+        return squareRing(scanRadius, true);
+    }
+
+    private static int[][] squareRing(int radius, boolean includeInterior) {
+        int count = 0;
+        for (int x = -radius; x <= radius; x++) {
+            for (int z = -radius; z <= radius; z++) {
+                boolean edge = x == -radius || x == radius || z == -radius || z == radius;
+                if (includeInterior || edge) {
+                    count++;
+                }
+            }
+        }
+        int[][] offsets = new int[count][2];
+        int i = 0;
+        for (int x = -radius; x <= radius; x++) {
+            for (int z = -radius; z <= radius; z++) {
+                boolean edge = x == -radius || x == radius || z == -radius || z == radius;
+                if (includeInterior || edge) {
+                    offsets[i][0] = x;
+                    offsets[i][1] = z;
+                    i++;
+                }
+            }
+        }
+        return offsets;
+    }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: package-info.java
+----------------------------------------------------------------------------------------------------
+/**
+ * Queen territory domain contracts and validation.
+ */
+package com.weylandyutani.layer_0_domain.level_0.queen;
+
+----------------------------------------------------------------------------------------------------
+
+FILE: QueenAvoidanceMath.java
+----------------------------------------------------------------------------------------------------
+package com.weylandyutani.layer_0_domain.level_0.queen;
+
+import com.weylandyutani.layer_0_domain.level_0.spatial.Vec3Ref;
+
+//TODO: Are these speciifc to the queen or more gereral math? Is this gameplay constant type information that should be in resources?
+/**
+ * Pure queen avoidance computations — strength scaling and flee direction.
+ *
+ * FILE STATUS: STABLE
+ */
+public final class QueenAvoidanceMath {
+
+    private QueenAvoidanceMath() {
+    }
+
+    /**
+     * Avoidance strength from {@code 0.0} (at or beyond min distance) to {@code 1.0} (coincident).
+     */
+    public static double strength(double distance, int minDistance) {
+        if (minDistance <= 0 || distance >= minDistance) {
+            return 0.0;
+        }
+        return 1.0 - (distance / minDistance);
+    }
+
+    /**
+     * Unit vector away from {@code other}, scaled by {@code strength}.
+     */
+    public static Vec3Ref fleeVector(Vec3Ref self, Vec3Ref other, double strength) {
+        if (strength <= 0.0 || self == null || other == null) {
+            return new Vec3Ref(0.0, 0.0, 0.0);
+        }
+        Vec3Ref away = self.subtract(other).normalize();
+        return away.scale(strength);
+    }
+}
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: level_0/spatial
+====================================================================================================
+
+FILE: BlockPosRef.java
+----------------------------------------------------------------------------------------------------
+package com.weylandyutani.layer_0_domain.level_0.spatial;
+
+public record BlockPosRef(int x, int y, int z) {
+
+    public BlockPosRef offset(int dx, int dy, int dz) {
+        return new BlockPosRef(x + dx, y + dy, z + dz);
+    }
+
+    public BlockPosRef below() {
+        return offset(0, -1, 0);
+    }
+
+    public BlockPosRef above() {
+        return offset(0, 1, 0);
+    }
+
+    public double distanceSquared(BlockPosRef other) {
+        if (other == null) {
+            return Double.MAX_VALUE;
+        }
+        int dx = x - other.x();
+        int dy = y - other.y();
+        int dz = z - other.z();
+        return dx * dx + dy * dy + dz * dz;
+    }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: EntityScanHit.java
+----------------------------------------------------------------------------------------------------
+package com.weylandyutani.layer_0_domain.level_0.spatial;
+
+import java.util.UUID;
+
+public record EntityScanHit(UUID entityId, double distanceSq) {}
+
+
+----------------------------------------------------------------------------------------------------
+
+FILE: package-info.java
+----------------------------------------------------------------------------------------------------
+/**
+ * Block position and transformation constants.
+ */
+package com.weylandyutani.layer_0_domain.level_0.spatial;
+
+----------------------------------------------------------------------------------------------------
+
+FILE: SpawnSuitabilityRules.java
+----------------------------------------------------------------------------------------------------
+package com.weylandyutani.layer_0_domain.level_0.spatial;
+//TODO: Review file. Is this necesarry rules? It is okay if we went ahead and recreated the minecraft logic I suppose since we long way down the line plan for abstraction from minecraft.
+/**
+ * Pure spawn-position suitability given block probes (no Minecraft types).
+ */
+public final class SpawnSuitabilityRules {
+
+    private SpawnSuitabilityRules() {}
+
+    public static boolean isSafeSpawn(boolean feetAir, boolean solidGround, boolean verticalClear) {
+        return feetAir && solidGround && verticalClear;
+    }
+
+    public static boolean isSafeSpawnForEntity(
+            boolean feetAir, boolean solidGround, boolean verticalClear, boolean horizontalClear) {
+        return feetAir && solidGround && verticalClear && horizontalClear;
+    }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: Vec3Ref.java
+----------------------------------------------------------------------------------------------------
+package com.weylandyutani.layer_0_domain.level_0.spatial;
+
+/**
+ * Domain 3D vector for position search algorithms without Minecraft types.
+ */
+public record Vec3Ref(double x, double y, double z) {
+
+    public Vec3Ref add(Vec3Ref other) {
+        return new Vec3Ref(x + other.x, y + other.y, z + other.z);
+    }
+
+    public Vec3Ref subtract(Vec3Ref other) {
+        return new Vec3Ref(x - other.x, y - other.y, z - other.z);
+    }
+
+    public Vec3Ref scale(double factor) {
+        return new Vec3Ref(x * factor, y * factor, z * factor);
+    }
+
+    public Vec3Ref normalize() {
+        double length = Math.sqrt(x * x + y * y + z * z);
+        if (length < 1.0E-4D) {
+            return this;
+        }
+        return new Vec3Ref(x / length, y / length, z / length);
+    }
+
+    public Vec3Ref yRot(float angle) {
+        double cos = Math.cos(angle);
+        double sin = Math.sin(angle);
+        return new Vec3Ref(x * cos + z * sin, y, z * cos - x * sin);
+    }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: WorldRef.java
+----------------------------------------------------------------------------------------------------
+package com.weylandyutani.layer_0_domain.level_0.spatial;
+
+public record WorldRef(String dimensionId) {
+
+    public String dimensionKey() {
+        return dimensionId;
+    }
+}
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: level_0/transformation
+====================================================================================================
+
+FILE: package-info.java
+----------------------------------------------------------------------------------------------------
+package com.weylandyutani.layer_0_domain.level_0.transformation;
+
+----------------------------------------------------------------------------------------------------
+
+FILE: TransformationConstants.java
+----------------------------------------------------------------------------------------------------
+package com.weylandyutani.layer_0_domain.level_0.transformation;
+//TODO: Review file. Is the section B necessary?
+/**
+ * Constants for xenomorph transformation system.
+ * 
+ * This class contains constants used during entity transformations between
+ * different xenomorph lifecycle stages (chestburster → drone → queen, etc.).
+ * 
+ * FILE STATUS: STABLE
+ * 
+ * @author WeylandYutaniCorp
+ * @since 0.1.0
+ */
+public class TransformationConstants {
+    
+    // ============================================================================
+    // SECTION A: TECHNICAL CONSTANTS (Code-level, should stay in Java)
+    // ============================================================================
+    
+    /**
+     * Offset to center entity in block (0.5 blocks from corner).
+     * Used by: TransformationSystem parameterized transformTo handlers
+      */
+    public static final double ENTITY_POSITION_OFFSET = 0.5;
+    
+    // ============================================================================
+    // SECTION B: GAMEPLAY CONSTANTS (Now data-driven from JSON configs)
+    // ============================================================================
+    
+    // None currently - all transformation timing comes from maturation configs
+    
+    // Private constructor to prevent instantiation
+    private TransformationConstants() {
+        throw new UnsupportedOperationException("TransformationConstants is a utility class and cannot be instantiated");
+    }
+}
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: level_0/util
+====================================================================================================
+
+FILE: BoundedIntRandom.java
+----------------------------------------------------------------------------------------------------
+package com.weylandyutani.layer_0_domain.level_0.util;
+//TODO: Review the necessity of this file. I think we can just use the minecraft random source, but if its a simple abstraction it could be useful for a game not in minecraft.
+/**
+ * Framework-neutral bounded int random (bridged from MC {@code RandomSource} in L3).
+ */
+@FunctionalInterface
+public interface BoundedIntRandom {
+    int nextInt(int bound);
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: package-info.java
+----------------------------------------------------------------------------------------------------
+/**
+ * Bounded integer random utilities for domain logic.
+ */
+package com.weylandyutani.layer_0_domain.level_0.util;
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: level_0/validation
+====================================================================================================
+
+FILE: package-info.java
+----------------------------------------------------------------------------------------------------
+/**
+ * Validation result records.
+ */
+package com.weylandyutani.layer_0_domain.level_0.validation;
+
+----------------------------------------------------------------------------------------------------
+
+FILE: ValidationResult.java
+----------------------------------------------------------------------------------------------------
+package com.weylandyutani.layer_0_domain.level_0.validation;
+
+/**
+ * Validation result class for detailed feedback.
+ * DRY: Shared validation result class used by TerritoryValidator and ExpansionValidator.
+ * 
+ * FILE STATUS: STABLE
+ * 
+ * @author WeylandYutaniCorp
+ * @since 0.1.0
+ */
+public class ValidationResult {
+    private final boolean success;
+    private final String reason;
+    
+    private ValidationResult(boolean success, String reason) {
+        this.success = success;
+        this.reason = reason;
+    }
+    
+    public static ValidationResult success() {
+        return new ValidationResult(true, null);
+    }
+    
+    public static ValidationResult failure(String reason) {
+        return new ValidationResult(false, reason);
+    }
+    
+    public boolean isSuccess() {
+        return success;
+    }
+    
+    public String getReason() {
+        return reason;
+    }
+}
+
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: level_1
+====================================================================================================
+
+FILE: package-info.java
+----------------------------------------------------------------------------------------------------
+/**
+ * Level 1 domain types composing level 0 references.
+ */
+package com.weylandyutani.layer_0_domain.level_1;
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: level_1/effects
+====================================================================================================
+
+FILE: EffectState.java
+----------------------------------------------------------------------------------------------------
+package com.weylandyutani.layer_0_domain.level_1.effects;
+
+import com.weylandyutani.layer_0_domain.level_0.effects.DomainEffectKey;
+
+public record EffectState(DomainEffectKey key, int amplifier, int durationTicks) {}
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: level_1/entity
+====================================================================================================
+
+FILE: HumanEntityType.java
+----------------------------------------------------------------------------------------------------
+package com.weylandyutani.layer_0_domain.level_1.entity;
+
+import com.weylandyutani.layer_0_domain.level_0.entity.EntityType;
+
+/**
+ * Human entity classification enumeration.
+ * Distinguishes human subtypes for entity configuration and lifecycle management.
+ * 
+ * @author WeylandYutaniCorp
+ * @since 0.1.0
+ */
+public enum HumanEntityType implements EntityType {
+    VILLAGER("villager", "human_villager"),
+    PLAYER_NPC("player_npc", "human_player_npc"),
+    SCIENTIST("scientist", "human_scientist"),
+    COLONIST("colonist", "human_colonist");
+    
+    private final String configKey;
+    private final String entityName;
+    
+    HumanEntityType(String configKey, String entityName) {
+        this.configKey = configKey;
+        this.entityName = entityName;
+    }
+    
+    @Override
+    public String getConfigKey() {
+        return configKey;
+    }
+    
+    @Override
+    public String getEntityName() {
+        return entityName;
+    }
+    
+    /**
+     * Get config path for this human entity type.
+     * Format: `/data/weylandyutani/entity/human/{configKey}.json`
+     * 
+     * @return Configuration file path
+     */
+    public String getConfigPath() {
+        return String.format("/data/weylandyutani/entity/human/%s.json", configKey); //TODO: Suspicious. Review this.
+    }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: LivingEntityRef.java
+----------------------------------------------------------------------------------------------------
+package com.weylandyutani.layer_0_domain.level_1.entity;
+
+import java.util.UUID;
+
+import com.weylandyutani.layer_0_domain.level_0.spatial.WorldRef;
+
+public record LivingEntityRef(UUID entityId, WorldRef world) {}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: package-info.java
+----------------------------------------------------------------------------------------------------
+/**
+ * Living entity reference composing world refs.
+ */
+package com.weylandyutani.layer_0_domain.level_1.entity;
+
+----------------------------------------------------------------------------------------------------
+
+FILE: XenomorphType.java
+----------------------------------------------------------------------------------------------------
+package com.weylandyutani.layer_0_domain.level_1.entity;
+
+import com.weylandyutani.layer_0_domain.level_0.entity.EntityType;
+
+/**
+ * Enumeration of all xenomorph entity types.
+ * This provides a centralized way to reference entity types throughout the codebase.
+ *
+ * Implements the generic EntityType interface to allow use in common code.
+ *
+ * FILE STATUS: STABLE
+ *
+ * @author WeylandYutaniCorp
+ * @since 0.0.1
+ */
+public enum XenomorphType implements EntityType {
+    OVOMORPH("ovomorph", "ovomorph"),
+    FACEHUGGER("facehugger", "facehugger"),
+    CHESTBURSTER("chestburster", "chestburster"),
+    GROWTH("growth", "intermediate_growth"),
+    DRONE("drone", "xenomorph_drone"),
+    PRAETOR("praetor", "xenomorph_praetor"),
+    QUEEN("queen", "xenomorph_queen"),
+    HUMAN("human", "human");
+
+    private final String configKey;
+    private final String entityName;
+
+    XenomorphType(String configKey, String entityName) {
+        this.configKey = configKey;
+        this.entityName = entityName;
+    }
+
+    /**
+     * Gets the configuration key used in JSON files.
+     *
+     * @return The configuration key
+     */
+    public String getConfigKey() {
+        return configKey;
+    }
+
+    /**
+     * Gets the entity name used for registration.
+     *
+     * @return The entity name
+     */
+    public String getEntityName() {
+        return entityName;
+    }
+}
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: level_1/lab
+====================================================================================================
+
+FILE: SpecimenPodBlueprint.java
+----------------------------------------------------------------------------------------------------
+package com.weylandyutani.layer_0_domain.level_1.lab;
+
+import com.weylandyutani.layer_0_domain.level_0.spatial.BlockPosRef;
+import com.weylandyutani.layer_0_domain.level_0.validation.ValidationResult;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Pure layout rules for specimen pod multiblock structures.
+ */
+public final class SpecimenPodBlueprint {
+
+    private static final BlockOffset[] STANDARD_SHELL = {
+            new BlockOffset(-1, 0, 0, true),
+            new BlockOffset(1, 0, 0, true),
+            new BlockOffset(0, 0, -1, true),
+            new BlockOffset(0, 0, 1, true),
+            new BlockOffset(-1, 0, -1, false),
+            new BlockOffset(-1, 0, 1, false),
+            new BlockOffset(1, 0, -1, false),
+            new BlockOffset(1, 0, 1, false),
+            new BlockOffset(-1, 1, 0, true),
+            new BlockOffset(1, 1, 0, true),
+            new BlockOffset(0, 1, -1, true),
+            new BlockOffset(0, 1, 1, true),
+    };
+
+    private SpecimenPodBlueprint() {
+    }
+
+    public static ValidationResult validateLayout(int width, int depth) {
+        return width > 0 && depth > 0 ? ValidationResult.success() : ValidationResult.failure("invalid pod layout");
+    }
+
+    public static PodValidationResult validate(OccupancyCheck check) {
+        List<BlockOffset> occupied = new ArrayList<>();
+        boolean valid = true;
+        int maxY = 0;
+
+        for (BlockOffset offset : STANDARD_SHELL) {
+            if (check.isOccupied(offset.x(), offset.y(), offset.z())) {
+                occupied.add(offset);
+                maxY = Math.max(maxY, offset.y());
+            } else if (offset.required()) {
+                valid = false;
+            }
+        }
+
+        int height = Math.max(2, maxY + 1);
+        return new PodValidationResult(valid, occupied, height, "standard");
+    }
+
+    public record BlockOffset(int x, int y, int z, boolean required) {
+    }
+
+    public record PodValidationResult(boolean isValid, List<BlockOffset> occupiedOffsets, int structureHeight, String variant) {
+    }
+
+    @FunctionalInterface
+    public interface OccupancyCheck {
+        boolean isOccupied(int offsetX, int offsetY, int offsetZ);
+    }
+
+    public static List<BlockPosRef> toWorldOffsets(BlockPosRef center, List<BlockOffset> offsets) {
+        List<BlockPosRef> world = new ArrayList<>(offsets.size());
+        for (BlockOffset offset : offsets) {
+            world.add(center.offset(offset.x(), offset.y(), offset.z()));
+        }
+        return world;
+    }
+}
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: level_1/nest
+====================================================================================================
+
+FILE: NestStructureProgressPolicy.java
+----------------------------------------------------------------------------------------------------
+package com.weylandyutani.layer_0_domain.level_1.nest;
+
+import com.weylandyutani.layer_0_domain.level_0.queen.NestStructureFeatures;
+
+/**
+ * Pure domain scoring for nest structure detection stages (foundation → walls → decor → chamber).
+ */
+public final class NestStructureProgressPolicy {
+
+    public static final int NONE = 0;
+    public static final int FOUNDATION = 1;
+    public static final int WALLS = 2;
+    public static final int DECORATIONS = 3;
+    public static final int CHAMBER = 5;
+
+    private NestStructureProgressPolicy() {
+    }
+
+    public static int score(NestStructureFeatures features) {
+        if (features == null) {
+            return NONE;
+        }
+        return score(
+                features.foundation(),
+                features.walls(),
+                features.decorations(),
+                features.centerResin());
+    }
+
+    public static int score(
+            boolean hasFoundation,
+            boolean hasWalls,
+            boolean hasDecorations,
+            boolean hasCenterResin) {
+        if (!hasFoundation) {
+            return NONE;
+        }
+        if (!hasWalls) {
+            return FOUNDATION;
+        }
+        if (!hasDecorations) {
+            return WALLS;
+        }
+        if (!hasCenterResin) {
+            return DECORATIONS;
+        }
+        return CHAMBER;
+    }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: NestTerritoryStageRules.java
+----------------------------------------------------------------------------------------------------
+package com.weylandyutani.layer_0_domain.level_1.nest;
+
+import com.weylandyutani.layer_0_domain.level_0.queen.NestOrHive;
+
+/**
+ * Pure domain rules for nest territory restore / register decisions.
+ */
+public final class NestTerritoryStageRules {
+
+    private NestTerritoryStageRules() {
+    }
+
+    public static NestOrHive stageForExpanding(boolean expandingToHive) {
+        return NestOrHive.forExpanding(expandingToHive);
+    }
+
+    public static boolean shouldRegisterMissingTerritory(boolean territoryAlreadyPresent) {
+        return !territoryAlreadyPresent;
+    }
+}
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: level_1/parasite
+====================================================================================================
+
+FILE: AttachmentRules.java
+----------------------------------------------------------------------------------------------------
+package com.weylandyutani.layer_0_domain.level_1.parasite;
+
+import com.weylandyutani.layer_0_domain.level_0.parasite.AttachmentState;
+
+/**
+ * Pure domain rules for facehugger attachment FSM and invariants.
+ * Tunable values belong in {@code layer_1_infrastructure.level_4.entity.AttachmentConfigHelper}.
+ *
+ * FILE STATUS: STABLE
+ */
+public final class AttachmentRules {
+
+    private AttachmentRules() {
+        throw new UnsupportedOperationException("AttachmentRules is a utility class and cannot be instantiated");
+    }
+
+    public static boolean isSpentState(AttachmentState state) {
+        return state == AttachmentState.SPENT_WANDERING;
+    }
+
+    public static AttachmentState nextApproachState(AttachmentState current, double distance, double minDistance) {
+        if (current == AttachmentState.SPENT_WANDERING || current == AttachmentState.DETACHING) {
+            return current;
+        }
+        if (distance > minDistance) {
+            return AttachmentState.APPROACHING;
+        }
+        if (current == AttachmentState.FREE || current == AttachmentState.APPROACHING) {
+            return AttachmentState.READY_TO_ATTACH;
+        }
+        return current;
+    }
+
+    public static boolean shouldRedirectDamageToHost(AttachmentState state, int attachmentTicks) {
+        return attachmentTicks > 0
+                && (state == AttachmentState.READY_TO_ATTACH
+                || state == AttachmentState.ATTACHING
+                || state == AttachmentState.ATTACHED);
+    }
+
+    public static boolean shouldFacehuggerDealDamage() {
+        return false;
+    }
+
+    public static boolean isImmovableDuringAttachment(AttachmentState state, int attachmentTicks) {
+        return state == AttachmentState.READY_TO_ATTACH
+                || state == AttachmentState.ATTACHING
+                || state == AttachmentState.ATTACHED
+                || (state == AttachmentState.DETACHING && attachmentTicks > 0);
+    }
+
+    public static boolean shouldDespawnAfterSpentWander(int nextTimer, int spentWanderTime) {
+        return nextTimer >= spentWanderTime;
+    }
+
+    public static boolean shouldProcessImplantationTick(AttachmentState state) {
+        return state == AttachmentState.ATTACHING || state == AttachmentState.ATTACHED;
+    }
+
+    public static boolean shouldFacehuggerDieWithHost(AttachmentState state, boolean hostAlive) {
+        if (hostAlive) {
+            return false;
+        }
+        return state == AttachmentState.READY_TO_ATTACH
+                || state == AttachmentState.ATTACHING
+                || state == AttachmentState.ATTACHED;
+    }
+
+    public static boolean isAttachmentInProgress(int attachmentTicks, int totalDuration) {
+        return attachmentTicks < totalDuration;
+    }
+
+    public static AttachmentState onAttachmentGoalCancelled() {
+        return AttachmentState.FREE;
+    }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: package-info.java
+----------------------------------------------------------------------------------------------------
+/**
+ * Level 1 lifecycle domain rules and state.
+ */
+package com.weylandyutani.layer_0_domain.level_1.parasite;
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: level_1/spatial
+====================================================================================================
+
+FILE: AxisAlignedRegion.java
+----------------------------------------------------------------------------------------------------
+package com.weylandyutani.layer_0_domain.level_1.spatial;
+
+import com.weylandyutani.layer_0_domain.level_0.spatial.BlockPosRef;
+
+public record AxisAlignedRegion(BlockPosRef min, BlockPosRef max) {}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: package-info.java
+----------------------------------------------------------------------------------------------------
+/**
+ * Axis-aligned regions composing block positions.
+ */
+package com.weylandyutani.layer_0_domain.level_1.spatial;
+
+----------------------------------------------------------------------------------------------------
+
+FILE: QueenAvoidancePolicy.java
+----------------------------------------------------------------------------------------------------
+package com.weylandyutani.layer_0_domain.level_1.spatial;
+
+import com.weylandyutani.layer_0_domain.level_0.queen.QueenAvoidanceMath;
+import com.weylandyutani.layer_0_domain.level_0.spatial.Vec3Ref;
+
+/**
+ * Domain policy for queen-to-queen avoidance strength and flee direction.
+ */
+public final class QueenAvoidancePolicy {
+
+    private QueenAvoidancePolicy() {
+    }
+
+    public static double computeAvoidanceStrength(double distance, int minDistance) {
+        return QueenAvoidanceMath.strength(distance, minDistance);
+    }
+
+    public static boolean shouldFlee(double avoidanceStrength) {
+        return avoidanceStrength > 0.0;
+    }
+
+    public static boolean shouldLogStrongAvoidance(double avoidanceStrength) {
+        return avoidanceStrength > 0.5;
+    }
+
+    public static Vec3Ref fleeDirection(Vec3Ref self, Vec3Ref other, double avoidanceStrength) {
+        return QueenAvoidanceMath.fleeVector(self, other, avoidanceStrength);
+    }
+}
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: level_1/spawn
+====================================================================================================
+
+FILE: package-info.java
+----------------------------------------------------------------------------------------------------
+/**
+ * Spawn context composing world refs.
+ */
+package com.weylandyutani.layer_0_domain.level_1.spawn;
+
+----------------------------------------------------------------------------------------------------
+
+FILE: SpawnContext.java
+----------------------------------------------------------------------------------------------------
+package com.weylandyutani.layer_0_domain.level_1.spawn;
+
+import com.weylandyutani.layer_0_domain.level_0.spatial.WorldRef;
+
+public record SpawnContext(WorldRef world, double x, double y, double z, float yRot, float xRot, float headYaw) {
+
+    public static SpawnContext at(WorldRef world, double x, double y, double z, float yRot, float xRot, float headYaw) {
+        return new SpawnContext(world, x, y, z, yRot, xRot, headYaw);
+    }
+}
+
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: level_1/world
+====================================================================================================
+
+FILE: package-info.java
+----------------------------------------------------------------------------------------------------
+/**
+ * World mutation port interface.
+ */
+package com.weylandyutani.layer_0_domain.level_1.world;
+
+----------------------------------------------------------------------------------------------------
+
+FILE: WorldMutationPort.java
+----------------------------------------------------------------------------------------------------
+package com.weylandyutani.layer_0_domain.level_1.world;
+
+import com.weylandyutani.layer_0_domain.level_0.spatial.BlockPosRef;
+import com.weylandyutani.layer_0_domain.level_0.spatial.WorldRef;
+
+public interface WorldMutationPort {
+    boolean breakBlock(WorldRef world, BlockPosRef pos);
+
+    default boolean breakBlock(WorldRef world, BlockPosRef pos, boolean dropLoot) {
+        return breakBlock(world, pos);
+    }
+
+    boolean placeBlock(WorldRef world, BlockPosRef pos, String blockId);
+}
+
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: level_2
+====================================================================================================
+
+FILE: package-info.java
+----------------------------------------------------------------------------------------------------
+/**
+ * Level 2 domain port interfaces for boundary adapters.
+ */
+package com.weylandyutani.layer_0_domain.level_2;
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: level_2/ai
+====================================================================================================
+
+FILE: CombatThreatQueryPort.java
+----------------------------------------------------------------------------------------------------
+package com.weylandyutani.layer_0_domain.level_2.ai;
+
+import com.weylandyutani.layer_0_domain.level_1.entity.LivingEntityRef;
+import java.util.Optional;
+
+/**
+ * Domain port for locating combat-viable threats near an observer.
+ * MC-specific scans are implemented in L3 {@code NeoForgeCombatThreatAdapter}.
+ */
+public interface CombatThreatQueryPort {
+
+  /**
+   * @return nearest combat threat within {@code radius}, or empty if none
+   */
+  Optional<LivingEntityRef> findNearestCombatThreat(LivingEntityRef observer, double radius);
+
+  default boolean hasCombatThreatNearby(LivingEntityRef observer, double radius) {
+    return findNearestCombatThreat(observer, radius).isPresent();
+  }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: package-info.java
+----------------------------------------------------------------------------------------------------
+/**
+ * Combat threat query port interface.
+ */
+package com.weylandyutani.layer_0_domain.level_2.ai;
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: level_2/effects
+====================================================================================================
+
+FILE: EffectApplicationPort.java
+----------------------------------------------------------------------------------------------------
+package com.weylandyutani.layer_0_domain.level_2.effects;
+
+import com.weylandyutani.layer_0_domain.level_0.effects.DomainEffectKey;
+import com.weylandyutani.layer_0_domain.level_0.effects.EffectApplyOptions;
+import com.weylandyutani.layer_0_domain.level_0.effects.StandardMobEffectKey;
+import com.weylandyutani.layer_0_domain.level_1.entity.LivingEntityRef;
+
+public interface EffectApplicationPort {
+    void apply(LivingEntityRef target, DomainEffectKey key, int durationTicks, int amplifier, EffectApplyOptions options);
+
+    void applyStandard(LivingEntityRef target, StandardMobEffectKey key, int durationTicks, int amplifier, EffectApplyOptions options);
+
+    void remove(LivingEntityRef target, DomainEffectKey key);
+
+    void removeStandard(LivingEntityRef target, StandardMobEffectKey key);
+
+    boolean hasEffect(LivingEntityRef target, DomainEffectKey key);
+
+    boolean hasStandardEffect(LivingEntityRef target, StandardMobEffectKey key);
+
+    int getRemainingDuration(LivingEntityRef target, DomainEffectKey key);
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: package-info.java
+----------------------------------------------------------------------------------------------------
+/**
+ * Effect application port interface.
+ */
+package com.weylandyutani.layer_0_domain.level_2.effects;
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: level_2/entity
+====================================================================================================
+
+FILE: EntityPresentationPort.java
+----------------------------------------------------------------------------------------------------
+package com.weylandyutani.layer_0_domain.level_2.entity;
+
+import com.weylandyutani.layer_0_domain.level_1.entity.LivingEntityRef;
+import com.weylandyutani.layer_0_domain.level_1.spawn.SpawnContext;
+
+public interface EntityPresentationPort {
+    String displayName(LivingEntityRef ref);
+
+    float healthRatio(LivingEntityRef ref);
+
+    void applyMagicDamage(LivingEntityRef ref, float amount);
+
+    void spawnDamageIndicatorParticles(LivingEntityRef ref, int count, float spread);
+
+    void spawnExplosionParticles(LivingEntityRef ref, int count, float spread);
+
+    SpawnContext spawnContextAt(LivingEntityRef ref);
+
+    void setInvulnerable(LivingEntityRef ref, boolean value);
+
+    void setNoGravity(LivingEntityRef ref, boolean value);
+
+    void setDeltaMovement(LivingEntityRef ref, double x, double y, double z);
+
+    void setRotation(LivingEntityRef ref, float yRot, float xRot);
+
+    void positionOnHost(LivingEntityRef facehugger, LivingEntityRef host, double faceHeightRatio);
+
+    double distance(LivingEntityRef a, LivingEntityRef b);
+
+    int tickCount(LivingEntityRef ref);
+
+    void releaseUsingItem(LivingEntityRef ref);
+
+    void applyPlayerAttachmentPose(LivingEntityRef ref);
+
+    void restorePlayerAttachmentPose(LivingEntityRef ref);
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: EntityQueryPort.java
+----------------------------------------------------------------------------------------------------
+package com.weylandyutani.layer_0_domain.level_2.entity;
+
+import com.weylandyutani.layer_0_domain.level_0.entity.EntityKind;
+import com.weylandyutani.layer_0_domain.level_1.entity.LivingEntityRef;
+import java.util.Optional;
+
+public interface EntityQueryPort {
+    boolean isValid(LivingEntityRef ref);
+
+    boolean isClientSide(LivingEntityRef ref);
+
+    Optional<String> encodeId(LivingEntityRef ref);
+
+    EntityKind classify(LivingEntityRef ref);
+
+    boolean isPlayer(LivingEntityRef ref);
+
+    String typeDescriptionId(LivingEntityRef ref);
+
+    int countAttachedFacehuggers(LivingEntityRef host);
+
+    boolean isAlive(LivingEntityRef ref);
+
+    boolean isRemoved(LivingEntityRef ref);
+
+    boolean isCreativePlayer(LivingEntityRef ref);
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: package-info.java
+----------------------------------------------------------------------------------------------------
+/**
+ * Entity presentation and capability domain ports.
+ */
+package com.weylandyutani.layer_0_domain.level_2.entity;
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: level_2/lifecycle
+====================================================================================================
+
+FILE: AttachmentStatePort.java
+----------------------------------------------------------------------------------------------------
+package com.weylandyutani.layer_0_domain.level_2.lifecycle;
+
+import com.weylandyutani.layer_0_domain.level_0.parasite.AttachmentState;
+import com.weylandyutani.layer_0_domain.level_1.entity.LivingEntityRef;
+
+public interface AttachmentStatePort {
+    boolean supports(LivingEntityRef ref);
+    AttachmentState getState(LivingEntityRef ref);
+    void setState(LivingEntityRef ref, AttachmentState state);
+    int getTicks(LivingEntityRef ref);
+    void setTicks(LivingEntityRef ref, int ticks);
+    LivingEntityRef getTarget(LivingEntityRef ref);
+    void setTarget(LivingEntityRef ref, LivingEntityRef target);
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: MaturationStatePort.java
+----------------------------------------------------------------------------------------------------
+package com.weylandyutani.layer_0_domain.level_2.lifecycle;
+
+import com.weylandyutani.layer_0_domain.level_1.entity.LivingEntityRef;
+
+public interface MaturationStatePort {
+    boolean supports(LivingEntityRef ref);
+    int getMaturationTimer(LivingEntityRef ref);
+    void setMaturationTimer(LivingEntityRef ref, int ticks);
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: package-info.java
+----------------------------------------------------------------------------------------------------
+/**
+ * Attachment and maturation state port interfaces.
+ */
+package com.weylandyutani.layer_0_domain.level_2.lifecycle;
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: level_2/spawn
+====================================================================================================
+
+FILE: EntitySpawnPort.java
+----------------------------------------------------------------------------------------------------
+package com.weylandyutani.layer_0_domain.level_2.spawn;
+
+import com.weylandyutani.layer_0_domain.level_1.entity.LivingEntityRef;
+import com.weylandyutani.layer_0_domain.level_1.entity.XenomorphType;
+import com.weylandyutani.layer_0_domain.level_1.spawn.SpawnContext;
+
+public interface EntitySpawnPort {
+    LivingEntityRef spawnXenomorph(SpawnContext context, XenomorphType type);
+
+    LivingEntityRef transformXenomorph(LivingEntityRef source, XenomorphType targetType);
+
+    default boolean spawnForm(XenomorphType type, SpawnContext context) {
+        return spawnXenomorph(context, type) != null;
+    }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: package-info.java
+----------------------------------------------------------------------------------------------------
+/**
+ * Entity spawn port interface.
+ */
+package com.weylandyutani.layer_0_domain.level_2.spawn;
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: level_2/world
+====================================================================================================
+
+FILE: package-info.java
+----------------------------------------------------------------------------------------------------
+/**
+ * World query port interface.
+ */
+package com.weylandyutani.layer_0_domain.level_2.world;
+
+----------------------------------------------------------------------------------------------------
+
+FILE: WorldQueryPort.java
+----------------------------------------------------------------------------------------------------
+package com.weylandyutani.layer_0_domain.level_2.world;
+
+import com.weylandyutani.layer_0_domain.level_0.spatial.BlockPosRef;
+import com.weylandyutani.layer_0_domain.level_0.spatial.EntityScanHit;
+import com.weylandyutani.layer_0_domain.level_0.spatial.WorldRef;
+import com.weylandyutani.layer_0_domain.level_1.spatial.AxisAlignedRegion;
+
+import java.util.List;
+
+public interface WorldQueryPort {
+    List<EntityScanHit> scanLivingEntities(WorldRef world, AxisAlignedRegion region);
+    boolean isAirAt(WorldRef world, BlockPosRef pos);
+    boolean canOccludeAt(WorldRef world, BlockPosRef pos);
+    boolean isInBounds(WorldRef world, BlockPosRef pos);
+    boolean isUnbreakableAt(WorldRef world, BlockPosRef pos);
+    String blockIdAt(WorldRef world, BlockPosRef pos);
+}
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: level_2/xenomorph
+====================================================================================================
+
+FILE: package-info.java
+----------------------------------------------------------------------------------------------------
+/**
+ * Xenomorph form query port interface.
+ */
+package com.weylandyutani.layer_0_domain.level_2.xenomorph;
+
+----------------------------------------------------------------------------------------------------
+
+FILE: XenomorphFormQueryPort.java
+----------------------------------------------------------------------------------------------------
+package com.weylandyutani.layer_0_domain.level_2.xenomorph;
+
+import com.weylandyutani.layer_0_domain.level_1.entity.LivingEntityRef;
+import com.weylandyutani.layer_0_domain.level_1.entity.XenomorphType;
+
+public interface XenomorphFormQueryPort {
+    XenomorphType resolveForm(LivingEntityRef ref);
+}
+
+----------------------------------------------------------------------------------------------------
+
+
+END OF DUMP

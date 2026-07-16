@@ -1,0 +1,3175 @@
+Root: C:\Users\mdc0431\dev\ScriptCraft-Workspace\implementations\minecraft\AlienCraft\weyland-yutani-core\src\main\resources
+====================================================================================================
+JSON Files: 122
+
+PACKAGE: assets/weylandyutani/blockstates
+====================================================================================================
+
+FILE: cocoon_block.json
+----------------------------------------------------------------------------------------------------
+{
+  "variants": {
+    "": {
+      "model": "weylandyutani:block/cocoon_block"
+    }
+  }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: lab_machine.json
+----------------------------------------------------------------------------------------------------
+{
+  "variants": {
+    "": {
+      "model": "weylandyutani:block/lab_machine"
+    }
+  }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: resin_block.json
+----------------------------------------------------------------------------------------------------
+{
+  "variants": {
+    "": {
+      "model": "weylandyutani:block/resin_block"
+    }
+  }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: specimen_glass.json
+----------------------------------------------------------------------------------------------------
+{
+  "variants": {
+    "": {
+      "model": "weylandyutani:block/specimen_glass"
+    }
+  }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: specimen_pod_controller.json
+----------------------------------------------------------------------------------------------------
+{
+  "variants": {
+    "": {
+      "model": "weylandyutani:block/specimen_pod_controller"
+    }
+  }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: spiny_block.json
+----------------------------------------------------------------------------------------------------
+{
+  "variants": {
+    "": {
+      "model": "weylandyutani:block/spiny_block"
+    }
+  }
+}
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: assets/weylandyutani/lang
+====================================================================================================
+
+FILE: en_us.json
+----------------------------------------------------------------------------------------------------
+{
+  "block.weylandyutani.resin_block": "Resin Block",
+  "block.weylandyutani.spiny_block": "Spiny Block",
+  "block.weylandyutani.cocoon_block": "Cocoon Block",
+  "block.weylandyutani.lab_machine": "Lab Machine",
+  "block.weylandyutani.specimen_glass": "Specimen Glass",
+  "block.weylandyutani.specimen_pod_controller": "Specimen Pod Controller",
+  "entity.weylandyutani.facehugger": "Facehugger",
+  "entity.weylandyutani.ovomorph": "Ovomorph",
+  "entity.weylandyutani.chestburster": "Chestburster",
+  "entity.weylandyutani.growth": "Growth",
+  "entity.weylandyutani.drone": "Drone",
+  "entity.weylandyutani.praetor": "Praetor",
+  "entity.weylandyutani.queen": "Xenomorph Queen",
+  "entity.weylandyutani.human": "Human"
+}
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: assets/weylandyutani/models/block
+====================================================================================================
+
+FILE: cocoon_block.json
+----------------------------------------------------------------------------------------------------
+{
+  "parent": "minecraft:block/cube_all",
+  "textures": {
+    "all": "weylandyutani:block/cocoon_block"
+  }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: lab_machine.json
+----------------------------------------------------------------------------------------------------
+{
+  "parent": "minecraft:block/cube_all",
+  "textures": {
+    "all": "weylandyutani:block/lab_machine"
+  }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: resin_block.json
+----------------------------------------------------------------------------------------------------
+{
+  "parent": "minecraft:block/cube_all",
+  "textures": {
+    "all": "weylandyutani:block/resin_block"
+  }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: specimen_glass.json
+----------------------------------------------------------------------------------------------------
+{
+  "parent": "minecraft:block/cube_all",
+  "textures": {
+    "all": "weylandyutani:block/specimen_glass"
+  }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: specimen_pod_controller.json
+----------------------------------------------------------------------------------------------------
+{
+  "parent": "minecraft:block/cube_all",
+  "textures": {
+    "all": "weylandyutani:block/specimen_pod_controller"
+  }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: spiny_block.json
+----------------------------------------------------------------------------------------------------
+{
+  "parent": "minecraft:block/cube_all",
+  "textures": {
+    "all": "weylandyutani:block/spiny_block"
+  }
+}
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: assets/weylandyutani/models/item
+====================================================================================================
+
+FILE: chestburster_spawn_egg.json
+----------------------------------------------------------------------------------------------------
+{
+  "parent": "item/generated",
+  "textures": {
+    "layer0": "weylandyutani:item/chestburster_spawn_egg",
+    "layer1": "weylandyutani:item/chestburster_spawn_egg_overlay"
+  }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: chestburster_specimen_pod_controller.json
+----------------------------------------------------------------------------------------------------
+{
+  "parent": "weylandyutani:block/specimen_pod_controller"
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: cocoon_block.json
+----------------------------------------------------------------------------------------------------
+{
+  "parent": "weylandyutani:block/cocoon_block"
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: drone_spawn_egg.json
+----------------------------------------------------------------------------------------------------
+{
+  "parent": "item/generated",
+  "textures": {
+    "layer0": "weylandyutani:item/drone_spawn_egg",
+    "layer1": "weylandyutani:item/drone_spawn_egg_overlay"
+  }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: facehugger_spawn_egg.json
+----------------------------------------------------------------------------------------------------
+{
+  "parent": "item/generated",
+  "textures": {
+    "layer0": "weylandyutani:item/facehugger_spawn_egg",
+    "layer1": "weylandyutani:item/facehugger_spawn_egg_overlay"
+  }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: facehugger_specimen_pod_controller.json
+----------------------------------------------------------------------------------------------------
+{
+  "parent": "weylandyutani:block/specimen_pod_controller"
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: gestation_potion.json
+----------------------------------------------------------------------------------------------------
+{
+  "parent": "item/generated",
+  "textures": {
+    "layer0": "weylandyutani:item/gestation_potion"
+  }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: gestation_splash_potion.json
+----------------------------------------------------------------------------------------------------
+{
+  "parent": "item/generated",
+  "textures": {
+    "layer0": "weylandyutani:item/gestation_splash_potion"
+  }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: growth_spawn_egg.json
+----------------------------------------------------------------------------------------------------
+{
+  "parent": "item/template_spawn_egg",
+  "textures": {
+    "0": "weylandyutani:item/growth_spawn_egg"
+  }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: human_spawn_egg.json
+----------------------------------------------------------------------------------------------------
+{
+  "parent": "item/generated",
+  "textures": {
+    "layer0": "weylandyutani:item/human_spawn_egg",
+    "layer1": "weylandyutani:item/human_spawn_egg_overlay"
+  }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: intermediate_growth_spawn_egg.json
+----------------------------------------------------------------------------------------------------
+{
+  "parent": "item/template_spawn_egg",
+  "textures": {
+    "0": "weylandyutani:item/intermediate_growth_spawn_egg"
+  }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: lab_machine.json
+----------------------------------------------------------------------------------------------------
+{
+  "parent": "weylandyutani:block/lab_machine"
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: motion_tracker.json
+----------------------------------------------------------------------------------------------------
+{
+  "parent": "item/generated",
+  "textures": {
+    "layer0": "weylandyutani:item/motion_tracker"
+  }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: ovomorph_spawn_egg.json
+----------------------------------------------------------------------------------------------------
+{
+  "parent": "item/generated",
+  "textures": {
+    "layer0": "weylandyutani:item/ovomorph_spawn_egg",
+    "layer1": "weylandyutani:item/ovomorph_spawn_egg_overlay"
+  }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: praetor_spawn_egg.json
+----------------------------------------------------------------------------------------------------
+{
+  "parent": "item/template_spawn_egg",
+  "textures": {
+    "0": "weylandyutani:item/praetor_spawn_egg"
+  }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: queen_spawn_egg.json
+----------------------------------------------------------------------------------------------------
+{
+  "parent": "item/generated",
+  "textures": {
+    "layer0": "weylandyutani:item/queen_spawn_egg",
+    "layer1": "weylandyutani:item/queen_spawn_egg_overlay"
+  }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: resin_block.json
+----------------------------------------------------------------------------------------------------
+{
+  "parent": "weylandyutani:block/resin_block"
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: specimen_glass.json
+----------------------------------------------------------------------------------------------------
+{
+  "parent": "weylandyutani:block/specimen_glass"
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: specimen_pod_controller.json
+----------------------------------------------------------------------------------------------------
+{
+  "parent": "weylandyutani:block/specimen_pod_controller"
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: spiny_block.json
+----------------------------------------------------------------------------------------------------
+{
+  "parent": "weylandyutani:block/spiny_block"
+}
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: assets/weylandyutani/sounds
+====================================================================================================
+
+FILE: sounds.json
+----------------------------------------------------------------------------------------------------
+{
+  "entity.chestburster.ambient": {
+    "sounds": [
+      "weylandyutani:entity/chestburster/ambient1",
+      "weylandyutani:entity/chestburster/ambient2"
+    ],
+    "subtitle": "subtitles.entity.chestburster.ambient"
+  },
+  "entity.chestburster.hurt": {
+    "sounds": [
+      "weylandyutani:entity/chestburster/hurt1",
+      "weylandyutani:entity/chestburster/hurt2"
+    ],
+    "subtitle": "subtitles.entity.chestburster.hurt"
+  },
+  "entity.chestburster.death": {
+    "sounds": [
+      "weylandyutani:entity/chestburster/death"
+    ],
+    "subtitle": "subtitles.entity.chestburster.death"
+  },
+  "entity.drone.ambient": {
+    "sounds": [
+      "weylandyutani:entity/drone/ambient1",
+      "weylandyutani:entity/drone/ambient2"
+    ],
+    "subtitle": "subtitles.entity.drone.ambient"
+  },
+  "entity.drone.hurt": {
+    "sounds": [
+      "weylandyutani:entity/drone/hurt1",
+      "weylandyutani:entity/drone/hurt2"
+    ],
+    "subtitle": "subtitles.entity.drone.hurt"
+  },
+  "entity.drone.death": {
+    "sounds": [
+      "weylandyutani:entity/drone/death"
+    ],
+    "subtitle": "subtitles.entity.drone.death"
+  },
+  "entity.facehugger.ambient": {
+    "sounds": [
+      "weylandyutani:entity/facehugger/ambient1",
+      "weylandyutani:entity/facehugger/ambient2"
+    ],
+    "subtitle": "subtitles.entity.facehugger.ambient"
+  },
+  "entity.facehugger.hurt": {
+    "sounds": [
+      "weylandyutani:entity/facehugger/hurt1",
+      "weylandyutani:entity/facehugger/hurt2"
+    ],
+    "subtitle": "subtitles.entity.facehugger.hurt"
+  },
+  "entity.facehugger.death": {
+    "sounds": [
+      "weylandyutani:entity/facehugger/death"
+    ],
+    "subtitle": "subtitles.entity.facehugger.death"
+  },
+  "entity.growth.ambient": {
+    "sounds": [
+      "weylandyutani:entity/growth/ambient1",
+      "weylandyutani:entity/growth/ambient2"
+    ],
+    "subtitle": "subtitles.entity.growth.ambient"
+  },
+  "entity.growth.hurt": {
+    "sounds": [
+      "weylandyutani:entity/growth/hurt1",
+      "weylandyutani:entity/growth/hurt2"
+    ],
+    "subtitle": "subtitles.entity.growth.hurt"
+  },
+  "entity.growth.death": {
+    "sounds": [
+      "weylandyutani:entity/growth/death"
+    ],
+    "subtitle": "subtitles.entity.growth.death"
+  },
+  "entity.praetor.ambient": {
+    "sounds": [
+      "weylandyutani:entity/praetor/ambient1",
+      "weylandyutani:entity/praetor/ambient2"
+    ],
+    "subtitle": "subtitles.entity.praetor.ambient"
+  },
+  "entity.praetor.hurt": {
+    "sounds": [
+      "weylandyutani:entity/praetor/hurt1",
+      "weylandyutani:entity/praetor/hurt2"
+    ],
+    "subtitle": "subtitles.entity.praetor.hurt"
+  },
+  "entity.praetor.death": {
+    "sounds": [
+      "weylandyutani:entity/praetor/death"
+    ],
+    "subtitle": "subtitles.entity.praetor.death"
+  },
+  "entity.queen.ambient": {
+    "sounds": [
+      "weylandyutani:entity/queen/ambient1",
+      "weylandyutani:entity/queen/ambient2"
+    ],
+    "subtitle": "subtitles.entity.queen.ambient"
+  },
+  "entity.queen.hurt": {
+    "sounds": [
+      "weylandyutani:entity/queen/hurt1",
+      "weylandyutani:entity/queen/hurt2"
+    ],
+    "subtitle": "subtitles.entity.queen.hurt"
+  },
+  "entity.queen.death": {
+    "sounds": [
+      "weylandyutani:entity/queen/death"
+    ],
+    "subtitle": "subtitles.entity.queen.death"
+  },
+  "entity.ovomorph.ambient": {
+    "sounds": [
+      "weylandyutani:entity/player/ovomorph/ambient1",
+      "weylandyutani:entity/player/ovomorph/ambient2"
+    ],
+    "subtitle": "subtitles.entity.ovomorph.ambient"
+  },
+  "entity.ovomorph.hurt": {
+    "sounds": [
+      "weylandyutani:entity/player/ovomorph/hurt1",
+      "weylandyutani:entity/player/ovomorph/hurt2"
+    ],
+    "subtitle": "subtitles.entity.ovomorph.hurt"
+  },
+  "entity.ovomorph.death": {
+    "sounds": [
+      "weylandyutani:entity/player/ovomorph/death"
+    ],
+    "subtitle": "subtitles.entity.ovomorph.death"
+  },
+  "entity.ovomorph.hatch": {
+    "sounds": [
+      "weylandyutani:entity/player/ovomorph/hatch"
+    ],
+    "subtitle": "subtitles.entity.ovomorph.hatch"
+  },
+  "xenomorph.intelligence_activate": {
+    "sounds": [
+      "weylandyutani:entity/special/intelligence_activate"
+    ],
+    "subtitle": "subtitles.xenomorph.intelligence_activate"
+  },
+  "xenomorph.special_ability": {
+    "sounds": [
+      "weylandyutani:entity/special/ability1",
+      "weylandyutani:entity/special/ability2"
+    ],
+    "subtitle": "subtitles.xenomorph.special_ability"
+  },
+  "xenomorph.group_coordination": {
+    "sounds": [
+      "weylandyutani:entity/special/group_coordination"
+    ],
+    "subtitle": "subtitles.xenomorph.group_coordination"
+  }
+}
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: assets/weylandyutani
+====================================================================================================
+
+FILE: sounds.json
+----------------------------------------------------------------------------------------------------
+{
+  "_comment": "Placeholder sound events — .ogg stubs under sounds/ for dev smoke tests",
+  "entity.ovomorph.ambient": {
+    "subtitle": "entity.ovomorph.ambient",
+    "sounds": [
+      "entity/ovomorph/ambient"
+    ]
+  },
+  "entity.ovomorph.hurt": {
+    "subtitle": "entity.ovomorph.hurt",
+    "sounds": [
+      "entity/ovomorph/hurt"
+    ]
+  },
+  "entity.ovomorph.death": {
+    "subtitle": "entity.ovomorph.death",
+    "sounds": [
+      "entity/ovomorph/death"
+    ]
+  },
+  "entity.ovomorph.hatch": {
+    "sounds": [
+      "entity/xenomorph/human/ovomorph/hatch"
+    ]
+  },
+  "entity.facehugger.ambient": {
+    "subtitle": "entity.facehugger.ambient",
+    "sounds": [
+      "entity/facehugger/ambient"
+    ]
+  },
+  "entity.facehugger.hurt": {
+    "subtitle": "entity.facehugger.hurt",
+    "sounds": [
+      "entity/facehugger/hurt"
+    ]
+  },
+  "entity.facehugger.death": {
+    "subtitle": "entity.facehugger.death",
+    "sounds": [
+      "entity/facehugger/death"
+    ]
+  },
+  "entity.chestburster.ambient": {
+    "subtitle": "entity.chestburster.ambient",
+    "sounds": [
+      "entity/chestburster/ambient"
+    ]
+  },
+  "entity.chestburster.hurt": {
+    "subtitle": "entity.chestburster.hurt",
+    "sounds": [
+      "entity/chestburster/hurt"
+    ]
+  },
+  "entity.chestburster.death": {
+    "subtitle": "entity.chestburster.death",
+    "sounds": [
+      "entity/chestburster/death"
+    ]
+  },
+  "entity.growth.ambient": {
+    "subtitle": "entity.growth.ambient",
+    "sounds": [
+      "entity/growth/ambient"
+    ]
+  },
+  "entity.growth.hurt": {
+    "subtitle": "entity.growth.hurt",
+    "sounds": [
+      "entity/growth/hurt"
+    ]
+  },
+  "entity.growth.death": {
+    "subtitle": "entity.growth.death",
+    "sounds": [
+      "entity/growth/death"
+    ]
+  },
+  "entity.drone.ambient": {
+    "subtitle": "entity.drone.ambient",
+    "sounds": [
+      "entity/drone/ambient"
+    ]
+  },
+  "entity.drone.hurt": {
+    "subtitle": "entity.drone.hurt",
+    "sounds": [
+      "entity/drone/hurt"
+    ]
+  },
+  "entity.drone.death": {
+    "subtitle": "entity.drone.death",
+    "sounds": [
+      "entity/drone/death"
+    ]
+  },
+  "entity.praetor.ambient": {
+    "subtitle": "entity.praetor.ambient",
+    "sounds": [
+      "entity/praetor/ambient"
+    ]
+  },
+  "entity.praetor.hurt": {
+    "subtitle": "entity.praetor.hurt",
+    "sounds": [
+      "entity/praetor/hurt"
+    ]
+  },
+  "entity.praetor.death": {
+    "subtitle": "entity.praetor.death",
+    "sounds": [
+      "entity/praetor/death"
+    ]
+  },
+  "entity.queen.ambient": {
+    "subtitle": "entity.queen.ambient",
+    "sounds": [
+      "entity/queen/ambient"
+    ]
+  },
+  "entity.queen.hurt": {
+    "subtitle": "entity.queen.hurt",
+    "sounds": [
+      "entity/queen/hurt"
+    ]
+  },
+  "entity.queen.death": {
+    "subtitle": "entity.queen.death",
+    "sounds": [
+      "entity/queen/death"
+    ]
+  },
+  "entity.human.ambient": {
+    "subtitle": "entity.human.ambient",
+    "sounds": [
+      "entity/human/ambient"
+    ]
+  },
+  "entity.human.hurt": {
+    "subtitle": "entity.human.hurt",
+    "sounds": [
+      "entity/human/hurt"
+    ]
+  },
+  "entity.human.death": {
+    "subtitle": "entity.human.death",
+    "sounds": [
+      "entity/human/death"
+    ]
+  }
+}
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: data/weylandyutani/ai_behaviors
+====================================================================================================
+
+FILE: aggressive_queen.json
+----------------------------------------------------------------------------------------------------
+{
+  "behavior_type": "aggressive_queen",
+  "description": "Aggressive queen — faster movement with expanded threat radius",
+  "speed_multipliers": {
+    "melee_attack_speed": 1.2,
+    "stroll_speed": 0.6,
+    "look_range_multiplier": 2.0
+  },
+  "standard_parameters": {
+    "nest_focused": true,
+    "egg_laying_priority": true,
+    "aggressive_patrol": true
+  }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: defensive_villager.json
+----------------------------------------------------------------------------------------------------
+{
+  "behavior_type": "defensive_villager",
+  "description": "Human defensive behavior — cautious movement with extended awareness",
+  "speed_multipliers": {
+    "melee_attack_speed": 0.9,
+    "stroll_speed": 0.8,
+    "look_range_multiplier": 1.3
+  },
+  "standard_parameters": {
+    "flee_when_threatened": true,
+    "defend_nearby_allies": true
+  }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: escape_and_hide.json
+----------------------------------------------------------------------------------------------------
+{
+  "behavior_type": "escape_and_hide",
+  "description": "Flee threats and hide; faster movement when escaping",
+  "speed_multipliers": {
+    "melee_attack_speed": 1.2,
+    "stroll_speed": 1.3,
+    "look_range_multiplier": 1.2
+  },
+  "standard_parameters": {
+    "flee_on_damage": true,
+    "hide_when_low_health": true
+  }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: hive_mother.json
+----------------------------------------------------------------------------------------------------
+{
+  "behavior_type": "hive_mother",
+  "description": "Queen hive mother — slow movement, nest-focused behavior",
+  "speed_multipliers": {
+    "melee_attack_speed": 1.0,
+    "stroll_speed": 0.3,
+    "look_range_multiplier": 1.5
+  },
+  "standard_parameters": {
+    "nest_focused": true,
+    "egg_laying_priority": true
+  }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: passive_development.json
+----------------------------------------------------------------------------------------------------
+{
+  "behavior_type": "passive_development",
+  "description": "Slow movement while maturing; minimal aggression",
+  "speed_multipliers": {
+    "melee_attack_speed": 0.8,
+    "stroll_speed": 0.5,
+    "look_range_multiplier": 0.8
+  },
+  "standard_parameters": {
+    "avoid_combat": true
+  }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: patient_egg.json
+----------------------------------------------------------------------------------------------------
+{
+  "behavior_type": "patient_egg",
+  "description": "Stationary ovomorph — no movement, proximity detection only",
+  "speed_multipliers": {
+    "melee_attack_speed": 0.0,
+    "stroll_speed": 0.0,
+    "look_range_multiplier": 0.0
+  },
+  "standard_parameters": {
+    "proximity_detection": true
+  }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: standard.json
+----------------------------------------------------------------------------------------------------
+{
+  "behavior_type": "standard",
+  "description": "Default xenomorph AI speed multipliers",
+  "speed_multipliers": {
+    "melee_attack_speed": 1.0,
+    "stroll_speed": 1.0,
+    "look_range_multiplier": 1.0
+  },
+  "standard_parameters": {
+    "use_vanilla_goal_priorities": true
+  }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: stealthy_hunter.json
+----------------------------------------------------------------------------------------------------
+{
+  "behavior_type": "stealthy_hunter",
+  "description": "Reduced movement speed with extended look range for ambush predators",
+  "speed_multipliers": {
+    "melee_attack_speed": 1.0,
+    "stroll_speed": 0.7,
+    "look_range_multiplier": 1.5
+  },
+  "stealth_parameters": {
+    "prefer_darkness": true,
+    "stalk_before_attack": true
+  }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: strategic_commander.json
+----------------------------------------------------------------------------------------------------
+{
+  "behavior_type": "strategic_commander",
+  "description": "Tactical commander with extended look range and measured movement",
+  "speed_multipliers": {
+    "melee_attack_speed": 0.8,
+    "stroll_speed": 0.7,
+    "look_range_multiplier": 2.0
+  },
+  "standard_parameters": {
+    "command_radius": 32
+  }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: survival_ai.json
+----------------------------------------------------------------------------------------------------
+{
+  "escapeAttemptIntervalTicks": 5,
+  "stuckThresholdTicks": 20,
+  "suffocationLowThreshold": 0.3,
+  "suffocationCriticalThreshold": 0.1
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: swarm_killer.json
+----------------------------------------------------------------------------------------------------
+{
+  "behavior_type": "swarm_killer",
+  "description": "Aggressive pack hunter with elevated attack speed",
+  "speed_multipliers": {
+    "melee_attack_speed": 1.2,
+    "stroll_speed": 1.1,
+    "look_range_multiplier": 1.0
+  },
+  "standard_parameters": {
+    "pack_coordination": true
+  }
+}
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: data/weylandyutani/blocks
+====================================================================================================
+
+FILE: block_textures.json
+----------------------------------------------------------------------------------------------------
+{
+  "_comment": "Single source of truth for block texture assets. Block configs reference keys via visual.texture_key.",
+  "resin_block": {
+    "type": "single",
+    "texture": "weylandyutani:block/resin_block",
+    "fallback": "minecraft:block/black_concrete"
+  },
+  "spiny_block": {
+    "type": "single",
+    "texture": "weylandyutani:block/spiny_block",
+    "fallback": "minecraft:block/black_concrete"
+  },
+  "cocoon_block": {
+    "type": "single",
+    "texture": "weylandyutani:block/cocoon_block",
+    "fallback": "minecraft:block/black_concrete"
+  },
+  "lab_machine": {
+    "type": "single",
+    "texture": "weylandyutani:block/lab_machine",
+    "fallback": "minecraft:block/iron_block"
+  },
+  "specimen_glass": {
+    "type": "single",
+    "texture": "weylandyutani:block/specimen_glass",
+    "fallback": "minecraft:block/glass"
+  },
+  "specimen_pod_controller": {
+    "type": "single",
+    "texture": "weylandyutani:block/specimen_pod_controller",
+    "fallback": "minecraft:block/iron_block"
+  }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: cocoon_block.json
+----------------------------------------------------------------------------------------------------
+{
+  "visual": {
+    "texture_key": "cocoon_block"
+  },
+  "gameplay": {
+    "destroy_time": 3.0,
+    "blast_resistance": 9.0
+  }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: lab_machine.json
+----------------------------------------------------------------------------------------------------
+{
+  "visual": {
+    "texture_key": "lab_machine"
+  },
+  "gameplay": {
+    "destroy_time": 4.0,
+    "blast_resistance": 12.0
+  }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: resin_block.json
+----------------------------------------------------------------------------------------------------
+{
+  "visual": {
+    "texture_key": "resin_block"
+  },
+  "gameplay": {
+    "destroy_time": 2.0,
+    "blast_resistance": 6.0
+  }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: specimen_glass.json
+----------------------------------------------------------------------------------------------------
+{
+  "visual": {
+    "texture_key": "specimen_glass"
+  },
+  "gameplay": {
+    "destroy_time": 2.0,
+    "blast_resistance": 6.0
+  }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: specimen_pod_controller.json
+----------------------------------------------------------------------------------------------------
+{
+  "visual": {
+    "texture_key": "specimen_pod_controller"
+  },
+  "gameplay": {
+    "destroy_time": 2.5,
+    "blast_resistance": 7.0,
+    "validation_interval_ticks": 100
+  }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: spiny_block.json
+----------------------------------------------------------------------------------------------------
+{
+  "visual": {
+    "texture_key": "spiny_block"
+  },
+  "gameplay": {
+    "destroy_time": 1.5,
+    "blast_resistance": 3.0
+  }
+}
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: data/weylandyutani/effects
+====================================================================================================
+
+FILE: gestation.json
+----------------------------------------------------------------------------------------------------
+{
+  "version": 1,
+  "effect_name": "gestation",
+  "display_name": "Gestation",
+  "description": "Chestburster gestation inside a host",
+  "category": "harmful",
+  "color": "0x8B0000",
+  "duration": {
+    "base_duration": 1200,
+    "duration_ticks": 1200,
+    "max_duration": 2400,
+    "min_duration": 600
+  },
+  "visual_effects": {
+    "particle_type": "damage_indicator",
+    "particle_count": 5,
+    "particle_spread": 0.5,
+    "warning_start_ticks": 200,
+    "warning_particle_count": 10,
+    "warning_particle_spread": 1.0
+  },
+  "damage_phases": {
+    "warning_phase": {
+      "start_ticks": 200,
+      "damage_interval": 40,
+      "damage_amount": 2.0,
+      "damage_type": "magic"
+    },
+    "final_phase": {
+      "start_ticks": 20,
+      "damage_amount": 500.0,
+      "damage_type": "magic",
+      "instant_kill": true
+    }
+  },
+  "spawn_effects": {
+    "spawn_entity": "chestburster",
+    "spawn_offset_x": 0.0,
+    "spawn_offset_y": 0.0,
+    "spawn_offset_z": 0.0,
+    "explosion_particles": true,
+    "explosion_particle_count": 20,
+    "explosion_particle_spread": 1.0
+  },
+  "behavior": {
+    "can_be_cured": false,
+    "can_be_removed": false,
+    "show_icon": true,
+    "show_particles": true,
+    "ambient": false,
+    "instant": false
+  }
+}
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: data/weylandyutani/entity/human
+====================================================================================================
+
+FILE: human.json
+----------------------------------------------------------------------------------------------------
+{
+  "health": 20.0,
+  "speed": 0.25,
+  "damage": 2.0,
+  "shadow_size": 0.5,
+  "follow_range": 16.0,
+  "attachment_duration": 200,
+  "implantation_delay": 200,
+  "lifecycle": {
+    "can_mature": false,
+    "stage": "adult"
+  },
+  "spawning": {
+    "spawn_weight": 5,
+    "min_group_size": 1,
+    "max_group_size": 1
+  },
+  "entity_size": {
+    "width": 0.6,
+    "height": 1.8
+  },
+  "visual": {
+    "model": "player",
+    "texture": "minecraft:textures/entity/player/wide/steve.png",
+    "texture_fallback": "minecraft:textures/block/black_concrete.png",
+    "ambient_sound": "weylandyutani:entity.human.ambient",
+    "hurt_sound": "weylandyutani:entity.human.hurt",
+    "death_sound": "weylandyutani:entity.human.death"
+  },
+  "client_parameters": {
+    "tracking_range": 64,
+    "update_interval": 3,
+    "transition_duration_ticks": 30,
+    "transition_modifiers": {
+      "normal": 1.0,
+      "stalking": 0.6,
+      "chasing": 1.3,
+      "fighting": 1.6
+    }
+  },
+  "ai_goals": {
+    "behavior_type": "standard",
+    "aggression_level": 5,
+    "melee_attack_speed": 1.0,
+    "look_at_player_range": 8.0,
+    "stroll_speed": 1.0,
+    "attack_knockback": 0.0,
+    "movement": {
+      "light_level_dark": 4,
+      "block_destroy_speed_soft": 3.0,
+      "safety_urgency_threshold": 0.7,
+      "stalking_distance": 16.0,
+      "close_combat_distance": 4.0,
+      "melee_range": 2.0
+    }
+  },
+  "sound_parameters": {
+    "step_volume": 0.15,
+    "step_pitch": 1.0,
+    "ambient_volume": 0.5,
+    "ambient_pitch": 1.0
+  }
+}
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: data/weylandyutani/entity/xenomorph/human
+====================================================================================================
+
+FILE: chestburster.json
+----------------------------------------------------------------------------------------------------
+{
+  "health": 20.0,
+  "speed": 0.25,
+  "damage": 2.0,
+  "shadow_size": 0.5,
+  "follow_range": 16.0,
+  "attachment_duration": 200,
+  "implantation_delay": 200,
+  "lifecycle": {
+    "can_mature": true,
+    "mature_to": "growth",
+    "stage": "juvenile"
+  },
+  "spawning": {
+    "spawn_weight": 5,
+    "min_group_size": 1,
+    "max_group_size": 1
+  },
+  "entity_size": {
+    "width": 0.4,
+    "height": 0.6
+  },
+  "visual": {
+    "model": "chestburster_custom",
+    "texture": "weylandyutani:textures/entity/xenomorph/human/chestburster/v1/chestburster.png",
+    "texture_fallback": "minecraft:textures/block/black_concrete.png",
+    "ambient_sound": "weylandyutani:entity.chestburster.ambient",
+    "hurt_sound": "weylandyutani:entity.chestburster.hurt",
+    "death_sound": "weylandyutani:entity.chestburster.death"
+  },
+  "client_parameters": {
+    "tracking_range": 64,
+    "update_interval": 3,
+    "transition_duration_ticks": 30,
+    "transition_modifiers": {
+      "normal": 1.0,
+      "stalking": 0.6,
+      "chasing": 1.3,
+      "fighting": 1.6
+    }
+  },
+  "ai_goals": {
+    "behavior_type": "escape_and_hide",
+    "aggression_level": 3,
+    "melee_attack_speed": 1.2,
+    "look_at_player_range": 8.0,
+    "stroll_speed": 1.2,
+    "attack_knockback": 0.0,
+    "special_abilities": {
+      "eat_small_animals": true,
+      "attack_distance": 2.0,
+      "food_healing": 2.0,
+      "maturation_timer_reduction": 100
+    },
+    "goal_priorities": {
+      "survival": 0,
+      "float": 1,
+      "stroll": 2,
+      "random_look": 3,
+      "flee": 2,
+      "hide": 3,
+      "hunt": 4
+    },
+    "movement": {
+      "light_level_dark": 4,
+      "block_destroy_speed_soft": 3.0,
+      "safety_urgency_threshold": 0.7,
+      "stalking_distance": 16.0,
+      "close_combat_distance": 4.0,
+      "melee_range": 2.0,
+      "flee_distance": 16.0,
+      "escape_speed_multiplier": 2.0,
+      "movement_speed_multiplier": 1.5,
+      "safety_search_radius": 16.0
+    }
+  },
+  "sound_parameters": {
+    "step_volume": 0.1,
+    "step_pitch": 1.2,
+    "ambient_volume": 0.4,
+    "ambient_pitch": 1.1
+  }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: drone.json
+----------------------------------------------------------------------------------------------------
+{
+  "health": 20.0,
+  "speed": 0.25,
+  "damage": 2.0,
+  "shadow_size": 0.5,
+  "follow_range": 16.0,
+  "attachment_duration": 200,
+  "implantation_delay": 200,
+  "lifecycle": {
+    "can_mature": false,
+    "stage": "adult"
+  },
+  "spawning": {
+    "spawn_weight": 5,
+    "min_group_size": 1,
+    "max_group_size": 1
+  },
+  "entity_size": {
+    "width": 0.6,
+    "height": 1.8
+  },
+  "visual": {
+    "model": "drone_custom",
+    "texture": "weylandyutani:textures/entity/xenomorph/human/drone/v1/drone.png",
+    "texture_fallback": "minecraft:textures/block/black_concrete.png",
+    "ambient_sound": "weylandyutani:entity.drone.ambient",
+    "hurt_sound": "weylandyutani:entity.drone.hurt",
+    "death_sound": "weylandyutani:entity.drone.death"
+  },
+  "client_parameters": {
+    "tracking_range": 64,
+    "update_interval": 3,
+    "transition_duration_ticks": 30,
+    "transition_modifiers": {
+      "normal": 1.0,
+      "stalking": 0.6,
+      "chasing": 1.3,
+      "fighting": 1.6
+    }
+  },
+  "ai_goals": {
+    "behavior_type": "swarm_killer",
+    "aggression_level": 7,
+    "melee_attack_speed": 1.0,
+    "look_at_player_range": 8.0,
+    "stroll_speed": 1.0,
+    "attack_knockback": 0.5,
+    "special_abilities": {
+      "patrol_interval": 100,
+      "swarm_stroll_speed_multiplier": 1.5,
+      "swarm_look_range_multiplier": 1.5
+    },
+    "goal_priorities": {
+      "survival": 0,
+      "patrol": 3,
+      "float": 1,
+      "stroll": 3,
+      "swarm": 2,
+      "look": 4,
+      "random_look": 5,
+      "hurt_by_target": 1,
+      "target_player": 2,
+      "target_villager": 3,
+      "target_animal": 4,
+      "target_iron_golem": 5,
+      "target_snow_golem": 6,
+      "prioritized_host": 7
+    },
+    "movement": {
+      "light_level_dark": 4,
+      "block_destroy_speed_soft": 3.0,
+      "safety_urgency_threshold": 0.7,
+      "stalking_distance": 16.0,
+      "close_combat_distance": 4.0,
+      "melee_range": 2.0
+    }
+  },
+  "sound_parameters": {
+    "step_volume": 0.15,
+    "step_pitch": 1.0,
+    "ambient_volume": 0.5,
+    "ambient_pitch": 1.0
+  }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: facehugger.json
+----------------------------------------------------------------------------------------------------
+{
+  "health": 20.0,
+  "speed": 0.25,
+  "damage": 2.0,
+  "shadow_size": 0.5,
+  "follow_range": 16.0,
+  "attachment_duration": 200,
+  "implantation_delay": 200,
+  "lifecycle": {
+    "can_mature": false,
+    "stage": "parasite"
+  },
+  "spawning": {
+    "spawn_weight": 5,
+    "min_group_size": 1,
+    "max_group_size": 1
+  },
+  "entity_size": {
+    "width": 0.6,
+    "height": 0.4
+  },
+  "visual": {
+    "model": "facehugger_custom",
+    "texture": "weylandyutani:textures/entity/xenomorph/human/facehugger/v1/facehugger.png",
+    "texture_fallback": "minecraft:textures/block/black_concrete.png",
+    "ambient_sound": "weylandyutani:entity.facehugger.ambient",
+    "hurt_sound": "weylandyutani:entity.facehugger.hurt",
+    "death_sound": "weylandyutani:entity.facehugger.death"
+  },
+  "client_parameters": {
+    "tracking_range": 64,
+    "update_interval": 3,
+    "transition_duration_ticks": 30,
+    "transition_modifiers": {
+      "normal": 1.0,
+      "stalking": 0.6,
+      "chasing": 1.3,
+      "fighting": 1.6
+    }
+  },
+  "ai_goals": {
+    "behavior_type": "stealthy_hunter",
+    "aggression_level": 5,
+    "melee_attack_speed": 1.0,
+    "look_at_player_range": 32.0,
+    "stroll_speed": 1.0,
+    "attack_knockback": 0.0,
+    "basic_movement": {
+      "stroll_speed": 1.0,
+      "look_at_player_range": 32.0,
+      "float_priority": 1,
+      "stroll_priority": 3,
+      "look_priority": 4
+    },
+    "goal_priorities": {
+      "float": 1,
+      "attachment": 2,
+      "stroll": 3,
+      "look_at_player": 4,
+      "random_look": 5,
+      "host_target": 1,
+      "hurt_by_target": 2,
+      "stealth_target": 1
+    },
+    "movement": {
+      "light_level_dark": 4,
+      "block_destroy_speed_soft": 3.0,
+      "safety_urgency_threshold": 0.7,
+      "stalking_distance": 16.0,
+      "close_combat_distance": 4.0,
+      "melee_range": 2.0
+    }
+  },
+  "attachment_parameters": {
+    "max_distance": 8.0,
+    "min_distance": 1.0,
+    "move_speed": 1.2,
+    "damage_interval": 20,
+    "damage_amount": 1.0,
+    "look_angle": 30.0,
+    "face_height_multiplier": 0.8,
+    "rotation_offset": 180.0,
+    "spent_wander_ticks": 100,
+    "death_animation_ticks": 40,
+    "effect_refresh_ticks": 20,
+    "paralysis": {
+      "disable_attacking": true,
+      "disable_movement": true,
+      "disable_looking": true,
+      "disable_jumping": true,
+      "disable_sprinting": true,
+      "disable_swimming": true,
+      "disable_flying": true,
+      "disable_riding": true,
+      "disable_using_items": true,
+      "disable_breaking_blocks": true,
+      "disable_placing_blocks": true,
+      "disable_interacting": true
+    }
+  },
+  "sound_parameters": {
+    "step_volume": 0.15,
+    "step_pitch": 1.0,
+    "ambient_volume": 0.5,
+    "ambient_pitch": 1.0
+  }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: growth.json
+----------------------------------------------------------------------------------------------------
+{
+  "health": 20.0,
+  "speed": 0.25,
+  "damage": 2.0,
+  "shadow_size": 0.5,
+  "follow_range": 16.0,
+  "attachment_duration": 200,
+  "implantation_delay": 200,
+  "lifecycle": {
+    "can_mature": true,
+    "mature_to": "drone",
+    "stage": "growth"
+  },
+  "spawning": {
+    "spawn_weight": 5,
+    "min_group_size": 1,
+    "max_group_size": 1
+  },
+  "entity_size": {
+    "width": 0.5,
+    "height": 1.2
+  },
+  "visual": {
+    "model": "growth_custom",
+    "texture": "weylandyutani:textures/entity/xenomorph/human/growth/v1/growth.png",
+    "texture_fallback": "minecraft:textures/block/black_concrete.png",
+    "ambient_sound": "weylandyutani:entity.growth.ambient",
+    "hurt_sound": "weylandyutani:entity.growth.hurt",
+    "death_sound": "weylandyutani:entity.growth.death"
+  },
+  "client_parameters": {
+    "tracking_range": 64,
+    "update_interval": 3,
+    "transition_duration_ticks": 30,
+    "transition_modifiers": {
+      "normal": 1.0,
+      "stalking": 0.6,
+      "chasing": 1.3,
+      "fighting": 1.6
+    }
+  },
+  "ai_goals": {
+    "behavior_type": "passive_development",
+    "aggression_level": 2,
+    "melee_attack_speed": 0.8,
+    "look_at_player_range": 6.0,
+    "stroll_speed": 0.5,
+    "attack_knockback": 0.0,
+    "special_abilities": {
+      "passive_stroll_speed_multiplier": 0.5
+    },
+    "movement": {
+      "light_level_dark": 4,
+      "block_destroy_speed_soft": 3.0,
+      "safety_urgency_threshold": 0.7,
+      "stalking_distance": 16.0,
+      "close_combat_distance": 4.0,
+      "melee_range": 2.0
+    }
+  },
+  "sound_parameters": {
+    "step_volume": 0.12,
+    "step_pitch": 1.0,
+    "ambient_volume": 0.4,
+    "ambient_pitch": 1.0
+  }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: human.json
+----------------------------------------------------------------------------------------------------
+{
+  "variant_id": "human",
+  "host_type": "human",
+  "description": "Human-hosted xenomorphs with enhanced intelligence and social behaviors",
+  "health_multiplier": 1.0,
+  "speed_multiplier": 1.1,
+  "damage_multiplier": 1.0,
+  "intelligence_bonus": 1.2,
+  "adaptation_rate": 1.0,
+  "social_behavior": true,
+  "tool_use_capability": true,
+  "learning_speed": 1.3,
+  "pack_coordination": true,
+  "host_interaction": "complex",
+  "environment_adaptation": "high",
+  "stealth_preference": true,
+  "persistence": "high",
+  "overall_scale": 0.95,
+  "near_human_structures": true,
+  "underground_preference": true,
+  "group_spawn_chance": 0.3
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: ovomorph.json
+----------------------------------------------------------------------------------------------------
+{
+  "health": 5.0,
+  "speed": 0.0,
+  "damage": 0.0,
+  "shadow_size": 0.5,
+  "follow_range": 0.0,
+  "attachment_duration": 200,
+  "implantation_delay": 200,
+  "lifecycle": {
+    "can_mature": true,
+    "maturation_time": 1200,
+    "mature_to": "facehugger",
+    "stage": "ovomorph"
+  },
+  "spawning": {
+    "spawn_weight": 10,
+    "min_group_size": 1,
+    "max_group_size": 5,
+    "spawn_biomes": [
+      "minecraft:deep_dark",
+      "minecraft:dark_forest",
+      "minecraft:dripstone_caves"
+    ]
+  },
+  "entity_size": {
+    "width": 0.5,
+    "height": 0.5
+  },
+  "visual": {
+    "model": "ovomorph_custom",
+    "texture": "weylandyutani:textures/entity/xenomorph/human/ovomorph/v1/ovomorph.png",
+    "texture_fallback": "minecraft:textures/block/black_concrete.png",
+    "ambient_sound": "weylandyutani:entity.ovomorph.ambient",
+    "hurt_sound": "weylandyutani:entity.ovomorph.hurt",
+    "death_sound": "weylandyutani:entity.ovomorph.death"
+  },
+  "client_parameters": {
+    "tracking_range": 8,
+    "update_interval": 2,
+    "transition_duration_ticks": 30,
+    "transition_modifiers": {
+      "normal": 1.0,
+      "stalking": 0.6,
+      "chasing": 1.3,
+      "fighting": 1.6
+    }
+  },
+  "hatching": {
+    "hatch_time": 600,
+    "proximity_required": true,
+    "proximity_distance": 8.0,
+    "spawn_entity": "facehugger",
+    "hatch_sound": "weylandyutani:entity.ovomorph.hatch",
+    "spawn_offset_x": 0.0,
+    "spawn_offset_y": 0.5,
+    "spawn_offset_z": 0.0
+  },
+  "ai_goals": {
+    "behavior_type": "patient_egg",
+    "aggression_level": 0,
+    "melee_attack_speed": 0.0,
+    "look_at_player_range": 0.0,
+    "stroll_speed": 0.0,
+    "attack_knockback": 0.0,
+    "special_abilities": {
+      "proximity_detection": true
+    },
+    "goal_priorities": {
+      "float": 1,
+      "hatch": 2,
+      "random_look": 3,
+      "look": 4
+    },
+    "movement": {
+      "light_level_dark": 4,
+      "block_destroy_speed_soft": 3.0,
+      "safety_urgency_threshold": 0.7,
+      "stalking_distance": 16.0,
+      "close_combat_distance": 4.0,
+      "melee_range": 2.0
+    }
+  },
+  "sound_parameters": {
+    "step_volume": 0.0,
+    "step_pitch": 1.0,
+    "ambient_volume": 1.0,
+    "ambient_pitch": 0.8
+  }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: praetor.json
+----------------------------------------------------------------------------------------------------
+{
+  "health": 40.0,
+  "speed": 0.3,
+  "damage": 4.0,
+  "shadow_size": 0.75,
+  "follow_range": 24.0,
+  "attachment_duration": 200,
+  "implantation_delay": 200,
+  "lifecycle": {
+    "can_mature": false,
+    "stage": "adult"
+  },
+  "spawning": {
+    "spawn_weight": 2,
+    "min_group_size": 1,
+    "max_group_size": 1
+  },
+  "entity_size": {
+    "width": 0.8,
+    "height": 2.2
+  },
+  "visual": {
+    "model": "praetor_custom",
+    "texture": "weylandyutani:textures/entity/xenomorph/human/praetor/v1/praetor.png",
+    "texture_fallback": "minecraft:textures/block/black_concrete.png",
+    "ambient_sound": "weylandyutani:entity.praetor.ambient",
+    "hurt_sound": "weylandyutani:entity.praetor.hurt",
+    "death_sound": "weylandyutani:entity.praetor.death"
+  },
+  "client_parameters": {
+    "tracking_range": 64,
+    "update_interval": 3,
+    "transition_duration_ticks": 30,
+    "transition_modifiers": {
+      "normal": 1.0,
+      "stalking": 0.6,
+      "chasing": 1.3,
+      "fighting": 1.6
+    }
+  },
+  "ai_goals": {
+    "behavior_type": "strategic_commander",
+    "aggression_level": 6,
+    "melee_attack_speed": 0.8,
+    "look_at_player_range": 16.0,
+    "stroll_speed": 0.7,
+    "attack_knockback": 0.8,
+    "special_abilities": {
+      "strategic_melee_speed_multiplier": 0.8,
+      "strategic_stroll_speed_multiplier": 0.7,
+      "command_look_range_multiplier": 2.0
+    },
+    "goal_priorities": {
+      "float": 1,
+      "melee": 2,
+      "stroll": 3,
+      "look": 4,
+      "random_look": 5,
+      "hurt_by_target": 1,
+      "target_player": 2
+    },
+    "movement": {
+      "light_level_dark": 4,
+      "block_destroy_speed_soft": 3.0,
+      "safety_urgency_threshold": 0.7,
+      "stalking_distance": 16.0,
+      "close_combat_distance": 4.0,
+      "melee_range": 2.0
+    }
+  },
+  "sound_parameters": {
+    "step_volume": 0.2,
+    "step_pitch": 0.9,
+    "ambient_volume": 0.6,
+    "ambient_pitch": 0.9
+  }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: queen.json
+----------------------------------------------------------------------------------------------------
+{
+  "health": 100.0,
+  "speed": 0.2,
+  "damage": 6.0,
+  "shadow_size": 1.0,
+  "follow_range": 32.0,
+  "attachment_duration": 200,
+  "implantation_delay": 200,
+  "lifecycle": {
+    "can_mature": false,
+    "stage": "adult"
+  },
+  "spawning": {
+    "spawn_weight": 1,
+    "min_group_size": 1,
+    "max_group_size": 1
+  },
+  "entity_size": {
+    "width": 1.2,
+    "height": 3.0
+  },
+  "visual": {
+    "model": "queen_custom",
+    "texture": "weylandyutani:textures/entity/xenomorph/human/queen/v1/queen.png",
+    "texture_fallback": "minecraft:textures/block/black_concrete.png",
+    "ambient_sound": "weylandyutani:entity.queen.ambient",
+    "hurt_sound": "weylandyutani:entity.queen.hurt",
+    "death_sound": "weylandyutani:entity.queen.death"
+  },
+  "client_parameters": {
+    "tracking_range": 64,
+    "update_interval": 3,
+    "transition_duration_ticks": 30,
+    "transition_modifiers": {
+      "normal": 1.0,
+      "stalking": 0.6,
+      "chasing": 1.3,
+      "fighting": 1.6
+    }
+  },
+  "nesting": {
+    "scan_radius": 4,
+    "nest_radius": 16
+  },
+  "ai_goals": {
+    "behavior_type": "hive_mother",
+    "aggression_level": 8,
+    "melee_attack_speed": 1.0,
+    "look_at_player_range": 16.0,
+    "stroll_speed": 0.5,
+    "attack_knockback": 1.0,
+    "special_abilities": {
+      "hive_mother_speed_multiplier": 0.3,
+      "egg_laying_interval": 1200,
+      "min_distance_between_eggs": 5,
+      "max_eggs_per_chunk": 4,
+      "egg_search_radius": 16,
+      "egg_placement_radius": 2,
+      "max_eggs_in_area": 10,
+      "vertical_search_range": 5,
+      "nest_building_phases": 5,
+      "hive_building_phases": 5,
+      "nest_creation_cooldown": 100,
+      "phase_build_delay": 200,
+      "stroll_interval": 20,
+      "wander_interval": 40,
+      "nest_radius": 16,
+      "avoidance_distance_multiplier": 2.0,
+      "avoidance_speed_multiplier": 1.5
+    },
+    "goal_priorities": {
+      "survival": 0,
+      "nest": 1,
+      "avoidance": 2,
+      "wander_near_nest": 3,
+      "float": 1,
+      "melee": 2,
+      "stroll": 3,
+      "look": 4,
+      "random_look": 5,
+      "hurt_by_target": 1,
+      "target_player": 2,
+      "target_villager": 3,
+      "target_animal": 4,
+      "target_iron_golem": 5,
+      "target_snow_golem": 6,
+      "prioritized_host": 7
+    },
+    "movement": {
+      "light_level_dark": 4,
+      "block_destroy_speed_soft": 3.0,
+      "safety_urgency_threshold": 0.7,
+      "stalking_distance": 16.0,
+      "close_combat_distance": 4.0,
+      "melee_range": 2.0
+    }
+  },
+  "sound_parameters": {
+    "step_volume": 0.25,
+    "step_pitch": 0.8,
+    "ambient_volume": 0.8,
+    "ambient_pitch": 0.7
+  }
+}
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: data/weylandyutani/entity/xenomorph/mob-based/aggressive
+====================================================================================================
+
+FILE: creeper.json
+----------------------------------------------------------------------------------------------------
+{
+  "variant_id": "creeper",
+  "host_type": "organic",
+  "description": "Aggressive creeper species variant",
+  "health_multiplier": 1.2,
+  "speed_multiplier": 0.9,
+  "damage_multiplier": 1.5,
+  "infection_spread": true,
+  "aggression_bonus": 1.3,
+  "surface_biomes": true
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: spider.json
+----------------------------------------------------------------------------------------------------
+{
+  "variant_id": "spider",
+  "host_type": "organic",
+  "description": "Aggressive spider species variant",
+  "health_multiplier": 1.0,
+  "speed_multiplier": 1.1,
+  "damage_multiplier": 1.0,
+  "climbing_ability": true,
+  "web_abilities": true,
+  "aggression_bonus": 1.2,
+  "stealth_bonus": 1.1,
+  "nocturnal_preference": true,
+  "cave_biomes": true
+}
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: data/weylandyutani/entity/xenomorph/mob-based/boss/construct/ender_dragon/v1
+====================================================================================================
+
+FILE: ender_dragon.json
+----------------------------------------------------------------------------------------------------
+{
+  "variant_id": "ender_dragon",
+  "host_type": "construct",
+  "description": "Ender_Dragon-hosted xenomorph variant (boss/construct catalog stub)",
+  "health_multiplier": 1.0,
+  "speed_multiplier": 1.0,
+  "damage_multiplier": 1.0
+}
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: data/weylandyutani/entity/xenomorph/mob-based/boss/construct/warden/v1
+====================================================================================================
+
+FILE: warden.json
+----------------------------------------------------------------------------------------------------
+{
+  "variant_id": "warden",
+  "host_type": "construct",
+  "description": "Warden-hosted xenomorph variant (boss/construct catalog stub)",
+  "health_multiplier": 1.0,
+  "speed_multiplier": 1.0,
+  "damage_multiplier": 1.0
+}
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: data/weylandyutani/entity/xenomorph/mob-based/boss/construct/wither/v1
+====================================================================================================
+
+FILE: wither.json
+----------------------------------------------------------------------------------------------------
+{
+  "variant_id": "wither",
+  "host_type": "construct",
+  "description": "Wither-hosted xenomorph variant (boss/construct catalog stub)",
+  "health_multiplier": 1.0,
+  "speed_multiplier": 1.0,
+  "damage_multiplier": 1.0
+}
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: data/weylandyutani/entity/xenomorph/mob-based/boss/organic/ender_dragon/v1
+====================================================================================================
+
+FILE: ender_dragon.json
+----------------------------------------------------------------------------------------------------
+{
+  "variant_id": "ender_dragon",
+  "host_type": "organic",
+  "description": "Ender_Dragon-hosted xenomorph variant (boss/organic catalog stub)",
+  "health_multiplier": 1.0,
+  "speed_multiplier": 1.0,
+  "damage_multiplier": 1.0
+}
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: data/weylandyutani/entity/xenomorph/mob-based/boss/organic/warden/v1
+====================================================================================================
+
+FILE: warden.json
+----------------------------------------------------------------------------------------------------
+{
+  "variant_id": "warden",
+  "host_type": "organic",
+  "description": "Warden-hosted xenomorph variant (boss/organic catalog stub)",
+  "health_multiplier": 1.0,
+  "speed_multiplier": 1.0,
+  "damage_multiplier": 1.0
+}
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: data/weylandyutani/entity/xenomorph/mob-based/boss/organic/wither/v1
+====================================================================================================
+
+FILE: wither.json
+----------------------------------------------------------------------------------------------------
+{
+  "variant_id": "wither",
+  "host_type": "organic",
+  "description": "Wither-hosted xenomorph variant (boss/organic catalog stub)",
+  "health_multiplier": 1.0,
+  "speed_multiplier": 1.0,
+  "damage_multiplier": 1.0
+}
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: data/weylandyutani/entity/xenomorph/mob-based/boss/undead/ender_dragon/v1
+====================================================================================================
+
+FILE: ender_dragon.json
+----------------------------------------------------------------------------------------------------
+{
+  "variant_id": "ender_dragon",
+  "host_type": "undead",
+  "description": "Ender_Dragon-hosted xenomorph variant (boss/undead catalog stub)",
+  "health_multiplier": 1.0,
+  "speed_multiplier": 1.0,
+  "damage_multiplier": 1.0
+}
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: data/weylandyutani/entity/xenomorph/mob-based/boss/undead/warden/v1
+====================================================================================================
+
+FILE: warden.json
+----------------------------------------------------------------------------------------------------
+{
+  "variant_id": "warden",
+  "host_type": "undead",
+  "description": "Warden-hosted xenomorph variant (boss/undead catalog stub)",
+  "health_multiplier": 1.0,
+  "speed_multiplier": 1.0,
+  "damage_multiplier": 1.0
+}
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: data/weylandyutani/entity/xenomorph/mob-based/boss/undead/wither/v1
+====================================================================================================
+
+FILE: wither.json
+----------------------------------------------------------------------------------------------------
+{
+  "variant_id": "wither",
+  "host_type": "undead",
+  "description": "Wither-hosted xenomorph variant (boss/undead catalog stub)",
+  "health_multiplier": 1.0,
+  "speed_multiplier": 1.0,
+  "damage_multiplier": 1.0
+}
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: data/weylandyutani/entity/xenomorph/mob-based/hostile/inorganic/cave_spider/v1
+====================================================================================================
+
+FILE: cave_spider.json
+----------------------------------------------------------------------------------------------------
+{
+  "variant_id": "cave_spider",
+  "host_type": "inorganic",
+  "description": "Cave_Spider-hosted xenomorph variant (hostile/inorganic catalog stub)",
+  "health_multiplier": 1.0,
+  "speed_multiplier": 1.0,
+  "damage_multiplier": 1.0
+}
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: data/weylandyutani/entity/xenomorph/mob-based/hostile/inorganic/creeper/v1
+====================================================================================================
+
+FILE: creeper.json
+----------------------------------------------------------------------------------------------------
+{
+  "variant_id": "creeper",
+  "host_type": "inorganic",
+  "description": "Inorganic creeper-hosted xenomorph variant",
+  "health_multiplier": 1.3,
+  "speed_multiplier": 0.85,
+  "damage_multiplier": 1.6,
+  "metal_consumption": true,
+  "construction_ability": true,
+  "infection_spread": true,
+  "aggression_bonus": 1.1,
+  "surface_biomes": true
+}
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: data/weylandyutani/entity/xenomorph/mob-based/hostile/inorganic/magma_cube/v1
+====================================================================================================
+
+FILE: magma_cube.json
+----------------------------------------------------------------------------------------------------
+{
+  "variant_id": "magma_cube",
+  "host_type": "inorganic",
+  "description": "Magma_Cube-hosted xenomorph variant (hostile/inorganic catalog stub)",
+  "health_multiplier": 1.0,
+  "speed_multiplier": 1.0,
+  "damage_multiplier": 1.0
+}
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: data/weylandyutani/entity/xenomorph/mob-based/hostile/inorganic/skeleton/v1
+====================================================================================================
+
+FILE: skeleton.json
+----------------------------------------------------------------------------------------------------
+{
+  "variant_id": "skeleton",
+  "host_type": "inorganic",
+  "description": "Skeleton-hosted xenomorph variant (hostile/inorganic catalog stub)",
+  "health_multiplier": 1.0,
+  "speed_multiplier": 1.0,
+  "damage_multiplier": 1.0
+}
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: data/weylandyutani/entity/xenomorph/mob-based/hostile/inorganic/slime/v1
+====================================================================================================
+
+FILE: slime.json
+----------------------------------------------------------------------------------------------------
+{
+  "variant_id": "slime",
+  "host_type": "inorganic",
+  "description": "Slime-hosted xenomorph variant (hostile/inorganic catalog stub)",
+  "health_multiplier": 1.0,
+  "speed_multiplier": 1.0,
+  "damage_multiplier": 1.0
+}
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: data/weylandyutani/entity/xenomorph/mob-based/hostile/inorganic/spider/v1
+====================================================================================================
+
+FILE: spider.json
+----------------------------------------------------------------------------------------------------
+{
+  "variant_id": "spider",
+  "host_type": "inorganic",
+  "description": "Inorganic spider-hosted xenomorph variant",
+  "health_multiplier": 1.1,
+  "speed_multiplier": 1.0,
+  "damage_multiplier": 1.1,
+  "metal_consumption": true,
+  "climbing_ability": true,
+  "aggression_bonus": 1.1,
+  "stealth_bonus": 1.0,
+  "cave_biomes": true
+}
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: data/weylandyutani/entity/xenomorph/mob-based/hostile/inorganic/zombie/v1
+====================================================================================================
+
+FILE: zombie.json
+----------------------------------------------------------------------------------------------------
+{
+  "variant_id": "zombie",
+  "host_type": "inorganic",
+  "description": "Zombie-hosted xenomorph variant (hostile/inorganic catalog stub)",
+  "health_multiplier": 1.0,
+  "speed_multiplier": 1.0,
+  "damage_multiplier": 1.0
+}
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: data/weylandyutani/entity/xenomorph/mob-based/hostile/organic/cave_spider/v1
+====================================================================================================
+
+FILE: cave_spider.json
+----------------------------------------------------------------------------------------------------
+{
+  "variant_id": "cave_spider",
+  "host_type": "organic",
+  "description": "Cave_Spider-hosted xenomorph variant (hostile/organic catalog stub)",
+  "health_multiplier": 1.0,
+  "speed_multiplier": 1.0,
+  "damage_multiplier": 1.0
+}
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: data/weylandyutani/entity/xenomorph/mob-based/hostile/organic/creeper/v1
+====================================================================================================
+
+FILE: creeper.json
+----------------------------------------------------------------------------------------------------
+{
+  "variant_id": "creeper",
+  "host_type": "organic",
+  "description": "Creeper-hosted xenomorph variant",
+  "health_multiplier": 1.2,
+  "speed_multiplier": 0.9,
+  "damage_multiplier": 1.5,
+  "infection_spread": true,
+  "aggression_bonus": 1.3,
+  "surface_biomes": true
+}
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: data/weylandyutani/entity/xenomorph/mob-based/hostile/organic/magma_cube/v1
+====================================================================================================
+
+FILE: magma_cube.json
+----------------------------------------------------------------------------------------------------
+{
+  "variant_id": "magma_cube",
+  "host_type": "organic",
+  "description": "Magma_Cube-hosted xenomorph variant (hostile/organic catalog stub)",
+  "health_multiplier": 1.0,
+  "speed_multiplier": 1.0,
+  "damage_multiplier": 1.0
+}
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: data/weylandyutani/entity/xenomorph/mob-based/hostile/organic/skeleton/v1
+====================================================================================================
+
+FILE: skeleton.json
+----------------------------------------------------------------------------------------------------
+{
+  "variant_id": "skeleton",
+  "host_type": "organic",
+  "description": "Skeleton-hosted xenomorph variant (hostile/organic catalog stub)",
+  "health_multiplier": 1.0,
+  "speed_multiplier": 1.0,
+  "damage_multiplier": 1.0
+}
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: data/weylandyutani/entity/xenomorph/mob-based/hostile/organic/slime/v1
+====================================================================================================
+
+FILE: slime.json
+----------------------------------------------------------------------------------------------------
+{
+  "variant_id": "slime",
+  "host_type": "organic",
+  "description": "Slime-hosted xenomorph variant (hostile/organic catalog stub)",
+  "health_multiplier": 1.0,
+  "speed_multiplier": 1.0,
+  "damage_multiplier": 1.0
+}
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: data/weylandyutani/entity/xenomorph/mob-based/hostile/organic/spider/v1
+====================================================================================================
+
+FILE: spider.json
+----------------------------------------------------------------------------------------------------
+{
+  "variant_id": "spider",
+  "host_type": "organic",
+  "description": "Spider-hosted xenomorph variant",
+  "health_multiplier": 1.0,
+  "speed_multiplier": 1.1,
+  "damage_multiplier": 1.0,
+  "climbing_ability": true,
+  "web_abilities": true,
+  "aggression_bonus": 1.2,
+  "stealth_bonus": 1.1,
+  "nocturnal_preference": true,
+  "cave_biomes": true
+}
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: data/weylandyutani/entity/xenomorph/mob-based/hostile/organic/zombie/v1
+====================================================================================================
+
+FILE: zombie.json
+----------------------------------------------------------------------------------------------------
+{
+  "variant_id": "zombie",
+  "host_type": "organic",
+  "description": "Zombie-hosted xenomorph variant (hostile/organic catalog stub)",
+  "health_multiplier": 1.0,
+  "speed_multiplier": 1.0,
+  "damage_multiplier": 1.0
+}
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: data/weylandyutani/entity/xenomorph/mob-based/hostile/undead/cave_spider/v1
+====================================================================================================
+
+FILE: cave_spider.json
+----------------------------------------------------------------------------------------------------
+{
+  "variant_id": "cave_spider",
+  "host_type": "undead",
+  "description": "Cave_Spider-hosted xenomorph variant (hostile/undead catalog stub)",
+  "health_multiplier": 1.0,
+  "speed_multiplier": 1.0,
+  "damage_multiplier": 1.0
+}
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: data/weylandyutani/entity/xenomorph/mob-based/hostile/undead/creeper/v1
+====================================================================================================
+
+FILE: creeper.json
+----------------------------------------------------------------------------------------------------
+{
+  "variant_id": "creeper",
+  "host_type": "undead",
+  "description": "Undead creeper-hosted xenomorph variant",
+  "health_multiplier": 1.4,
+  "speed_multiplier": 0.75,
+  "damage_multiplier": 1.4,
+  "decay_resistance": true,
+  "infection_spread": true,
+  "aggression_bonus": 1.2,
+  "surface_biomes": true
+}
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: data/weylandyutani/entity/xenomorph/mob-based/hostile/undead/magma_cube/v1
+====================================================================================================
+
+FILE: magma_cube.json
+----------------------------------------------------------------------------------------------------
+{
+  "variant_id": "magma_cube",
+  "host_type": "undead",
+  "description": "Magma_Cube-hosted xenomorph variant (hostile/undead catalog stub)",
+  "health_multiplier": 1.0,
+  "speed_multiplier": 1.0,
+  "damage_multiplier": 1.0
+}
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: data/weylandyutani/entity/xenomorph/mob-based/hostile/undead/skeleton/v1
+====================================================================================================
+
+FILE: skeleton.json
+----------------------------------------------------------------------------------------------------
+{
+  "variant_id": "skeleton",
+  "host_type": "undead",
+  "description": "Skeleton-hosted xenomorph variant (hostile/undead catalog stub)",
+  "health_multiplier": 1.0,
+  "speed_multiplier": 1.0,
+  "damage_multiplier": 1.0
+}
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: data/weylandyutani/entity/xenomorph/mob-based/hostile/undead/slime/v1
+====================================================================================================
+
+FILE: slime.json
+----------------------------------------------------------------------------------------------------
+{
+  "variant_id": "slime",
+  "host_type": "undead",
+  "description": "Slime-hosted xenomorph variant (hostile/undead catalog stub)",
+  "health_multiplier": 1.0,
+  "speed_multiplier": 1.0,
+  "damage_multiplier": 1.0
+}
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: data/weylandyutani/entity/xenomorph/mob-based/hostile/undead/spider/v1
+====================================================================================================
+
+FILE: spider.json
+----------------------------------------------------------------------------------------------------
+{
+  "variant_id": "spider",
+  "host_type": "undead",
+  "description": "Undead spider-hosted xenomorph variant",
+  "health_multiplier": 1.2,
+  "speed_multiplier": 0.95,
+  "damage_multiplier": 1.0,
+  "decay_resistance": true,
+  "climbing_ability": true,
+  "web_abilities": true,
+  "aggression_bonus": 1.2,
+  "stealth_bonus": 1.0,
+  "nocturnal_preference": true,
+  "cave_biomes": true
+}
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: data/weylandyutani/entity/xenomorph/mob-based/hostile/undead/zombie/v1
+====================================================================================================
+
+FILE: zombie.json
+----------------------------------------------------------------------------------------------------
+{
+  "variant_id": "zombie",
+  "host_type": "undead",
+  "description": "Zombie-hosted xenomorph variant (hostile/undead catalog stub)",
+  "health_multiplier": 1.0,
+  "speed_multiplier": 1.0,
+  "damage_multiplier": 1.0
+}
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: data/weylandyutani/entity/xenomorph/mob-based/neutral
+====================================================================================================
+
+FILE: enderman.json
+----------------------------------------------------------------------------------------------------
+{
+  "variant_id": "enderman",
+  "host_type": "organic",
+  "description": "Neutral enderman species variant",
+  "health_multiplier": 1.3,
+  "speed_multiplier": 1.0,
+  "damage_multiplier": 1.2,
+  "ranged_attacks": false,
+  "aggression_bonus": 1.0,
+  "stealth_bonus": 1.4,
+  "end_biomes": true,
+  "solo_spawn": true,
+  "teleportation": true,
+  "dimensional_awareness": true
+}
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: data/weylandyutani/entity/xenomorph/mob-based/neutral/organic/enderman/v1
+====================================================================================================
+
+FILE: enderman.json
+----------------------------------------------------------------------------------------------------
+{
+  "variant_id": "enderman",
+  "host_type": "organic",
+  "description": "Enderman-hosted xenomorph variant",
+  "health_multiplier": 1.3,
+  "speed_multiplier": 1.0,
+  "damage_multiplier": 1.2,
+  "ranged_attacks": false,
+  "aggression_bonus": 1.0,
+  "stealth_bonus": 1.4,
+  "end_biomes": true,
+  "solo_spawn": true
+}
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: data/weylandyutani/entity/xenomorph/mob-based/neutral/organic/polar_bear/v1
+====================================================================================================
+
+FILE: polar_bear.json
+----------------------------------------------------------------------------------------------------
+{
+  "variant_id": "polar_bear",
+  "host_type": "organic",
+  "description": "Polar_Bear-hosted xenomorph variant (neutral/organic catalog stub)",
+  "health_multiplier": 1.0,
+  "speed_multiplier": 1.0,
+  "damage_multiplier": 1.0
+}
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: data/weylandyutani/entity/xenomorph/mob-based/neutral/organic/wolf/v1
+====================================================================================================
+
+FILE: wolf.json
+----------------------------------------------------------------------------------------------------
+{
+  "variant_id": "wolf",
+  "host_type": "organic",
+  "description": "Wolf-hosted xenomorph variant",
+  "health_multiplier": 1.1,
+  "speed_multiplier": 1.2,
+  "damage_multiplier": 1.0,
+  "pack_behavior": true,
+  "enhanced_senses": true,
+  "aggression_bonus": 1.1,
+  "pack_spawn": true,
+  "pack_size": 3
+}
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: data/weylandyutani/entity/xenomorph/mob-based/neutral
+====================================================================================================
+
+FILE: wolf.json
+----------------------------------------------------------------------------------------------------
+{
+  "variant_id": "wolf",
+  "host_type": "organic",
+  "description": "Neutral wolf species variant",
+  "health_multiplier": 1.1,
+  "speed_multiplier": 1.2,
+  "damage_multiplier": 1.0,
+  "pack_behavior": true,
+  "enhanced_senses": true,
+  "aggression_bonus": 1.1,
+  "pack_spawn": true,
+  "pack_size": 3
+}
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: data/weylandyutani/entity/xenomorph/mob-based/passive/organic/chicken/v1
+====================================================================================================
+
+FILE: chicken.json
+----------------------------------------------------------------------------------------------------
+{
+  "variant_id": "chicken",
+  "host_type": "organic",
+  "description": "Chicken-hosted xenomorph variant (passive/organic catalog stub)",
+  "health_multiplier": 1.0,
+  "speed_multiplier": 1.0,
+  "damage_multiplier": 1.0
+}
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: data/weylandyutani/entity/xenomorph/mob-based/passive/organic/cow/v1
+====================================================================================================
+
+FILE: cow.json
+----------------------------------------------------------------------------------------------------
+{
+  "variant_id": "cow",
+  "host_type": "organic",
+  "description": "Cow-hosted xenomorph variant (passive/organic catalog stub)",
+  "health_multiplier": 1.0,
+  "speed_multiplier": 1.0,
+  "damage_multiplier": 1.0
+}
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: data/weylandyutani/entity/xenomorph/mob-based/passive/organic/pig/v1
+====================================================================================================
+
+FILE: pig.json
+----------------------------------------------------------------------------------------------------
+{
+  "variant_id": "pig",
+  "host_type": "organic",
+  "description": "Pig-hosted xenomorph variant (passive/organic catalog stub)",
+  "health_multiplier": 1.0,
+  "speed_multiplier": 1.0,
+  "damage_multiplier": 1.0
+}
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: data/weylandyutani/entity/xenomorph/mob-based/utility/construct/allay/v1
+====================================================================================================
+
+FILE: allay.json
+----------------------------------------------------------------------------------------------------
+{
+  "variant_id": "allay",
+  "host_type": "construct",
+  "description": "Allay-hosted xenomorph variant (utility/construct catalog stub)",
+  "health_multiplier": 1.0,
+  "speed_multiplier": 1.0,
+  "damage_multiplier": 1.0
+}
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: data/weylandyutani/entity/xenomorph/mob-based/utility/construct/iron_golem/v1
+====================================================================================================
+
+FILE: iron_golem.json
+----------------------------------------------------------------------------------------------------
+{
+  "variant_id": "iron_golem",
+  "host_type": "construct",
+  "description": "Iron_Golem-hosted xenomorph variant (utility/construct catalog stub)",
+  "health_multiplier": 1.0,
+  "speed_multiplier": 1.0,
+  "damage_multiplier": 1.0
+}
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: data/weylandyutani/entity/xenomorph/mob-based/utility/construct/snow_golem/v1
+====================================================================================================
+
+FILE: snow_golem.json
+----------------------------------------------------------------------------------------------------
+{
+  "variant_id": "snow_golem",
+  "host_type": "construct",
+  "description": "Snow_Golem-hosted xenomorph variant (utility/construct catalog stub)",
+  "health_multiplier": 1.0,
+  "speed_multiplier": 1.0,
+  "damage_multiplier": 1.0
+}
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: data/weylandyutani/entity/xenomorph/mob-based/utility/construct/vex/v1
+====================================================================================================
+
+FILE: vex.json
+----------------------------------------------------------------------------------------------------
+{
+  "variant_id": "vex",
+  "host_type": "construct",
+  "description": "Vex-hosted xenomorph variant (utility/construct catalog stub)",
+  "health_multiplier": 1.0,
+  "speed_multiplier": 1.0,
+  "damage_multiplier": 1.0
+}
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: data/weylandyutani/entity/xenomorph/mob-based/utility/spiritual/allay/v1
+====================================================================================================
+
+FILE: allay.json
+----------------------------------------------------------------------------------------------------
+{
+  "variant_id": "allay",
+  "host_type": "spiritual",
+  "description": "Allay-hosted xenomorph variant (utility/spiritual catalog stub)",
+  "health_multiplier": 1.0,
+  "speed_multiplier": 1.0,
+  "damage_multiplier": 1.0
+}
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: data/weylandyutani/entity/xenomorph/mob-based/utility/spiritual/iron_golem/v1
+====================================================================================================
+
+FILE: iron_golem.json
+----------------------------------------------------------------------------------------------------
+{
+  "variant_id": "iron_golem",
+  "host_type": "spiritual",
+  "description": "Iron_Golem-hosted xenomorph variant (utility/spiritual catalog stub)",
+  "health_multiplier": 1.0,
+  "speed_multiplier": 1.0,
+  "damage_multiplier": 1.0
+}
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: data/weylandyutani/entity/xenomorph/mob-based/utility/spiritual/snow_golem/v1
+====================================================================================================
+
+FILE: snow_golem.json
+----------------------------------------------------------------------------------------------------
+{
+  "variant_id": "snow_golem",
+  "host_type": "spiritual",
+  "description": "Snow_Golem-hosted xenomorph variant (utility/spiritual catalog stub)",
+  "health_multiplier": 1.0,
+  "speed_multiplier": 1.0,
+  "damage_multiplier": 1.0
+}
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: data/weylandyutani/entity/xenomorph/mob-based/utility/spiritual/vex/v1
+====================================================================================================
+
+FILE: vex.json
+----------------------------------------------------------------------------------------------------
+{
+  "variant_id": "vex",
+  "host_type": "spiritual",
+  "description": "Vex-hosted xenomorph variant (utility/spiritual catalog stub)",
+  "health_multiplier": 1.0,
+  "speed_multiplier": 1.0,
+  "damage_multiplier": 1.0
+}
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: data/weylandyutani/items
+====================================================================================================
+
+FILE: motion_tracker.json
+----------------------------------------------------------------------------------------------------
+{
+  "detection_radius": 32,
+  "cooldown_ticks": 40,
+  "max_entities_to_report": 5
+}
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: data/weylandyutani/systems
+====================================================================================================
+
+FILE: combat.json
+----------------------------------------------------------------------------------------------------
+{
+  "enabled": true
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: entity_block_interaction.json
+----------------------------------------------------------------------------------------------------
+{
+  "enabled": true,
+  "description": "Single source of truth for xenomorph-block interactions: breaking, damaging, destruction effects.",
+  "blocks": {
+    "unbreakable": [
+      "minecraft:bedrock",
+      "minecraft:barrier",
+      "minecraft:command_block",
+      "minecraft:structure_block",
+      "minecraft:jigsaw",
+      "minecraft:reinforced_deepslate"
+    ],
+    "breakable": [
+      "minecraft:glass",
+      "minecraft:white_stained_glass",
+      "minecraft:black_stained_glass",
+      "minecraft:glass_pane",
+      "minecraft:oak_door",
+      "minecraft:iron_door",
+      "minecraft:oak_fence",
+      "minecraft:oak_fence_gate"
+    ]
+  },
+  "entities": {
+    "chestburster": {
+      "can_break_blocks": false
+    },
+    "growth": {
+      "can_break_blocks": false
+    },
+    "drone": {
+      "can_break_blocks": true
+    },
+    "praetor": {
+      "can_break_blocks": true
+    },
+    "queen": {
+      "can_break_blocks": true
+    }
+  },
+  "damage": {
+    "damage_per_attempt": 1,
+    "max_damage_per_tick": 5,
+    "cooldown_ticks": 20
+  }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: host_effects.json
+----------------------------------------------------------------------------------------------------
+{
+  "host_types": {
+    "living_biological": {
+      "requires_player_specific_effects": true,
+      "can_be_immobilized": true,
+      "description": "Standard facehugger attachment effects for living biological hosts",
+      "visual_effects": [
+        {
+          "effect": "blindness",
+          "duration": 20,
+          "amplifier": 0,
+          "show_particles": true,
+          "description": "Visual impairment"
+        },
+        {
+          "effect": "weakness",
+          "duration": 20,
+          "amplifier": 4,
+          "show_particles": true,
+          "description": "Prevent fighting back"
+        },
+        {
+          "effect": "hunger",
+          "duration": 20,
+          "amplifier": 2,
+          "show_particles": true,
+          "description": "Show distress"
+        }
+      ],
+      "movement_effects": [
+        {
+          "effect": "movement_slowdown",
+          "duration": 20,
+          "amplifier": 4,
+          "show_particles": true,
+          "description": "Immobilize host"
+        }
+      ]
+    },
+    "undead": {
+      "requires_player_specific_effects": true,
+      "can_be_immobilized": true,
+      "description": "Enhanced facehugger attachment effects for undead hosts",
+      "visual_effects": [
+        {
+          "effect": "blindness",
+          "duration": 20,
+          "amplifier": 0,
+          "show_particles": true,
+          "description": "Visual impairment"
+        },
+        {
+          "effect": "weakness",
+          "duration": 20,
+          "amplifier": 6,
+          "show_particles": true,
+          "description": "Enhanced weakness for undead"
+        },
+        {
+          "effect": "hunger",
+          "duration": 20,
+          "amplifier": 3,
+          "show_particles": true,
+          "description": "Enhanced distress"
+        },
+        {
+          "effect": "poison",
+          "duration": 20,
+          "amplifier": 1,
+          "show_particles": true,
+          "description": "Tissue decay resistance"
+        }
+      ],
+      "movement_effects": [
+        {
+          "effect": "movement_slowdown",
+          "duration": 20,
+          "amplifier": 6,
+          "show_particles": true,
+          "description": "Enhanced immobilization"
+        },
+        {
+          "effect": "dig_slowdown",
+          "duration": 20,
+          "amplifier": 4,
+          "show_particles": true,
+          "description": "Prevent digging"
+        }
+      ]
+    },
+    "construct": {
+      "requires_player_specific_effects": false,
+      "can_be_immobilized": false,
+      "description": "Minimal effects for construct hosts (unusual case)",
+      "visual_effects": [
+        {
+          "effect": "weakness",
+          "duration": 20,
+          "amplifier": 2,
+          "show_particles": true,
+          "description": "Minimal weakness"
+        }
+      ],
+      "movement_effects": [
+        {
+          "effect": "movement_slowdown",
+          "duration": 20,
+          "amplifier": 2,
+          "show_particles": true,
+          "description": "Minimal slowdown"
+        }
+      ]
+    },
+    "inorganic": {
+      "requires_player_specific_effects": false,
+      "can_be_immobilized": false,
+      "description": "No effects for inorganic hosts (should not be facehugged)",
+      "visual_effects": [],
+      "movement_effects": []
+    },
+    "elemental": {
+      "requires_player_specific_effects": false,
+      "can_be_immobilized": false,
+      "description": "No effects for elemental hosts (should not be facehugged)",
+      "visual_effects": [],
+      "movement_effects": []
+    },
+    "spiritual": {
+      "requires_player_specific_effects": false,
+      "can_be_immobilized": false,
+      "description": "No effects for spiritual hosts (should not be facehugged)",
+      "visual_effects": [],
+      "movement_effects": []
+    }
+  }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: hosts.json
+----------------------------------------------------------------------------------------------------
+{
+  "vanilla_hosts": {
+    "living_biological": [
+      "player",
+      "villager",
+      "pig",
+      "cow",
+      "sheep",
+      "chicken",
+      "wolf",
+      "cat",
+      "horse",
+      "donkey",
+      "mule",
+      "llama",
+      "parrot",
+      "rabbit",
+      "fox",
+      "panda",
+      "polar_bear",
+      "dolphin",
+      "squid",
+      "turtle",
+      "cod",
+      "salmon",
+      "tropical_fish",
+      "pufferfish",
+      "bat",
+      "bee",
+      "goat",
+      "axolotl",
+      "glow_squid",
+      "creeper",
+      "spider",
+      "cave_spider",
+      "enderman"
+    ],
+    "undead": [
+      "zombie",
+      "skeleton",
+      "wither_skeleton",
+      "stray",
+      "husk",
+      "drowned",
+      "phantom",
+      "wither",
+      "zombie_villager",
+      "skeleton_horse",
+      "zombie_horse"
+    ],
+    "unsuitable": {
+      "construct": [
+        "iron_golem",
+        "snow_golem",
+        "copper_golem"
+      ],
+      "inorganic": [
+        "slime",
+        "magma_cube",
+        "shulker",
+        "guardian",
+        "elder_guardian",
+        "warden"
+      ],
+      "elemental": [
+        "ghast",
+        "blaze"
+      ],
+      "spiritual": [
+        "vex",
+        "allay"
+      ]
+    }
+  },
+  "variant_mappings": {
+    "spider": "aggressive",
+    "creeper": "aggressive",
+    "wolf": "neutral",
+    "enderman": "neutral"
+  },
+  "dna_mappings": {
+    "living_biological": "living_biological",
+    "undead": "undead",
+    "construct": "construct",
+    "inorganic": "inorganic",
+    "elemental": "elemental",
+    "spiritual": "spiritual",
+    "player": "player"
+  }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: lifecycle.json
+----------------------------------------------------------------------------------------------------
+{
+  "enabled": true,
+  "parasite_enabled": true,
+  "growth_enabled": true,
+  "defaults": {
+    "maturation_time": 6000,
+    "attachment_duration": 600,
+    "implantation_delay": 200,
+    "timer_reduction": 100,
+    "spent_wander_ticks": 100,
+    "death_animation_ticks": 40
+  },
+  "attachment": {
+    "effect_refresh_ticks": 20
+  },
+  "maturation": {
+    "chestburster_log_interval_divisor": 4,
+    "drone_log_interval": 100
+  },
+  "maturation_policy": {
+    "food_hunt_urgency_threshold": 0.75,
+    "default_food_timer_reduction_ticks": 600
+  },
+  "maturation_times": {
+    "ovomorph": 1200,
+    "chestburster": 4800,
+    "growth": 6000
+  },
+  "form_thresholds": {
+    "early_stage_exclusive": 25,
+    "mid_stage_exclusive": 50,
+    "late_stage_exclusive": 75,
+    "queen_maturation_min": 90,
+    "drone_to_praetor_min": 60
+  }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: mob_catalog.json
+----------------------------------------------------------------------------------------------------
+{
+  "_comment": "Manifest of mob-based xenomorph configs. Missing JSON paths warn and skip.",
+  "deep_mob_configs": {
+    "hostile": {
+      "host_types": [
+        "organic",
+        "undead",
+        "inorganic"
+      ],
+      "mobs": [
+        "spider",
+        "creeper",
+        "cave_spider",
+        "zombie",
+        "skeleton",
+        "slime",
+        "magma_cube"
+      ]
+    },
+    "neutral": {
+      "host_types": [
+        "organic"
+      ],
+      "mobs": [
+        "wolf",
+        "polar_bear",
+        "enderman"
+      ]
+    },
+    "passive": {
+      "host_types": [
+        "organic"
+      ],
+      "mobs": [
+        "cow",
+        "pig",
+        "chicken"
+      ]
+    },
+    "utility": {
+      "host_types": [
+        "construct",
+        "spiritual"
+      ],
+      "mobs": [
+        "iron_golem",
+        "snow_golem",
+        "allay",
+        "vex"
+      ]
+    },
+    "boss": {
+      "host_types": [
+        "organic",
+        "undead",
+        "construct"
+      ],
+      "mobs": [
+        "ender_dragon",
+        "wither",
+        "warden"
+      ]
+    }
+  },
+  "species_variants": {
+    "aggressive": [
+      "spider",
+      "creeper"
+    ],
+    "neutral": [
+      "wolf",
+      "enderman"
+    ],
+    "passive": []
+  }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: territory.json
+----------------------------------------------------------------------------------------------------
+{
+  "min_queen_distance": 144,
+  "nest_radius": 16,
+  "hive_radius": 80,
+  "egg_threshold": 10,
+  "time_threshold": 1800,
+  "hive_structure_size": 25,
+  "expansion_clearance_required": 75,
+  "check_expansion_space": true,
+  "nest_search_radius": 64,
+  "territory_check_radius": 32,
+  "nest_inner_radius": 4
+}
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: META-INF
+====================================================================================================
+
+FILE: enumextensions.json
+----------------------------------------------------------------------------------------------------
+{
+  "entries": [
+    {
+      "enum": "net/minecraft/world/damagesource/DamageEffects",
+      "name": "WEYLANDYUTANI_ACID",
+      "constructor": "(Ljava/lang/String;Ljava/util/function/Supplier;)V",
+      "parameters": [
+        "weylandyutani:acid",
+        null
+      ]
+    },
+    {
+      "enum": "net/minecraft/world/damagesource/DamageEffects",
+      "name": "WEYLANDYUTANI_PARASITIC",
+      "constructor": "(Ljava/lang/String;Ljava/util/function/Supplier;)V",
+      "parameters": [
+        "weylandyutani:parasitic",
+        null
+      ]
+    }
+  ]
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: feature_flags.json
+----------------------------------------------------------------------------------------------------
+{
+  "flags": [
+    "weylandyutani:experimental_growth",
+    "weylandyutani:experimental_praetor",
+    "weylandyutani:experimental_expansions"
+  ]
+}
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: .
+====================================================================================================
+
+FILE: weylandyutani.mixins.json
+----------------------------------------------------------------------------------------------------
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.weylandyutani.mixins",
+  "compatibilityLevel": "JAVA_21",
+  "refmap": "weylandyutani.refmap.json",
+  "mixins": [],
+  "client": [],
+  "server": []
+}
+
+----------------------------------------------------------------------------------------------------
+
+
+END OF DUMP
