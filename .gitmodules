@@ -5,3 +5,4 @@
 [submodule "implementations/minecraft/AlienCraft"]
 	path = implementations/minecraft/AlienCraft
 	url = https://github.com/Mcusac/AlienCraft.git
+	branch = main
