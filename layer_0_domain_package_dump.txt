@@ -1,0 +1,4095 @@
+Root: E:\Docs\Personal\Projects\ScriptCraft-Workspace\implementations\minecraft\AlienCraft\biocraft-alien\src\main\java\com\biocraft\alien\layer_0_domain
+====================================================================================================
+
+PACKAGE: level_0
+====================================================================================================
+
+FILE: package-info.java
+----------------------------------------------------------------------------------------------------
+/**
+ * Level 0 domain types with no same-layer dependencies.
+ */
+package com.biocraft.alien.layer_0_domain.level_0;
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: level_0/admission
+====================================================================================================
+
+FILE: AdmissionResult.java
+----------------------------------------------------------------------------------------------------
+package com.biocraft.alien.layer_0_domain.level_0.admission;
+
+import java.util.Objects;
+
+/**
+ * Outcome of an {@code AdmissionTransaction}: commit or rollback with reason.
+ */
+public record AdmissionResult(boolean committed, String reason) {
+
+    public AdmissionResult {
+        if (!committed) {
+            reason = Objects.requireNonNull(reason, "rollback reason required");
+        }
+    }
+
+    public static AdmissionResult commit() {
+        return new AdmissionResult(true, null);
+    }
+
+    public static AdmissionResult rollback(String reason) {
+        return new AdmissionResult(false, reason);
+    }
+
+    public boolean rolledBack() {
+        return !committed;
+    }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: package-info.java
+----------------------------------------------------------------------------------------------------
+/**
+ * Atomic specimen-admission domain values.
+ */
+package com.biocraft.alien.layer_0_domain.level_0.admission;
+
+----------------------------------------------------------------------------------------------------
+
+FILE: SpecimenExtents.java
+----------------------------------------------------------------------------------------------------
+package com.biocraft.alien.layer_0_domain.level_0.admission;
+
+/**
+ * Bounding extents for pre-realization containment fit checks.
+ *
+ * <p>Values are in blocks (Minecraft bbWidth / bbHeight semantics).
+ */
+public record SpecimenExtents(double width, double height) {
+
+    public SpecimenExtents {
+        if (width <= 0 || height <= 0) {
+            throw new IllegalArgumentException("specimen extents must be positive");
+        }
+    }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: SpecimenKind.java
+----------------------------------------------------------------------------------------------------
+package com.biocraft.alien.layer_0_domain.level_0.admission;
+
+/**
+ * Whether a {@link com.biocraft.alien.layer_0_domain.level_1.admission.PortableSpecimen} is a
+ * type blueprint or a captured identity.
+ */
+public enum SpecimenKind {
+    /** Create a specimen of this type (defaults). */
+    BLUEPRINT,
+    /** Reconstitute this specific specimen. */
+    CAPTURED
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: SpecimenSettlement.java
+----------------------------------------------------------------------------------------------------
+package com.biocraft.alien.layer_0_domain.level_0.admission;
+
+import java.util.Objects;
+import java.util.Optional;
+
+/**
+ * Settlement outcome after a successful Handling ADMIT.
+ *
+ * <p>Carrier-specific empty-container production is an adapter concern; this record only
+ * reports whether settlement applied and an optional empty-container type key for callers.
+ */
+public record SpecimenSettlement(boolean applied, Optional<String> emptyContainerTypeKey, String reason) {
+
+    public SpecimenSettlement {
+        emptyContainerTypeKey = Objects.requireNonNullElse(emptyContainerTypeKey, Optional.empty());
+        if (!applied) {
+            reason = Objects.requireNonNull(reason, "settlement failure reason required");
+        }
+    }
+
+    public static SpecimenSettlement ok() {
+        return new SpecimenSettlement(true, Optional.empty(), null);
+    }
+
+    public static SpecimenSettlement okWithEmptyContainer(String typeKey) {
+        return new SpecimenSettlement(
+                true, Optional.of(Objects.requireNonNull(typeKey, "typeKey")), null);
+    }
+
+    public static SpecimenSettlement failed(String reason) {
+        return new SpecimenSettlement(false, Optional.empty(), reason);
+    }
+}
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: level_0/ai
+====================================================================================================
+
+FILE: AIContext.java
+----------------------------------------------------------------------------------------------------
+package com.biocraft.alien.layer_0_domain.level_0.ai;
+
+public enum AIContext {
+    IDLE,
+    COMBAT,
+    ATTACHMENT,
+    MATURATION,
+    NEST,
+    NORMAL,
+    STALKING,
+    CHASING,
+    FIGHTING
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: AISignalType.java
+----------------------------------------------------------------------------------------------------
+package com.biocraft.alien.layer_0_domain.level_0.ai;
+
+public enum AISignalType {
+    ALERT, FLEE, HUNT, NEST_BUILD,
+    HOST_TARGETED, HOST_RESERVED, HOST_ATTACHED
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: package-info.java
+----------------------------------------------------------------------------------------------------
+/**
+ * AI constants, context enums, policies, and coordination signals.
+ */
+package com.biocraft.alien.layer_0_domain.level_0.ai;
+
+----------------------------------------------------------------------------------------------------
+
+FILE: PreferredFoodRules.java
+----------------------------------------------------------------------------------------------------
+package com.biocraft.alien.layer_0_domain.level_0.ai;
+
+import java.util.List;
+
+/**
+ * Pure preferred-food matching (entity type key vs configured food names).
+ * Uses exact or whole-token match — never substring (avoids {@code pig} → {@code piglin}).
+ */
+public final class PreferredFoodRules {
+
+    private PreferredFoodRules() {}
+
+    public static boolean matches(String entityTypeKey, List<String> preferredFood) {
+        if (entityTypeKey == null || preferredFood == null || preferredFood.isEmpty()) {
+            return false;
+        }
+        String key = entityTypeKey.toLowerCase();
+        String path = key.contains(":") ? key.substring(key.indexOf(':') + 1) : key;
+        return preferredFood.stream().anyMatch(food -> matchesOne(key, path, food));
+    }
+
+    private static boolean matchesOne(String fullKey, String path, String food) {
+        if (food == null || food.isEmpty()) {
+            return false;
+        }
+        String f = food.toLowerCase();
+        if (fullKey.equals(f) || path.equals(f)) {
+            return true;
+        }
+        for (String token : path.split("_")) {
+            if (token.equals(f)) {
+                return true;
+            }
+        }
+        return false;
+    }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: SurvivalBehaviorRules.java
+----------------------------------------------------------------------------------------------------
+package com.biocraft.alien.layer_0_domain.level_0.ai;
+
+/**
+ * Domain rules for survival behavior decisions.
+ *
+ * Contains pure survival logic shared across implementations.
+ * Does not depend on Minecraft, NeoForge, configuration loading,
+ * or infrastructure.
+ *
+ * FILE STATUS: NEW
+ *
+ * @author BioCraft
+ * @since 0.1.0
+ */
+public final class SurvivalBehaviorRules {
+
+    private SurvivalBehaviorRules() {
+        throw new UnsupportedOperationException(
+                "SurvivalBehaviorRules is a utility class and cannot be instantiated");
+    }
+
+
+    /**
+     * Determines whether suffocation should trigger escape behavior.
+     *
+     * @param airRatio current air ratio (0.0 - 1.0)
+     * @param currentlyStuck whether the entity is stuck
+     * @param criticalThreshold immediate escape threshold
+     * @param lowThreshold stuck escape threshold
+     *
+     * @return true if escape should occur
+     */
+    public static boolean shouldEscapeSuffocation(
+            double airRatio,
+            boolean currentlyStuck,
+            double criticalThreshold,
+            double lowThreshold) {
+
+        if (airRatio <= criticalThreshold) {
+            return true;
+        }
+
+        return currentlyStuck && airRatio <= lowThreshold;
+    }
+
+
+    /**
+     * Determines whether an escape attempt cooldown has expired.
+     *
+     * @param cooldownTicks remaining cooldown
+     *
+     * @return true when an escape attempt is allowed
+     */
+    public static boolean canAttemptEscape(int cooldownTicks) {
+        return cooldownTicks <= 0;
+    }
+
+
+    /**
+     * Determines whether an entity has exceeded its stuck threshold.
+     *
+     * @param stuckTicks current stuck duration
+     * @param threshold configured threshold
+     *
+     * @return true when entity is stuck
+     */
+    public static boolean isStuck(
+            int stuckTicks,
+            int threshold) {
+
+        return stuckTicks >= threshold;
+    }
+}
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: level_0/blocks
+====================================================================================================
+
+FILE: BlockBreakRules.java
+----------------------------------------------------------------------------------------------------
+package com.biocraft.alien.layer_0_domain.level_0.blocks;
+
+import java.util.Collections;
+import java.util.Objects;
+import java.util.Set;
+
+/**
+ * Domain view of block break eligibility lists.
+ * Populated from infrastructure config; consumed by {@link BlockBreakPolicy}.
+ *
+ * FILE STATUS: STABLE
+ *
+ * @author BioCraft
+ * @since 0.1.0
+ */
+public final class BlockBreakRules {
+
+    private final Set<String> unbreakable;
+    private final Set<String> breakable;
+
+    /**
+     * @param unbreakable block registry IDs that must never be broken
+     * @param breakable   block registry IDs on the explicit whitelist
+     */
+    public BlockBreakRules(Set<String> unbreakable, Set<String> breakable) {
+        this.unbreakable = Collections.unmodifiableSet(
+                Objects.requireNonNullElse(unbreakable, Set.of()));
+        this.breakable = Collections.unmodifiableSet(
+                Objects.requireNonNullElse(breakable, Set.of()));
+    }
+
+    /**
+     * @param blockId registry ID
+     * @return true if listed as unbreakable
+     */
+    public boolean isUnbreakable(String blockId) {
+        if (blockId == null || blockId.isBlank()) {
+            return false;
+        }
+        return unbreakable.contains(blockId);
+    }
+
+    /**
+     * @param blockId registry ID
+     * @return true if listed on the breakable whitelist
+     */
+    public boolean isExplicitlyBreakable(String blockId) {
+        if (blockId == null || blockId.isBlank()) {
+            return false;
+        }
+        return breakable.contains(blockId);
+    }
+
+    public Set<String> unbreakable() {
+        return unbreakable;
+    }
+
+    public Set<String> breakable() {
+        return breakable;
+    }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: package-info.java
+----------------------------------------------------------------------------------------------------
+/**
+ * Block-break eligibility policy and immutable break/unbreakable id rule sets.
+ */
+package com.biocraft.alien.layer_0_domain.level_0.blocks;
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: level_0/combat
+====================================================================================================
+
+FILE: CombatProfile.java
+----------------------------------------------------------------------------------------------------
+package com.biocraft.alien.layer_0_domain.level_0.combat;
+
+/**
+ * Combat behavior profile for xenomorphs.
+ * Loaded from JSON per xenomorph form (drone, chestburster, queen).
+ * 
+ * @author BioCraft
+ * @since 0.1.0
+ */
+public class CombatProfile {
+    
+    private final String formId;
+    private final int baseAttackDamage;
+    private final double attackSpeed;
+    private final boolean canBreakBlocks;
+    private final int blockBreakTier;
+    private final double meleeRange;
+    
+    public CombatProfile(String formId, int baseAttackDamage, double attackSpeed, 
+                         boolean canBreakBlocks, int blockBreakTier, double meleeRange) {
+        this.formId = formId;
+        this.baseAttackDamage = baseAttackDamage;
+        this.attackSpeed = attackSpeed;
+        this.canBreakBlocks = canBreakBlocks;
+        this.blockBreakTier = blockBreakTier;
+        this.meleeRange = meleeRange;
+    }
+    
+    public String getFormId() {
+        return formId;
+    }
+    
+    public int getBaseAttackDamage() {
+        return baseAttackDamage;
+    }
+    
+    public double getAttackSpeed() {
+        return attackSpeed;
+    }
+    
+    public boolean canBreakBlocks() {
+        return canBreakBlocks;
+    }
+    
+    public int getBlockBreakTier() {
+        return blockBreakTier;
+    }
+    
+    public double getMeleeRange() {
+        return meleeRange;
+    }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: package-info.java
+----------------------------------------------------------------------------------------------------
+/**
+ * Combat profile DTOs loaded from entity JSON.
+ */
+package com.biocraft.alien.layer_0_domain.level_0.combat;
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: level_0/effects
+====================================================================================================
+
+FILE: DomainEffectKey.java
+----------------------------------------------------------------------------------------------------
+package com.biocraft.alien.layer_0_domain.level_0.effects;
+
+/**
+ * Mod-owned effect identity keys for Domain ports.
+ * Optional catalog split (parasite/host vs ambient) tracked as BACKLOG {@code DEBT-EFFECT-001} (legacy DOM-EFFECT-01).
+ *
+ * <p>TODO(DEBT-EFFECT-001): Split/rename DomainEffectKey only when catalogs make one namespace unclear.
+ */
+public enum DomainEffectKey {
+    FACEHUGGER_ATTACHMENT,
+    FACEHUGGER_IMPLANTATION,
+    GESTATION,
+    HOST_INFECTION,
+    SUFFOCATION
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: EffectApplyOptions.java
+----------------------------------------------------------------------------------------------------
+package com.biocraft.alien.layer_0_domain.level_0.effects;
+
+/**
+ * Effect application flags for Domain effect ports (intentional — has external callers).
+ */
+public record EffectApplyOptions(boolean ambient, boolean showParticles, boolean showIcon) {}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: package-info.java
+----------------------------------------------------------------------------------------------------
+/**
+ * Domain effect keys and apply options.
+ */
+package com.biocraft.alien.layer_0_domain.level_0.effects;
+
+----------------------------------------------------------------------------------------------------
+
+FILE: StandardMobEffectKey.java
+----------------------------------------------------------------------------------------------------
+package com.biocraft.alien.layer_0_domain.level_0.effects;
+
+/**
+ * Vanilla mob-effect identity vocabulary for Domain ports (intentional — see LAYER_0_DOMAIN_REFERENCE).
+ */
+public enum StandardMobEffectKey {
+    BLINDNESS,
+    SLOWNESS,
+    WEAKNESS,
+    HUNGER,
+    POISON,
+    DIG_SLOWDOWN,
+    SLOW_FALLING,
+    LEVITATION
+}
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: level_0/entity
+====================================================================================================
+
+FILE: EntityKind.java
+----------------------------------------------------------------------------------------------------
+package com.biocraft.alien.layer_0_domain.level_0.entity;
+
+public enum EntityKind {
+    PLAYER,
+    VILLAGER,
+    ANIMAL,
+    MOD_XENOMORPH,
+    OTHER
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: EntityThreatLevel.java
+----------------------------------------------------------------------------------------------------
+package com.biocraft.alien.layer_0_domain.level_0.entity;
+
+public enum EntityThreatLevel { NONE, LOW, MEDIUM, HIGH, CRITICAL }
+
+----------------------------------------------------------------------------------------------------
+
+FILE: EntityType.java
+----------------------------------------------------------------------------------------------------
+package com.biocraft.alien.layer_0_domain.level_0.entity;
+
+/**
+ * Generic interface for entity types across all species.
+ * Provides a common abstraction for entity type operations.
+ * 
+ * This interface allows common code to work with entity types without
+ * depending on specific species implementations (com.biocraft.alien.layer_0_domain.level_1.entity.XenomorphType, HumanType, etc.).
+ * 
+ * FILE STATUS: NEW
+ * 
+ * @author BioCraft
+ * @since 0.1.8
+ */
+public interface EntityType {
+    
+    /**
+     * Gets the configuration key used in JSON files.
+     * This is the key used to look up entity configuration data.
+     * 
+     * @return The configuration key (e.g., "ovomorph", "human", "drone")
+     */
+    String getConfigKey();
+    
+    /**
+     * Gets the entity name used for registration.
+     * This is the name used when registering the entity type.
+     * 
+     * @return The entity name (e.g., "ovomorph", "human", "xenomorph_drone")
+     */
+    String getEntityName();
+    
+    /**
+     * Gets the display name for this entity type.
+     * Used for user-facing text and logging.
+     * 
+     * @return The display name (e.g., "Ovomorph", "Human", "Xenomorph Drone")
+     */
+    default String getName() {
+        return getEntityName();
+    }
+}
+
+
+----------------------------------------------------------------------------------------------------
+
+FILE: MovementFormFsm.java
+----------------------------------------------------------------------------------------------------
+package com.biocraft.alien.layer_0_domain.level_0.entity;
+
+import javax.annotation.Nonnull;
+
+/**
+ * Pure server movement-form state machine. Interrupted transitions cancel and
+ * re-enter a stable phase (no stuck TransitionToCrawl / TransitionToStand).
+ */
+public final class MovementFormFsm {
+
+    public static final double MOVE_THRESHOLD_SQR = 1.0E-6D;
+
+    private MovementFormFsm() {
+    }
+
+    public static boolean isMovingHorizontally(double horizontalDistanceSqr) {
+        return horizontalDistanceSqr > MOVE_THRESHOLD_SQR;
+    }
+
+    /**
+     * Advances phase/timer for one tick. Mutates {@code state} in place.
+     *
+     * @param state  mutable phase + remaining ticks + crawlingForm flag
+     * @param moving whether horizontal locomotion intent is active this tick
+     */
+    public static void tick(MovementFormState state, boolean moving) {
+        switch (state.phase) {
+            case STANDING -> {
+                if (moving) {
+                    state.phase = MovementFormPhase.TRANSITION_TO_CRAWL;
+                    state.ticksRemaining = MovementFormTiming.CRAWL_DELAY_TICKS;
+                }
+            }
+            case TRANSITION_TO_CRAWL -> {
+                if (!moving) {
+                    // Interrupt: cancel crawl transition; still standing hitbox.
+                    state.phase = MovementFormPhase.STANDING;
+                    state.ticksRemaining = 0;
+                    state.crawlingForm = false;
+                } else if (--state.ticksRemaining <= 0) {
+                    state.phase = MovementFormPhase.CRAWLING;
+                    state.ticksRemaining = 0;
+                    state.crawlingForm = true;
+                }
+            }
+            case CRAWLING -> {
+                if (!moving) {
+                    state.phase = MovementFormPhase.TRANSITION_TO_STAND;
+                    state.ticksRemaining = MovementFormTiming.STAND_DELAY_TICKS;
+                }
+            }
+            case TRANSITION_TO_STAND -> {
+                if (moving) {
+                    // Interrupt: cancel stand transition; still crawling hitbox.
+                    state.phase = MovementFormPhase.CRAWLING;
+                    state.ticksRemaining = 0;
+                    state.crawlingForm = true;
+                } else if (--state.ticksRemaining <= 0) {
+                    state.phase = MovementFormPhase.STANDING;
+                    state.ticksRemaining = 0;
+                    state.crawlingForm = false;
+                }
+            }
+        }
+    }
+
+    /** Mutable FSM snapshot applied by entity hosts each server tick. */
+    public static final class MovementFormState {
+        @Nonnull
+        public MovementFormPhase phase = MovementFormPhase.STANDING;
+        public int ticksRemaining;
+        public boolean crawlingForm;
+
+        public void copyFrom(@Nonnull MovementFormPhase phase, int ticksRemaining, boolean crawlingForm) {
+            this.phase = phase;
+            this.ticksRemaining = ticksRemaining;
+            this.crawlingForm = crawlingForm;
+        }
+    }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: MovementFormPhase.java
+----------------------------------------------------------------------------------------------------
+package com.biocraft.alien.layer_0_domain.level_0.entity;
+
+import java.util.Objects;
+import javax.annotation.Nonnull;
+
+/**
+ * Server-owned stand/crawl gameplay form phase (TECH-ANIM-TRANSITION-001).
+ * Hitbox form flips only when entering {@link #CRAWLING} or {@link #STANDING}.
+ */
+public enum MovementFormPhase {
+    STANDING,
+    TRANSITION_TO_CRAWL,
+    CRAWLING,
+    TRANSITION_TO_STAND;
+
+    @Nonnull
+    public static MovementFormPhase fromOrdinal(int ordinal) {
+        MovementFormPhase[] values = values();
+        if (ordinal < 0 || ordinal >= values.length) {
+            return STANDING;
+        }
+        return Objects.requireNonNull(values[ordinal]);
+    }
+
+    /** True while hitbox / crawl idle should use crawling dimensions. */
+    public boolean usesCrawlingHitbox() {
+        return this == CRAWLING || this == TRANSITION_TO_STAND;
+    }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: MovementFormTiming.java
+----------------------------------------------------------------------------------------------------
+package com.biocraft.alien.layer_0_domain.level_0.entity;
+
+/**
+ * Gameplay-owned stand↔crawl transition delays (TECH-ANIM-TRANSITION-001).
+ * Independent of animation clip helpers; defaults may match clip length numerically.
+ */
+public final class MovementFormTiming {
+
+    /** Ticks from movement start until crawling form + CRAWLING phase. */
+    public static final int CRAWL_DELAY_TICKS = 30;
+
+    /** Ticks from movement stop until standing form + STANDING phase. */
+    public static final int STAND_DELAY_TICKS = 30;
+
+    private MovementFormTiming() {
+    }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: package-info.java
+----------------------------------------------------------------------------------------------------
+/**
+ * Entity type and threat-level taxonomy.
+ */
+package com.biocraft.alien.layer_0_domain.level_0.entity;
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: level_0/handling
+====================================================================================================
+
+FILE: CaptureEligibilityPolicy.java
+----------------------------------------------------------------------------------------------------
+package com.biocraft.alien.layer_0_domain.level_0.handling;
+
+/**
+ * Legal capture policy for transport carriers (Net, future capsule/crate).
+ *
+ * <p>Expresses whether an entity may be captured — not whether it "is a specimen"
+ * ontologically. Extend rules here without changing carrier items.
+ *
+ * <p>TODO(FEATURE-NET-001): playtest policy — alive and non-player.
+ */
+public final class CaptureEligibilityPolicy {
+
+    private CaptureEligibilityPolicy() {
+    }
+
+    /**
+     * @param alive  whether the target is alive
+     * @param player whether the target is a player
+     * @return whether a transport carrier may legally capture the target
+     */
+    public static boolean canCapture(boolean alive, boolean player) {
+        return alive && !player;
+    }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: EntitySnapshotWorldIdentity.java
+----------------------------------------------------------------------------------------------------
+package com.biocraft.alien.layer_0_domain.level_0.handling;
+
+/**
+ * World-identity NBT keys stripped from entity snapshots so reconstitution
+ * receives a fresh runtime identity (UUID, pose, passengers, etc.).
+ *
+ * <p>Persistent specimen state (Health, CustomName, Age, equipment, mod data, …)
+ * is kept. Carriers preserve persistent state, not world identity.
+ *
+ * <p>TODO(FEATURE-NET-001)
+ */
+public final class EntitySnapshotWorldIdentity {
+
+    /** Keys removed from saved entity state before storage / reconstitution. */
+    public static final String[] STRIP_KEYS = {
+            "UUID",
+            "UUIDMost",
+            "UUIDLeast",
+            "Pos",
+            "Motion",
+            "Rotation",
+            "Passengers",
+            "Leash",
+            "Dimension",
+            "PortalCooldown",
+            "brain"
+    };
+
+    private EntitySnapshotWorldIdentity() {
+    }
+
+    public static boolean isStripKey(String key) {
+        if (key == null) {
+            return false;
+        }
+        for (String strip : STRIP_KEYS) {
+            if (strip.equals(key)) {
+                return true;
+            }
+        }
+        return false;
+    }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: HandlingAction.java
+----------------------------------------------------------------------------------------------------
+package com.biocraft.alien.layer_0_domain.level_0.handling;
+
+/**
+ * Explicit handling actions. RELEASE never creates entities.
+ */
+public enum HandlingAction {
+    ADMIT,
+    RELEASE
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: HandlingResult.java
+----------------------------------------------------------------------------------------------------
+package com.biocraft.alien.layer_0_domain.level_0.handling;
+
+import java.util.Objects;
+
+/**
+ * Outcome of a handling request. No spawn metadata.
+ */
+public record HandlingResult(boolean accepted, String reason) {
+
+    public HandlingResult {
+        if (!accepted) {
+            reason = Objects.requireNonNull(reason, "rejection reason required");
+        }
+    }
+
+    public static HandlingResult ok() {
+        return new HandlingResult(true, null);
+    }
+
+    public static HandlingResult rejected(String reason) {
+        return new HandlingResult(false, reason);
+    }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: package-info.java
+----------------------------------------------------------------------------------------------------
+/**
+ * Atomic handling domain values.
+ */
+package com.biocraft.alien.layer_0_domain.level_0.handling;
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: level_0/lab
+====================================================================================================
+
+FILE: BreachStatus.java
+----------------------------------------------------------------------------------------------------
+package com.biocraft.alien.layer_0_domain.level_0.lab;
+
+/**
+ * Graded containment failure severity.
+ *
+ * <p>Domain state only — consumers own alarms, doors, AI, and escape reactions.
+ */
+public enum BreachStatus {
+    SECURE,
+    WARNING,
+    COMPROMISED,
+    BREACHED,
+    DISABLED;
+
+    public boolean isSecure() {
+        return this == SECURE;
+    }
+
+    /**
+     * True when the volume can no longer hold occupants (breach or disabled).
+     */
+    public boolean isFailed() {
+        return this == BREACHED || this == DISABLED;
+    }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: ContainmentFitRules.java
+----------------------------------------------------------------------------------------------------
+package com.biocraft.alien.layer_0_domain.level_0.lab;
+
+/**
+ * Pure containment capacity fit policy.
+ *
+ * <p>Capacity is determined by interior block volume extents, never by shell model thickness
+ * or presentation shapes. Default pen-tier interior is one block cell ({@link #DEFAULT_PEN_INTERIOR_EXTENT}).
+ */
+public final class ContainmentFitRules {
+
+    public static final String REJECT_DOES_NOT_FIT = "entity does not fit containment interior";
+
+    /**
+     * Standard containment-pen interior extents (blocks) for the hollow 3×3×3 tier —
+     * single-cell interior at controller+(0,1,0).
+     */
+    public static final double DEFAULT_PEN_INTERIOR_EXTENT = 1.0;
+
+    private ContainmentFitRules() {
+    }
+
+    /**
+     * Whether an entity with the given bounding extents fits the interior volume.
+     *
+     * @param interiorX interior width (blocks)
+     * @param interiorY interior height (blocks)
+     * @param interiorZ interior depth (blocks)
+     * @param entityWidth entity XZ diameter (blocks), e.g. Minecraft {@code bbWidth}
+     * @param entityHeight entity height (blocks), e.g. Minecraft {@code bbHeight}
+     */
+    public static boolean fits(
+            double interiorX,
+            double interiorY,
+            double interiorZ,
+            double entityWidth,
+            double entityHeight) {
+        if (interiorX <= 0 || interiorY <= 0 || interiorZ <= 0) {
+            return false;
+        }
+        if (entityWidth <= 0 || entityHeight <= 0) {
+            return false;
+        }
+        return entityWidth <= interiorX
+                && entityWidth <= interiorZ
+                && entityHeight <= interiorY;
+    }
+
+    /**
+     * Fit check against the default containment-pen interior extents for this tier.
+     */
+    public static boolean fitsContainmentPenInterior(double entityWidth, double entityHeight) {
+        return fits(
+                DEFAULT_PEN_INTERIOR_EXTENT,
+                DEFAULT_PEN_INTERIOR_EXTENT,
+                DEFAULT_PEN_INTERIOR_EXTENT,
+                entityWidth,
+                entityHeight);
+    }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: ContainmentIntegrity.java
+----------------------------------------------------------------------------------------------------
+package com.biocraft.alien.layer_0_domain.level_0.lab;
+
+/**
+ * Describes the structural integrity state of a containment volume.
+ *
+ * INTACT — structure has no failures; containment is secure.
+ * DEGRADED — minor structural failures; structure forms but is weakened.
+ * BREACHED — structure is broken; occupant can escape.
+ */
+public enum ContainmentIntegrity {
+    INTACT,
+    DEGRADED,
+    BREACHED;
+
+    /**
+     * Returns true if the containment is secure (occupant cannot escape).
+     */
+    public boolean isSecure() {
+        return this == INTACT;
+    }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: ContainmentOccupancySnapshot.java
+----------------------------------------------------------------------------------------------------
+package com.biocraft.alien.layer_0_domain.level_0.lab;
+
+import java.util.Optional;
+import java.util.UUID;
+
+/**
+ * Immutable, query-only view of containment occupancy.
+ */
+public record ContainmentOccupancySnapshot(boolean structureFormed, Optional<UUID> occupantEntityId) {
+
+    public ContainmentOccupancySnapshot {
+        occupantEntityId = occupantEntityId == null ? Optional.empty() : occupantEntityId;
+    }
+
+    public boolean occupied() {
+        return occupantEntityId.isPresent();
+    }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: ContainmentPenState.java
+----------------------------------------------------------------------------------------------------
+package com.biocraft.alien.layer_0_domain.level_0.lab;
+
+public enum ContainmentPenState {
+    UNFORMED,
+    FORMED;
+
+    public boolean isFormed() {
+        return this == FORMED;
+    }
+
+    public ContainmentPenState transitionOnValidate(boolean valid) {
+        return valid ? FORMED : UNFORMED;
+    }
+
+    public ContainmentPenState transitionOnBreak() {
+        return UNFORMED;
+    }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: ContainmentVolumeId.java
+----------------------------------------------------------------------------------------------------
+package com.biocraft.alien.layer_0_domain.level_0.lab;
+
+import java.util.Objects;
+import java.util.UUID;
+
+/**
+ * Immutable identifier for a containment volume.
+ *
+ * Uniquely identifies a containment instance in the world.
+ * Distinct from occupancy identity (which uses entity UUID).
+ */
+public record ContainmentVolumeId(UUID id) {
+
+    public ContainmentVolumeId {
+        Objects.requireNonNull(id, "containment volume ID cannot be null");
+    }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: HorizontalFacing.java
+----------------------------------------------------------------------------------------------------
+package com.biocraft.alien.layer_0_domain.level_0.lab;
+
+/**
+ * Horizontal facing for entrance / outward direction (domain — no Minecraft types).
+ */
+public enum HorizontalFacing {
+    NORTH(0, -1),
+    SOUTH(0, 1),
+    WEST(-1, 0),
+    EAST(1, 0);
+
+    private final int dx;
+    private final int dz;
+
+    HorizontalFacing(int dx, int dz) {
+        this.dx = dx;
+        this.dz = dz;
+    }
+
+    public int dx() {
+        return dx;
+    }
+
+    public int dz() {
+        return dz;
+    }
+
+    public HorizontalFacing opposite() {
+        return switch (this) {
+            case NORTH -> SOUTH;
+            case SOUTH -> NORTH;
+            case WEST -> EAST;
+            case EAST -> WEST;
+        };
+    }
+
+    /** Left when looking along this facing (outward). */
+    public HorizontalFacing left() {
+        return switch (this) {
+            case NORTH -> WEST;
+            case SOUTH -> EAST;
+            case WEST -> SOUTH;
+            case EAST -> NORTH;
+        };
+    }
+
+    public HorizontalFacing right() {
+        return left().opposite();
+    }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: InteriorVolume.java
+----------------------------------------------------------------------------------------------------
+package com.biocraft.alien.layer_0_domain.level_0.lab;
+
+/**
+ * Authoritative interior air volume for a containment pen (inclusive block indices,
+ * relative to the controller at the origin).
+ *
+ * <p>All admit / release / fit / interaction bounds derive from this volume — never from
+ * shell presentation thickness.
+ */
+public record InteriorVolume(int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {
+
+    public InteriorVolume {
+        if (maxX < minX || maxY < minY || maxZ < minZ) {
+            throw new IllegalArgumentException("interior max must be >= min");
+        }
+    }
+
+    public int sizeX() {
+        return maxX - minX + 1;
+    }
+
+    public int sizeY() {
+        return maxY - minY + 1;
+    }
+
+    public int sizeZ() {
+        return maxZ - minZ + 1;
+    }
+
+    public double extentX() {
+        return sizeX();
+    }
+
+    public double extentY() {
+        return sizeY();
+    }
+
+    public double extentZ() {
+        return sizeZ();
+    }
+
+    /** Block center for teleport / search (relative). */
+    public double centerX() {
+        return (minX + maxX + 1) * 0.5;
+    }
+
+    public double centerY() {
+        return minY;
+    }
+
+    public double centerZ() {
+        return (minZ + maxZ + 1) * 0.5;
+    }
+
+    public boolean containsBlock(int x, int y, int z) {
+        return x >= minX && x <= maxX && y >= minY && y <= maxY && z >= minZ && z <= maxZ;
+    }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: package-info.java
+----------------------------------------------------------------------------------------------------
+/**
+ * Atomic laboratory domain values with no same-layer dependencies.
+ */
+package com.biocraft.alien.layer_0_domain.level_0.lab;
+
+----------------------------------------------------------------------------------------------------
+
+FILE: ShellRole.java
+----------------------------------------------------------------------------------------------------
+package com.biocraft.alien.layer_0_domain.level_0.lab;
+
+/**
+ * Role of a containment-pen shell cell within a validated enclosure.
+ * Presentation maps roles to proxies; doors may later add {@code OPENING}.
+ */
+public enum ShellRole {
+    FLOOR,
+    WALL,
+    CEILING
+}
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: level_0/nest
+====================================================================================================
+
+FILE: EggLayingPolicy.java
+----------------------------------------------------------------------------------------------------
+package com.biocraft.alien.layer_0_domain.level_0.nest;
+
+public final class EggLayingPolicy {
+    private EggLayingPolicy() {}
+
+    public static boolean canLayEgg(int existingEggs, int maxEggs) {
+        return existingEggs < maxEggs;
+    }
+
+    public static boolean isChunkBelowEggLimit(int chunkEggCount, int maxEggsPerChunk) {
+        return chunkEggCount < maxEggsPerChunk;
+    }
+}
+
+
+----------------------------------------------------------------------------------------------------
+
+FILE: NestOrHive.java
+----------------------------------------------------------------------------------------------------
+package com.biocraft.alien.layer_0_domain.level_0.nest;
+
+/**
+ * Domain nest vs hive stage used when restoring queen territory from save data.
+ */
+public enum NestOrHive {
+    NEST,
+    HIVE;
+
+    public static NestOrHive forExpanding(boolean expandingToHive) {
+        return expandingToHive ? HIVE : NEST;
+    }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: NestProfile.java
+----------------------------------------------------------------------------------------------------
+package com.biocraft.alien.layer_0_domain.level_0.nest;
+
+/**
+ * Queen nesting footprint profile.
+ * Defines nest expansion radius and building speed per form.
+ * Loaded from entity JSON per xenomorph form.
+ * 
+ * @author BioCraft
+ * @since 0.1.0
+ */
+public class NestProfile {
+    
+    private final String formId;
+    private final int nestInnerRadius;
+    private final int maxExpansionRadius;
+    private final int blocksBuildPerTick;
+    private final double expansionCostPerBlock;
+    
+    public NestProfile(String formId, int nestInnerRadius, int maxExpansionRadius,
+                       int blocksBuildPerTick, double expansionCostPerBlock) {
+        this.formId = formId;
+        this.nestInnerRadius = nestInnerRadius;
+        this.maxExpansionRadius = maxExpansionRadius;
+        this.blocksBuildPerTick = blocksBuildPerTick;
+        this.expansionCostPerBlock = expansionCostPerBlock;
+    }
+    
+    public String getFormId() {
+        return formId;
+    }
+    
+    public int getNestInnerRadius() {
+        return nestInnerRadius;
+    }
+    
+    public int getMaxExpansionRadius() {
+        return maxExpansionRadius;
+    }
+    
+    public int getBlocksBuildPerTick() {
+        return blocksBuildPerTick;
+    }
+    
+    public double getExpansionCostPerBlock() {
+        return expansionCostPerBlock;
+    }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: NestStructureFeatures.java
+----------------------------------------------------------------------------------------------------
+package com.biocraft.alien.layer_0_domain.level_0.nest;
+
+/**
+ * Detected nest-structure features used for progress scoring.
+ */
+public record NestStructureFeatures(
+        boolean foundation,
+        boolean walls,
+        boolean decorations,
+        boolean centerResin) {
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: NestStructureScanOffsets.java
+----------------------------------------------------------------------------------------------------
+package com.biocraft.alien.layer_0_domain.level_0.nest;
+
+/**
+ * Pure relative block offsets for nest-structure scan patterns (no Minecraft types).
+ */
+public final class NestStructureScanOffsets {
+
+    private NestStructureScanOffsets() {
+    }
+
+    /**
+     * Horizontal offsets in the foundation plane ({@code y = 0} relative to nest center).
+     */
+    public static int[][] foundationRingOffsets(int scanRadius) {
+        return squareRing(scanRadius, true);
+    }
+
+    /**
+     * Perimeter offsets used for wall detection ({@code y = 1} relative), edges of the square only.
+     */
+    public static int[][] wallPerimeterOffsets(int scanRadius) {
+        return squareRing(scanRadius, false);
+    }
+
+    /**
+     * Full horizontal square offsets for decoration / nearby-block probes ({@code y} supplied by caller).
+     */
+    public static int[][] horizontalSquareOffsets(int scanRadius) {
+        return squareRing(scanRadius, true);
+    }
+
+    private static int[][] squareRing(int radius, boolean includeInterior) {
+        int count = 0;
+        for (int x = -radius; x <= radius; x++) {
+            for (int z = -radius; z <= radius; z++) {
+                boolean edge = x == -radius || x == radius || z == -radius || z == radius;
+                if (includeInterior || edge) {
+                    count++;
+                }
+            }
+        }
+        int[][] offsets = new int[count][2];
+        int i = 0;
+        for (int x = -radius; x <= radius; x++) {
+            for (int z = -radius; z <= radius; z++) {
+                boolean edge = x == -radius || x == radius || z == -radius || z == radius;
+                if (includeInterior || edge) {
+                    offsets[i][0] = x;
+                    offsets[i][1] = z;
+                    i++;
+                }
+            }
+        }
+        return offsets;
+    }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: package-info.java
+----------------------------------------------------------------------------------------------------
+/**
+ * Nest and hive structure, footprint, and egg-laying domain contracts.
+ */
+package com.biocraft.alien.layer_0_domain.level_0.nest;
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: level_0/observation
+====================================================================================================
+
+FILE: MovementState.java
+----------------------------------------------------------------------------------------------------
+package com.biocraft.alien.layer_0_domain.level_0.observation;
+
+/**
+ * Discrete movement classification for observation facts.
+ */
+public enum MovementState {
+    STILL,
+    MOVING
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: ObservationInstant.java
+----------------------------------------------------------------------------------------------------
+package com.biocraft.alien.layer_0_domain.level_0.observation;
+
+/**
+ * Opaque observation ordering value. Source supplied by adapter;
+ * domain does not commit to wall-clock vs tick semantics.
+ */
+public record ObservationInstant(long value) {
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: package-info.java
+----------------------------------------------------------------------------------------------------
+/**
+ * Atomic observation domain values with no same-layer dependencies.
+ */
+package com.biocraft.alien.layer_0_domain.level_0.observation;
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: level_0/parasite
+====================================================================================================
+
+FILE: AttachmentCondition.java
+----------------------------------------------------------------------------------------------------
+package com.biocraft.alien.layer_0_domain.level_0.parasite;
+
+/**
+ * Platform-agnostic host restrictions applied during facehugger attachment.
+ * Minecraft (or a future engine) maps each condition through a presentation port.
+ *
+ * FILE STATUS: FUNCTIONAL
+ */
+public enum AttachmentCondition {
+    DISABLE_ATTACKING,
+    DISABLE_MOVEMENT,
+    DISABLE_LOOKING,
+    DISABLE_JUMPING,
+    DISABLE_SPRINTING,
+    DISABLE_SWIMMING,
+    DISABLE_FLYING,
+    DISABLE_RIDING,
+    DISABLE_USING_ITEMS,
+    DISABLE_BREAKING_BLOCKS,
+    DISABLE_PLACING_BLOCKS,
+    DISABLE_INTERACTING;
+
+    /**
+     * Parses JSON keys such as {@code disable_movement} or enum names.
+     */
+    public static AttachmentCondition fromConfigKey(String key) {
+        if (key == null || key.isBlank()) {
+            return null;
+        }
+        String normalized = key.trim().toUpperCase().replace('-', '_');
+        try {
+            return AttachmentCondition.valueOf(normalized);
+        } catch (IllegalArgumentException ignored) {
+            return null;
+        }
+    }
+
+    public String configKey() {
+        return name().toLowerCase();
+    }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: AttachmentState.java
+----------------------------------------------------------------------------------------------------
+package com.biocraft.alien.layer_0_domain.level_0.parasite;
+
+/**
+ * Facehugger attachment FSM (parasite actor). Distinct from {@link InfectionStage}
+ * (host progression: NONE / ATTACHING / GESTATING).
+ *
+ * FILE STATUS: STABLE
+ *
+ * @author BioCraft
+ * @since 0.1.2
+ */
+public enum AttachmentState {
+    /**
+     * Facehugger is not attached and is free to move
+     */
+    FREE,
+    
+    /**
+     * Facehugger is approaching target but not yet attached
+     */
+    APPROACHING,
+    
+    /**
+     * Facehugger is ready to attach (close enough to target)
+     */
+    READY_TO_ATTACH,
+    
+    /**
+     * Facehugger is currently attaching to the host
+     */
+    ATTACHING,
+    
+    /**
+     * Facehugger is attached and holding on during implantation delay
+     */
+    ATTACHED,
+    
+    /**
+     * Facehugger has completed implantation and is detaching
+     */
+    DETACHING,
+    
+    /**
+     * Facehugger is spent and wandering before death
+     */
+    SPENT_WANDERING
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: HostType.java
+----------------------------------------------------------------------------------------------------
+package com.biocraft.alien.layer_0_domain.level_0.parasite;
+
+/**
+ * Host taxonomy / xenomorph suitability (Domain vocabulary).
+ * Per-entity participation and DNA routing live in Host Registry resources;
+ * optional suitability externalization tracked as BACKLOG {@code DESIGN-HOST-001} (legacy DOM-HOST-01).
+ *
+ * <p>TODO(DESIGN-HOST-001): Decide Domain HostType.suitableForXenomorph vs Host Registry after FEATURE-DNA.
+ *
+ * FILE STATUS: MATURE
+ *
+ * @author BioCraft
+ * @since 0.0.1
+ */
+public enum HostType {
+    // Living biological hosts - suitable for xenomorphs
+    LIVING_BIOLOGICAL("living_biological", true, "Living biological organisms with organic tissue"),
+    
+    // Registered for combat/DNA routing, but not lifecycle-compatible with current facehuggers.
+    UNDEAD("undead", false, "Undead creatures reserved for future specialized xenomorph lifecycles"),
+    
+    // Constructs/golems - suitable for specialized alien species (NOT xenomorphs)
+    CONSTRUCT("construct", false, "Constructed beings with inorganic components - unsuitable for xenomorphs"),
+    
+    // Unsuitable hosts for xenomorphs
+    INORGANIC("inorganic", false, "Purely inorganic materials - unsuitable for biological parasites"),
+    SPIRITUAL("spiritual", false, "Spiritual or ethereal entities - no physical form"),
+    ELEMENTAL("elemental", false, "Elemental beings - no biological structure");
+    
+    private final String key;
+    private final boolean suitableForXenomorph;
+    private final String description;
+    
+    HostType(String key, boolean suitableForXenomorph, String description) {
+        this.key = key;
+        this.suitableForXenomorph = suitableForXenomorph;
+        this.description = description;
+    }
+    
+    public String getKey() {
+        return key;
+    }
+    
+    public boolean isSuitableForXenomorph() {
+        return suitableForXenomorph;
+    }
+    
+    public String getDescription() {
+        return description;
+    }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: InfectionStage.java
+----------------------------------------------------------------------------------------------------
+package com.biocraft.alien.layer_0_domain.level_0.parasite;
+
+/**
+ * Host-facing parasite infection progression vocabulary.
+ * Facehugger attachment FSM states live in {@link AttachmentState}.
+ */
+public enum InfectionStage {
+    NONE,
+    ATTACHING,
+    GESTATING
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: MaturationTimed.java
+----------------------------------------------------------------------------------------------------
+package com.biocraft.alien.layer_0_domain.level_0.parasite;
+
+/**
+ * Maturation timer contract for entities that advance through form growth ticks.
+ * Not a generic timer — name reflects parasite/form maturation ownership.
+ */
+public interface MaturationTimed {
+    int getMaturationTimer();
+
+    void setMaturationTimer(int ticks);
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: package-info.java
+----------------------------------------------------------------------------------------------------
+/**
+ * Parasite lifecycle vocabulary: attachment FSM, infection stages, host taxonomy, maturation contract.
+ */
+package com.biocraft.alien.layer_0_domain.level_0.parasite;
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: level_0/research
+====================================================================================================
+
+FILE: package-info.java
+----------------------------------------------------------------------------------------------------
+/**
+ * Atomic research domain values with no same-layer dependencies.
+ *
+ * <p>Current S3E subject model intentionally supports LivingEntity subjects only
+ * (composites live at level_2). Generalized research subjects deferred until required.
+ */
+package com.biocraft.alien.layer_0_domain.level_0.research;
+
+----------------------------------------------------------------------------------------------------
+
+FILE: ResearchCategory.java
+----------------------------------------------------------------------------------------------------
+package com.biocraft.alien.layer_0_domain.level_0.research;
+
+/**
+ * Capture-source classification for a research record.
+ *
+ * <p>Not an interpretation category — never add BIOLOGY / EVOLUTION / MUTATION here.
+ */
+public enum ResearchCategory {
+    OBSERVATION,
+    SAMPLE,
+    CONTAINMENT
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: ResearchFact.java
+----------------------------------------------------------------------------------------------------
+package com.biocraft.alien.layer_0_domain.level_0.research;
+
+import java.util.Locale;
+import java.util.Objects;
+
+/**
+ * Single captured observation fact. Not a derived conclusion.
+ */
+public record ResearchFact(String key, String value) {
+
+    public ResearchFact {
+        Objects.requireNonNull(key, "fact key required");
+        Objects.requireNonNull(value, "fact value required");
+        ResearchFactKeys.requireAllowed(key);
+        key = key.trim().toLowerCase(Locale.ROOT);
+    }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: ResearchFactKeys.java
+----------------------------------------------------------------------------------------------------
+package com.biocraft.alien.layer_0_domain.level_0.research;
+
+import java.util.Locale;
+import java.util.Objects;
+import java.util.Set;
+
+/**
+ * Governance allowlist / deny-list for research fact keys.
+ *
+ * <p>Facts represent captured observations, not derived conclusions.
+ */
+public final class ResearchFactKeys {
+
+    public static final String MOVEMENT = "movement";
+    public static final String CONTAINMENT_STATUS = "containment_status";
+    public static final String SAMPLE_KIND = "sample_kind";
+    public static final String OBSERVED_TICK = "observed_tick";
+
+    private static final Set<String> ALLOWED = Set.of(
+            MOVEMENT,
+            CONTAINMENT_STATUS,
+            SAMPLE_KIND,
+            OBSERVED_TICK);
+
+    private static final Set<String> FORBIDDEN = Set.of(
+            "threat",
+            "danger",
+            "aggression",
+            "evolution_stage");
+
+    private ResearchFactKeys() {
+    }
+
+    public static boolean isAllowed(String key) {
+        if (key == null) {
+            return false;
+        }
+        String normalized = normalize(key);
+        return ALLOWED.contains(normalized) && !FORBIDDEN.contains(normalized);
+    }
+
+    public static boolean isForbidden(String key) {
+        if (key == null) {
+            return false;
+        }
+        return FORBIDDEN.contains(normalize(key));
+    }
+
+    public static void requireAllowed(String key) {
+        Objects.requireNonNull(key, "fact key required");
+        String normalized = normalize(key);
+        if (FORBIDDEN.contains(normalized)) {
+            throw new IllegalArgumentException("forbidden interpretation fact key: " + key);
+        }
+        if (!ALLOWED.contains(normalized)) {
+            throw new IllegalArgumentException("fact key not on capture allowlist: " + key);
+        }
+    }
+
+    public static Set<String> allowedKeys() {
+        return ALLOWED;
+    }
+
+    private static String normalize(String key) {
+        return key.trim().toLowerCase(Locale.ROOT);
+    }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: ResearchInstant.java
+----------------------------------------------------------------------------------------------------
+package com.biocraft.alien.layer_0_domain.level_0.research;
+
+/**
+ * Opaque research ordering value. Source supplied by adapter;
+ * domain does not commit to wall-clock vs tick semantics.
+ */
+public record ResearchInstant(long value) {
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: ResearchRecordId.java
+----------------------------------------------------------------------------------------------------
+package com.biocraft.alien.layer_0_domain.level_0.research;
+
+import java.util.Objects;
+import java.util.UUID;
+
+/**
+ * Immutable identifier for a research record.
+ */
+public record ResearchRecordId(UUID id) {
+
+    public ResearchRecordId {
+        Objects.requireNonNull(id, "research record ID cannot be null");
+    }
+
+    public static ResearchRecordId random() {
+        return new ResearchRecordId(UUID.randomUUID());
+    }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: ResearchResult.java
+----------------------------------------------------------------------------------------------------
+package com.biocraft.alien.layer_0_domain.level_0.research;
+
+import java.util.Objects;
+
+/**
+ * Outcome of a research append attempt.
+ */
+public record ResearchResult(boolean accepted, String reason) {
+
+    public ResearchResult {
+        if (!accepted) {
+            reason = Objects.requireNonNull(reason, "rejection reason required");
+        }
+    }
+
+    public static ResearchResult ok() {
+        return new ResearchResult(true, null);
+    }
+
+    public static ResearchResult rejected(String reason) {
+        return new ResearchResult(false, reason);
+    }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: SampleId.java
+----------------------------------------------------------------------------------------------------
+package com.biocraft.alien.layer_0_domain.level_0.research;
+
+import java.util.Objects;
+import java.util.UUID;
+
+/**
+ * Immutable identifier for a sample custody record.
+ */
+public record SampleId(UUID id) {
+
+    public SampleId {
+        Objects.requireNonNull(id, "sample ID cannot be null");
+    }
+
+    public static SampleId random() {
+        return new SampleId(UUID.randomUUID());
+    }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: SampleKind.java
+----------------------------------------------------------------------------------------------------
+package com.biocraft.alien.layer_0_domain.level_0.research;
+
+/**
+ * Generic sample kind for custody. No DNA / tissue subtypes in S3E.
+ */
+public enum SampleKind {
+    UNKNOWN,
+    BIOLOGICAL
+}
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: level_0/spatial
+====================================================================================================
+
+FILE: BlockPosRef.java
+----------------------------------------------------------------------------------------------------
+package com.biocraft.alien.layer_0_domain.level_0.spatial;
+
+public record BlockPosRef(int x, int y, int z) {
+
+    public BlockPosRef offset(int dx, int dy, int dz) {
+        return new BlockPosRef(x + dx, y + dy, z + dz);
+    }
+
+    public BlockPosRef below() {
+        return offset(0, -1, 0);
+    }
+
+    public BlockPosRef above() {
+        return offset(0, 1, 0);
+    }
+
+    public double distanceSquared(BlockPosRef other) {
+        if (other == null) {
+            return Double.MAX_VALUE;
+        }
+        int dx = x - other.x();
+        int dy = y - other.y();
+        int dz = z - other.z();
+        return dx * dx + dy * dy + dz * dz;
+    }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: EntityScanHit.java
+----------------------------------------------------------------------------------------------------
+package com.biocraft.alien.layer_0_domain.level_0.spatial;
+
+import java.util.UUID;
+
+public record EntityScanHit(UUID entityId, double distanceSq) {}
+
+
+----------------------------------------------------------------------------------------------------
+
+FILE: package-info.java
+----------------------------------------------------------------------------------------------------
+/**
+ * Platform-agnostic spatial refs, scan hits, and spawn suitability rules.
+ */
+package com.biocraft.alien.layer_0_domain.level_0.spatial;
+
+----------------------------------------------------------------------------------------------------
+
+FILE: SpawnSuitabilityRules.java
+----------------------------------------------------------------------------------------------------
+package com.biocraft.alien.layer_0_domain.level_0.spatial;
+
+/**
+ * Pure spawn-position suitability from block probes (no Minecraft types).
+ * Platform-agnostic recreation of common spawn checks is intentional.
+ */
+public final class SpawnSuitabilityRules {
+
+    private SpawnSuitabilityRules() {}
+
+    public static boolean isSafeSpawn(boolean feetAir, boolean solidGround, boolean verticalClear) {
+        return feetAir && solidGround && verticalClear;
+    }
+
+    public static boolean isSafeSpawnForEntity(
+            boolean feetAir, boolean solidGround, boolean verticalClear, boolean horizontalClear) {
+        return feetAir && solidGround && verticalClear && horizontalClear;
+    }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: Vec3Ref.java
+----------------------------------------------------------------------------------------------------
+package com.biocraft.alien.layer_0_domain.level_0.spatial;
+
+/**
+ * Domain 3D vector for position search algorithms without Minecraft types.
+ */
+public record Vec3Ref(double x, double y, double z) {
+
+    public Vec3Ref add(Vec3Ref other) {
+        return new Vec3Ref(x + other.x, y + other.y, z + other.z);
+    }
+
+    public Vec3Ref subtract(Vec3Ref other) {
+        return new Vec3Ref(x - other.x, y - other.y, z - other.z);
+    }
+
+    public Vec3Ref scale(double factor) {
+        return new Vec3Ref(x * factor, y * factor, z * factor);
+    }
+
+    public Vec3Ref normalize() {
+        double length = Math.sqrt(x * x + y * y + z * z);
+        if (length < 1.0E-4D) {
+            return this;
+        }
+        return new Vec3Ref(x / length, y / length, z / length);
+    }
+
+    public Vec3Ref yRot(float angle) {
+        double cos = Math.cos(angle);
+        double sin = Math.sin(angle);
+        return new Vec3Ref(x * cos + z * sin, y, z * cos - x * sin);
+    }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: WorldRef.java
+----------------------------------------------------------------------------------------------------
+package com.biocraft.alien.layer_0_domain.level_0.spatial;
+
+public record WorldRef(String dimensionId) {
+
+    public String dimensionKey() {
+        return dimensionId;
+    }
+}
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: level_0/transformation
+====================================================================================================
+
+FILE: package-info.java
+----------------------------------------------------------------------------------------------------
+/**
+ * Geometric transformation invariants for entity placement.
+ */
+package com.biocraft.alien.layer_0_domain.level_0.transformation;
+
+----------------------------------------------------------------------------------------------------
+
+FILE: TransformationConstants.java
+----------------------------------------------------------------------------------------------------
+package com.biocraft.alien.layer_0_domain.level_0.transformation;
+
+/**
+ * Technical constants for entity transformations between xenomorph forms.
+ * Timing and other gameplay knobs live in maturation / entity JSON configs.
+ *
+ * FILE STATUS: MATURE
+ *
+ * @author BioCraft
+ * @since 0.1.0
+ */
+public final class TransformationConstants {
+
+    /**
+     * Offset to center entity in block (0.5 blocks from corner).
+     */
+    public static final double ENTITY_POSITION_OFFSET = 0.5;
+
+    private TransformationConstants() {
+        throw new UnsupportedOperationException(
+                "TransformationConstants is a utility class and cannot be instantiated");
+    }
+}
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: level_0/validation
+====================================================================================================
+
+FILE: package-info.java
+----------------------------------------------------------------------------------------------------
+/**
+ * Validation result records.
+ */
+package com.biocraft.alien.layer_0_domain.level_0.validation;
+
+----------------------------------------------------------------------------------------------------
+
+FILE: ValidationResult.java
+----------------------------------------------------------------------------------------------------
+package com.biocraft.alien.layer_0_domain.level_0.validation;
+
+/**
+ * Validation result class for detailed feedback.
+ * DRY: Shared validation result class used by TerritoryValidator and ExpansionValidator.
+ * 
+ * FILE STATUS: STABLE
+ * 
+ * @author BioCraft
+ * @since 0.1.0
+ */
+public class ValidationResult {
+    private final boolean success;
+    private final String reason;
+    
+    private ValidationResult(boolean success, String reason) {
+        this.success = success;
+        this.reason = reason;
+    }
+    
+    public static ValidationResult success() {
+        return new ValidationResult(true, null);
+    }
+    
+    public static ValidationResult failure(String reason) {
+        return new ValidationResult(false, reason);
+    }
+    
+    public boolean isSuccess() {
+        return success;
+    }
+    
+    public String getReason() {
+        return reason;
+    }
+}
+
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: level_1
+====================================================================================================
+
+FILE: package-info.java
+----------------------------------------------------------------------------------------------------
+/**
+ * Level 1 domain types composing level 0 references.
+ */
+package com.biocraft.alien.layer_0_domain.level_1;
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: level_1/admission
+====================================================================================================
+
+FILE: AdmissionContext.java
+----------------------------------------------------------------------------------------------------
+package com.biocraft.alien.layer_0_domain.level_1.admission;
+
+import java.util.Objects;
+
+import com.biocraft.alien.layer_0_domain.level_0.lab.ContainmentVolumeId;
+import com.biocraft.alien.layer_0_domain.level_0.lab.InteriorVolume;
+import com.biocraft.alien.layer_0_domain.level_0.spatial.WorldRef;
+
+/**
+ * Volume + pose inputs for one Admission Transaction (no Minecraft types).
+ *
+ * <p>Pose fields mirror spawn placement without depending on the same-tier spawn
+ * placement record (avoids peer type coupling).
+ */
+public record AdmissionContext(
+        ContainmentVolumeId volumeId,
+        InteriorVolume interior,
+        WorldRef world,
+        double x,
+        double y,
+        double z,
+        float yRot,
+        float xRot,
+        float headYaw
+) {
+
+    public AdmissionContext {
+        volumeId = Objects.requireNonNull(volumeId, "volumeId");
+        interior = Objects.requireNonNull(interior, "interior");
+        world = Objects.requireNonNull(world, "world");
+    }
+
+    public static AdmissionContext atInteriorCenter(
+            ContainmentVolumeId volumeId,
+            InteriorVolume interior,
+            WorldRef world,
+            double controllerX,
+            double controllerY,
+            double controllerZ) {
+        Objects.requireNonNull(volumeId, "volumeId");
+        Objects.requireNonNull(interior, "interior");
+        Objects.requireNonNull(world, "world");
+        return new AdmissionContext(
+                volumeId,
+                interior,
+                world,
+                controllerX + interior.centerX(),
+                controllerY + interior.centerY(),
+                controllerZ + interior.centerZ(),
+                0.0F,
+                0.0F,
+                0.0F);
+    }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: package-info.java
+----------------------------------------------------------------------------------------------------
+/**
+ * Specimen-admission compositions derived from level-zero values.
+ */
+package com.biocraft.alien.layer_0_domain.level_1.admission;
+
+----------------------------------------------------------------------------------------------------
+
+FILE: PortableSpecimen.java
+----------------------------------------------------------------------------------------------------
+package com.biocraft.alien.layer_0_domain.level_1.admission;
+
+import java.util.Objects;
+import java.util.Optional;
+
+import com.biocraft.alien.layer_0_domain.level_0.admission.SpecimenExtents;
+import com.biocraft.alien.layer_0_domain.level_0.admission.SpecimenKind;
+
+/**
+ * Canonical representation of a specimen while it is not embodied as a live world entity.
+ *
+ * <p>Immutable and behavior-free. Do not add admit/observe/research methods — if a feature
+ * needs behavior on this type, implement it elsewhere (architectural review guard).
+ *
+ * <p>TODO(FEATURE-ADMIT-001): foundation type for Admission Transaction.
+ */
+public record PortableSpecimen(
+        SpecimenKind kind,
+        String typeKey,
+        SpecimenExtents extents,
+        Optional<byte[]> identityPayload
+) {
+
+    public PortableSpecimen {
+        kind = Objects.requireNonNull(kind, "kind");
+        typeKey = Objects.requireNonNull(typeKey, "typeKey");
+        extents = Objects.requireNonNull(extents, "extents");
+        identityPayload = Objects.requireNonNullElse(identityPayload, Optional.empty());
+        if (typeKey.isBlank()) {
+            throw new IllegalArgumentException("typeKey must not be blank");
+        }
+    }
+
+    public static PortableSpecimen blueprint(String typeKey, SpecimenExtents extents) {
+        return new PortableSpecimen(SpecimenKind.BLUEPRINT, typeKey, extents, Optional.empty());
+    }
+
+    public static PortableSpecimen captured(
+            String typeKey, SpecimenExtents extents, byte[] identityPayload) {
+        return new PortableSpecimen(
+                SpecimenKind.CAPTURED,
+                typeKey,
+                extents,
+                Optional.ofNullable(identityPayload));
+    }
+}
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: level_1/ai
+====================================================================================================
+
+FILE: AIContextPolicy.java
+----------------------------------------------------------------------------------------------------
+package com.biocraft.alien.layer_0_domain.level_1.ai;
+
+import com.biocraft.alien.layer_0_domain.level_0.ai.AIContext;
+
+public final class AIContextPolicy {
+
+    private AIContextPolicy() {
+    }
+
+    public static AIContext fromAttachmentActive(boolean attached) {
+        return attached ? AIContext.ATTACHMENT : AIContext.IDLE;
+    }
+
+    public record ContextThresholds(
+            double fightingDistanceSq,
+            double chasingDistanceSq,
+            double stalkingDistanceSq
+    ) {
+    }
+
+    public record ContextInputs(
+            boolean hasTarget,
+            boolean targetAlive,
+            boolean crouching,
+            double distanceToTargetSq,
+            boolean recentlyHurt,
+            boolean pathfinding,
+            Double distanceToPathTargetSq
+    ) {
+    }
+
+    public record TransitionSpeedModifiers(
+            float normalModifier,
+            float stalkingModifier,
+            float chasingModifier,
+            float fightingModifier
+    ) {
+    }
+
+    public static AIContext classify(ContextInputs inputs, ContextThresholds thresholds) {
+        if (thresholds == null) {
+            throw new IllegalArgumentException("ContextThresholds is required");
+        }
+        if (inputs.hasTarget() && inputs.targetAlive()) {
+            if (inputs.distanceToTargetSq() <= thresholds.fightingDistanceSq()) {
+                return AIContext.FIGHTING;
+            }
+            if (inputs.distanceToTargetSq() <= thresholds.chasingDistanceSq()) {
+                return AIContext.CHASING;
+            }
+        }
+        if (inputs.crouching()) {
+            return AIContext.STALKING;
+        }
+        if (inputs.recentlyHurt()) {
+            return AIContext.COMBAT;
+        }
+        return AIContext.NORMAL;
+    }
+
+    public static float transitionSpeedModifier(AIContext context, TransitionSpeedModifiers modifiers) {
+        if (modifiers == null) {
+            throw new IllegalArgumentException("TransitionSpeedModifiers is required");
+        }
+        return switch (context) {
+            case STALKING -> modifiers.stalkingModifier();
+            case CHASING -> modifiers.chasingModifier();
+            case FIGHTING, COMBAT -> modifiers.fightingModifier();
+            default -> modifiers.normalModifier();
+        };
+    }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: package-info.java
+----------------------------------------------------------------------------------------------------
+/** Domain AI policy (depends on L0 AIContext). */
+package com.biocraft.alien.layer_0_domain.level_1.ai;
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: level_1/blocks
+====================================================================================================
+
+FILE: BlockBreakPolicy.java
+----------------------------------------------------------------------------------------------------
+package com.biocraft.alien.layer_0_domain.level_1.blocks;
+
+import com.biocraft.alien.layer_0_domain.level_0.blocks.BlockBreakRules;
+
+/**
+ * Domain policy for block breaking eligibility.
+ *
+ * Rules:
+ * - Entity must be allowed to break blocks ({@code canBreakBlocks})
+ * - Unbreakable blocks are never broken
+ * - Unrestricted scope may break any non-unbreakable block
+ * - Otherwise only explicitly whitelisted blocks may be broken
+ *
+ * Capability flags and rules lists are supplied by callers (systems/infra mapping).
+ * This class has no infrastructure dependencies.
+ *
+ * FILE STATUS: STABLE
+ *
+ * @author BioCraft
+ * @since 0.1.0
+ */
+public final class BlockBreakPolicy {
+
+    private BlockBreakPolicy() {
+        throw new UnsupportedOperationException(
+                "BlockBreakPolicy is a utility class and cannot be instantiated");
+    }
+
+    /**
+     * Determine if an entity may break a given block.
+     *
+     * @param blockId             registry ID (e.g., "minecraft:glass")
+     * @param canBreakBlocks      whether the entity type may break blocks at all
+     * @param unrestrictedScope   true to allow any non-unbreakable block
+     * @param rules               domain break rules (unbreakable / whitelist)
+     * @return true if this entity may break this block
+     */
+    public static boolean mayBreakBlock(
+            String blockId,
+            boolean canBreakBlocks,
+            boolean unrestrictedScope,
+            BlockBreakRules rules) {
+
+        if (blockId == null || blockId.isBlank() || rules == null || !canBreakBlocks) {
+            return false;
+        }
+
+        if (rules.isUnbreakable(blockId)) {
+            return false;
+        }
+
+        if (unrestrictedScope) {
+            return true;
+        }
+
+        return rules.isExplicitlyBreakable(blockId);
+    }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: package-info.java
+----------------------------------------------------------------------------------------------------
+/** Domain block-break policy (depends on L0 BlockBreakRules). */
+package com.biocraft.alien.layer_0_domain.level_1.blocks;
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: level_1/entity
+====================================================================================================
+
+FILE: HumanEntityType.java
+----------------------------------------------------------------------------------------------------
+package com.biocraft.alien.layer_0_domain.level_1.entity;
+
+import com.biocraft.alien.layer_0_domain.level_0.entity.EntityType;
+
+/**
+ * Human entity classification enumeration.
+ * Distinguishes human subtypes for entity configuration and lifecycle management.
+ *
+ * Config classpath paths are owned by infrastructure ({@code EntityConfigPaths}), not Domain.
+ *
+ * @author BioCraft
+ * @since 0.1.0
+ */
+public enum HumanEntityType implements EntityType {
+    VILLAGER("villager", "human_villager"),
+    PLAYER_NPC("player_npc", "human_player_npc"),
+    SCIENTIST("scientist", "human_scientist"),
+    COLONIST("colonist", "human_colonist");
+
+    private final String configKey;
+    private final String entityName;
+
+    HumanEntityType(String configKey, String entityName) {
+        this.configKey = configKey;
+        this.entityName = entityName;
+    }
+
+    @Override
+    public String getConfigKey() {
+        return configKey;
+    }
+
+    @Override
+    public String getEntityName() {
+        return entityName;
+    }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: LivingEntityRef.java
+----------------------------------------------------------------------------------------------------
+package com.biocraft.alien.layer_0_domain.level_1.entity;
+
+import java.util.UUID;
+
+import com.biocraft.alien.layer_0_domain.level_0.spatial.WorldRef;
+
+public record LivingEntityRef(UUID entityId, WorldRef world) {}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: package-info.java
+----------------------------------------------------------------------------------------------------
+/**
+ * Living entity refs and species form catalogs ({@code com.biocraft.alien.layer_0_domain.level_1.entity.XenomorphType}, {@code com.biocraft.alien.layer_0_domain.level_1.entity.HumanEntityType}).
+ */
+package com.biocraft.alien.layer_0_domain.level_1.entity;
+
+----------------------------------------------------------------------------------------------------
+
+FILE: XenomorphType.java
+----------------------------------------------------------------------------------------------------
+package com.biocraft.alien.layer_0_domain.level_1.entity;
+
+import com.biocraft.alien.layer_0_domain.level_0.entity.EntityType;
+
+/**
+ * Enumeration of xenomorph lifecycle forms.
+ * Human mob kinds use {@link HumanEntityType}, not this catalog.
+ *
+ * FILE STATUS: EXPERIMENTAL
+ *
+ * @author BioCraft
+ * @since 0.0.1
+ */
+public enum XenomorphType implements EntityType {
+    OVOMORPH("ovomorph", "ovomorph"),
+    FACEHUGGER("facehugger", "facehugger"),
+    CHESTBURSTER("chestburster", "chestburster"),
+    /** Catalog placeholder — gameplay not shipped; BACKLOG {@code FEAT-GROWTH-01}. */
+    GROWTH("growth", "intermediate_growth"),
+    DRONE("drone", "xenomorph_drone"),
+    /** Catalog placeholder — gameplay not shipped; BACKLOG {@code FEAT-PRAETOR-01}. */
+    PRAETOR("praetor", "xenomorph_praetor"),
+    QUEEN("queen", "xenomorph_queen");
+
+    private final String configKey;
+    private final String entityName;
+
+    XenomorphType(String configKey, String entityName) {
+        this.configKey = configKey;
+        this.entityName = entityName;
+    }
+
+    @Override
+    public String getConfigKey() {
+        return configKey;
+    }
+
+    @Override
+    public String getEntityName() {
+        return entityName;
+    }
+}
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: level_1/lab
+====================================================================================================
+
+FILE: BreachState.java
+----------------------------------------------------------------------------------------------------
+package com.biocraft.alien.layer_0_domain.level_1.lab;
+
+import java.util.Objects;
+import java.util.Optional;
+
+import com.biocraft.alien.layer_0_domain.level_0.lab.BreachStatus;
+import com.biocraft.alien.layer_0_domain.level_0.lab.ContainmentIntegrity;
+
+/**
+ * Immutable graded breach state. Mutations return new instances; no gameplay side effects.
+ *
+ * <p>{@code integrityLevel} is 0–100. Status is derived from level except when {@link BreachStatus#DISABLED}.
+ */
+public record BreachState(
+        BreachStatus status,
+        int integrityLevel,
+        Optional<Long> breachTimestampMillis
+) {
+
+    public static final int MAX_INTEGRITY = 100;
+    public static final int MIN_INTEGRITY = 0;
+
+    public BreachState {
+        status = Objects.requireNonNull(status, "breach status required");
+        if (integrityLevel < MIN_INTEGRITY || integrityLevel > MAX_INTEGRITY) {
+            throw new IllegalArgumentException("integrityLevel must be 0–100");
+        }
+        breachTimestampMillis = Objects.requireNonNull(
+                breachTimestampMillis, "breach timestamp optional required");
+    }
+
+    public static BreachState secure() {
+        return new BreachState(BreachStatus.SECURE, MAX_INTEGRITY, Optional.empty());
+    }
+
+    public static BreachStatus statusForLevel(int integrityLevel) {
+        if (integrityLevel < MIN_INTEGRITY || integrityLevel > MAX_INTEGRITY) {
+            throw new IllegalArgumentException("integrityLevel must be 0–100");
+        }
+        if (integrityLevel == MAX_INTEGRITY) {
+            return BreachStatus.SECURE;
+        }
+        if (integrityLevel >= 70) {
+            return BreachStatus.WARNING;
+        }
+        if (integrityLevel >= 1) {
+            return BreachStatus.COMPROMISED;
+        }
+        return BreachStatus.BREACHED;
+    }
+
+    /**
+     * Applies damage without gameplay reactions. Idempotent at floor 0 / DISABLED.
+     */
+    public BreachState damage(int amount, long nowMillis) {
+        if (amount < 0) {
+            throw new IllegalArgumentException("damage amount cannot be negative");
+        }
+        if (status == BreachStatus.DISABLED || amount == 0) {
+            return this;
+        }
+        int nextLevel = Math.max(MIN_INTEGRITY, integrityLevel - amount);
+        BreachStatus nextStatus = statusForLevel(nextLevel);
+        Optional<Long> timestamp = breachTimestampMillis;
+        if (nextStatus == BreachStatus.BREACHED && breachTimestampMillis.isEmpty()) {
+            timestamp = Optional.of(nowMillis);
+        }
+        return new BreachState(nextStatus, nextLevel, timestamp);
+    }
+
+    /**
+     * Repairs integrity when eligible. Clears breach timestamp once no longer failed.
+     */
+    public BreachState repair(int amount) {
+        if (amount < 0) {
+            throw new IllegalArgumentException("repair amount cannot be negative");
+        }
+        if (!isRepairEligible() || amount == 0) {
+            return this;
+        }
+        int nextLevel = Math.min(MAX_INTEGRITY, integrityLevel + amount);
+        BreachStatus nextStatus = statusForLevel(nextLevel);
+        Optional<Long> timestamp = nextStatus.isFailed() ? breachTimestampMillis : Optional.empty();
+        return new BreachState(nextStatus, nextLevel, timestamp);
+    }
+
+    public BreachState disable(long nowMillis) {
+        if (status == BreachStatus.DISABLED) {
+            return this;
+        }
+        Optional<Long> timestamp = breachTimestampMillis.isPresent()
+                ? breachTimestampMillis
+                : Optional.of(nowMillis);
+        return new BreachState(BreachStatus.DISABLED, integrityLevel, timestamp);
+    }
+
+    public BreachState enable() {
+        if (status != BreachStatus.DISABLED) {
+            return this;
+        }
+        BreachStatus nextStatus = statusForLevel(integrityLevel);
+        Optional<Long> timestamp = nextStatus.isFailed() ? breachTimestampMillis : Optional.empty();
+        return new BreachState(nextStatus, integrityLevel, timestamp);
+    }
+
+    public boolean isRepairEligible() {
+        return status != BreachStatus.DISABLED && integrityLevel < MAX_INTEGRITY;
+    }
+
+    /**
+     * Coarse integrity view for ContainedIntegrity / admission policy.
+     */
+    public ContainmentIntegrity toIntegrity() {
+        return switch (status) {
+            case SECURE -> ContainmentIntegrity.INTACT;
+            case WARNING, COMPROMISED -> ContainmentIntegrity.DEGRADED;
+            case BREACHED, DISABLED -> ContainmentIntegrity.BREACHED;
+        };
+    }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: ContainmentStatus.java
+----------------------------------------------------------------------------------------------------
+package com.biocraft.alien.layer_0_domain.level_1.lab;
+
+import java.util.Objects;
+import java.util.Optional;
+
+import com.biocraft.alien.layer_0_domain.level_0.lab.ContainmentIntegrity;
+import com.biocraft.alien.layer_0_domain.level_0.lab.ContainmentVolumeId;
+import com.biocraft.alien.layer_0_domain.level_0.spatial.WorldRef;
+
+/**
+ * Immutable snapshot of a containment volume's structural state.
+ */
+public record ContainmentStatus(
+        ContainmentVolumeId volumeId,
+        ContainmentIntegrity integrity,
+        Optional<WorldRef> controllerWorld
+) {
+
+    public ContainmentStatus {
+        volumeId = Objects.requireNonNull(volumeId, "volume ID required");
+        integrity = Objects.requireNonNull(integrity, "integrity required");
+        controllerWorld = Objects.requireNonNull(controllerWorld, "controller world optional required");
+    }
+
+    public boolean isSecure() {
+        return integrity.isSecure();
+    }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: package-info.java
+----------------------------------------------------------------------------------------------------
+/**
+ * Laboratory domain compositions derived from level-zero values.
+ */
+package com.biocraft.alien.layer_0_domain.level_1.lab;
+
+----------------------------------------------------------------------------------------------------
+
+FILE: ShellCell.java
+----------------------------------------------------------------------------------------------------
+package com.biocraft.alien.layer_0_domain.level_1.lab;
+
+import com.biocraft.alien.layer_0_domain.level_0.lab.ShellRole;
+
+/**
+ * One required shell cell of a validated containment pen (controller-relative).
+ */
+public record ShellCell(int x, int y, int z, ShellRole role) {
+}
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: level_1/nest
+====================================================================================================
+
+FILE: NestStructureProgressPolicy.java
+----------------------------------------------------------------------------------------------------
+package com.biocraft.alien.layer_0_domain.level_1.nest;
+
+import com.biocraft.alien.layer_0_domain.level_0.nest.NestStructureFeatures;
+
+/**
+ * Pure domain scoring for nest structure detection stages (foundation → walls → decor → chamber).
+ * Stage score constants externalization tracked as BACKLOG {@code DEBT-NEST-001} (legacy DOM-NEST-01).
+ *
+ * <p>TODO(DEBT-NEST-001): Externalize nest stage score constants when designers need to iterate.
+ */
+public final class NestStructureProgressPolicy {
+    public static final int NONE = 0;
+    public static final int FOUNDATION = 1;
+    public static final int WALLS = 2;
+    public static final int DECORATIONS = 3;
+    public static final int CHAMBER = 5;
+
+    private NestStructureProgressPolicy() {
+    }
+
+    public static int score(NestStructureFeatures features) {
+        if (features == null) {
+            return NONE;
+        }
+        return score(
+                features.foundation(),
+                features.walls(),
+                features.decorations(),
+                features.centerResin());
+    }
+
+    public static int score(
+            boolean hasFoundation,
+            boolean hasWalls,
+            boolean hasDecorations,
+            boolean hasCenterResin) {
+        if (!hasFoundation) {
+            return NONE;
+        }
+        if (!hasWalls) {
+            return FOUNDATION;
+        }
+        if (!hasDecorations) {
+            return WALLS;
+        }
+        if (!hasCenterResin) {
+            return DECORATIONS;
+        }
+        return CHAMBER;
+    }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: package-info.java
+----------------------------------------------------------------------------------------------------
+/**
+ * Nest structure progress scoring composing level_0 nest feature DTOs.
+ */
+package com.biocraft.alien.layer_0_domain.level_1.nest;
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: level_1/parasite
+====================================================================================================
+
+FILE: AttachmentConditionRules.java
+----------------------------------------------------------------------------------------------------
+package com.biocraft.alien.layer_0_domain.level_1.parasite;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.Set;
+
+import com.biocraft.alien.layer_0_domain.level_0.parasite.AttachmentCondition;
+
+/**
+ * Pure helpers for attachment condition lists (no engine coupling).
+ */
+public final class AttachmentConditionRules {
+
+    private AttachmentConditionRules() {
+    }
+
+    public static List<AttachmentCondition> dedupePreserveOrder(Collection<AttachmentCondition> conditions) {
+        if (conditions == null || conditions.isEmpty()) {
+            return List.of();
+        }
+        Set<AttachmentCondition> seen = EnumSet.noneOf(AttachmentCondition.class);
+        List<AttachmentCondition> ordered = new ArrayList<>();
+        for (AttachmentCondition condition : conditions) {
+            if (condition != null && seen.add(condition)) {
+                ordered.add(condition);
+            }
+        }
+        return Collections.unmodifiableList(ordered);
+    }
+
+    public static boolean includes(Collection<AttachmentCondition> conditions, AttachmentCondition needle) {
+        return conditions != null && needle != null && conditions.contains(needle);
+    }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: AttachmentGeometry.java
+----------------------------------------------------------------------------------------------------
+package com.biocraft.alien.layer_0_domain.level_1.parasite;
+
+import com.biocraft.alien.layer_0_domain.level_0.spatial.Vec3Ref;
+
+/**
+ * Pure geometry for parasite attachment seat on a host AABB (not bone-specific).
+ *
+ * <p>TODO(BUG-LIFECYCLE-002): Stage 5 polish — tall/awkward host latch edges.
+ * TODO(BUG-HOST-001): Stage 5 polish — Enderman seat distance (recognition OK).
+ */
+public final class AttachmentGeometry {
+
+    private AttachmentGeometry() {
+        throw new UnsupportedOperationException("AttachmentGeometry is a utility class");
+    }
+
+    /**
+     * Forward distance from host origin to the latch seat along look yaw.
+     * Half-width reaches the AABB face; head depth uses head size (width + crown above eyes),
+     * not full body height — tall hosts like Enderman stay close to the face.
+     *
+     * @param eyeHeightFromFeet standing eye height relative to feet; {@code <= 0} falls back to height ratio proxies
+     */
+    public static double faceStandoffForward(double hostWidth, double hostHeight, double eyeHeightFromFeet) {
+        double halfExtent = Math.max(0.0, hostWidth) * 0.5;
+        double crownAboveEye = eyeHeightFromFeet > 0.05
+                ? Math.max(0.0, hostHeight - eyeHeightFromFeet)
+                : Math.max(0.2, hostHeight * 0.12);
+        double headDepth = Math.max(0.15, Math.min(hostWidth * 0.55, crownAboveEye * 1.25 + 0.08));
+        return halfExtent + headDepth;
+    }
+
+    /**
+     * Vertical offset from host feet to the face seat. Prefers eye height when available.
+     */
+    public static double faceHeightOffset(double hostHeight, double heightRatio, double eyeHeightFromFeet) {
+        if (eyeHeightFromFeet > 0.05) {
+            return eyeHeightFromFeet;
+        }
+        return hostHeight * heightRatio;
+    }
+
+    /**
+     * Attachment point on the host face region: eye/face height, nudged forward by look yaw.
+     */
+    public static Vec3Ref attachmentPoint(
+            double hostX,
+            double hostY,
+            double hostZ,
+            float hostYawDegrees,
+            double hostWidth,
+            double hostHeight,
+            double heightRatio,
+            double eyeHeightFromFeet) {
+        double forward = faceStandoffForward(hostWidth, hostHeight, eyeHeightFromFeet);
+        float yawRad = hostYawDegrees * ((float) Math.PI / 180.0f);
+        double x = hostX - Math.sin(yawRad) * forward;
+        double z = hostZ + Math.cos(yawRad) * forward;
+        double y = hostY + faceHeightOffset(hostHeight, heightRatio, eyeHeightFromFeet);
+        return new Vec3Ref(x, y, z);
+    }
+
+    public static double distance(Vec3Ref a, Vec3Ref b) {
+        if (a == null || b == null) {
+            return Double.MAX_VALUE;
+        }
+        double dx = a.x() - b.x();
+        double dy = a.y() - b.y();
+        double dz = a.z() - b.z();
+        return Math.sqrt(dx * dx + dy * dy + dz * dz);
+    }
+
+    /** Horizontal reach is authoritative for beginning an attachment entry. */
+    public static double horizontalDistance(Vec3Ref a, Vec3Ref b) {
+        if (a == null || b == null) {
+            return Double.MAX_VALUE;
+        }
+        double dx = a.x() - b.x();
+        double dz = a.z() - b.z();
+        return Math.sqrt(dx * dx + dz * dz);
+    }
+
+    /** True when geometry permits presentation to begin the attachment entry. */
+    public static boolean canBeginAttachment(double horizontalDistance, double latchReach) {
+        return horizontalDistance <= latchReach;
+    }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: AttachmentRules.java
+----------------------------------------------------------------------------------------------------
+package com.biocraft.alien.layer_0_domain.level_1.parasite;
+
+import com.biocraft.alien.layer_0_domain.level_0.parasite.AttachmentState;
+
+/**
+ * Pure domain rules for facehugger attachment FSM and invariants.
+ * Tunable values belong in {@code layer_1_infrastructure.level_4.entity.AttachmentConfigHelper}.
+ *
+ * FILE STATUS: STABLE
+ */
+public final class AttachmentRules {
+
+    private AttachmentRules() {
+        throw new UnsupportedOperationException("AttachmentRules is a utility class and cannot be instantiated");
+    }
+
+    public static boolean isSpentState(AttachmentState state) {
+        return state == AttachmentState.SPENT_WANDERING;
+    }
+
+    public static AttachmentState nextApproachState(AttachmentState current, double distance, double minDistance) {
+        if (current == AttachmentState.SPENT_WANDERING || current == AttachmentState.DETACHING) {
+            return current;
+        }
+        // Once latched, stay latched — distance jitter must not demote to APPROACHING
+        // (that pauses implantation ticks and matches the "attaches then falls off" playtest bug).
+        if (current == AttachmentState.ATTACHING || current == AttachmentState.ATTACHED) {
+            return current;
+        }
+        if (distance > minDistance) {
+            return AttachmentState.APPROACHING;
+        }
+        if (current == AttachmentState.FREE || current == AttachmentState.APPROACHING) {
+            return AttachmentState.READY_TO_ATTACH;
+        }
+        return current;
+    }
+
+    public static boolean shouldRedirectDamageToHost(AttachmentState state, int attachmentTicks) {
+        return attachmentTicks > 0
+                && (state == AttachmentState.READY_TO_ATTACH
+                || state == AttachmentState.ATTACHING
+                || state == AttachmentState.ATTACHED);
+    }
+
+    public static boolean shouldFacehuggerDealDamage() {
+        return false;
+    }
+
+    public static boolean isImmovableDuringAttachment(AttachmentState state, int attachmentTicks) {
+        return state == AttachmentState.READY_TO_ATTACH
+                || state == AttachmentState.ATTACHING
+                || state == AttachmentState.ATTACHED
+                || (state == AttachmentState.DETACHING && attachmentTicks > 0);
+    }
+
+    /** True when spent wander time is over and the facehugger should begin dying. */
+    public static boolean shouldDieAfterSpentWander(int nextTimer, int spentWanderTime) {
+        return nextTimer >= spentWanderTime;
+    }
+
+    /**
+     * @deprecated Use {@link #shouldDieAfterSpentWander(int, int)}; discard is delayed for death anim.
+     */
+    @Deprecated
+    public static boolean shouldDespawnAfterSpentWander(int nextTimer, int spentWanderTime) {
+        return shouldDieAfterSpentWander(nextTimer, spentWanderTime);
+    }
+
+    /** True when death animation time has elapsed after wander expiry (timer includes wander + death). */
+    public static boolean shouldDiscardAfterDeathAnimation(
+            int nextTimer, int spentWanderTime, int deathAnimationTicks) {
+        if (deathAnimationTicks <= 0) {
+            return shouldDieAfterSpentWander(nextTimer, spentWanderTime);
+        }
+        return nextTimer >= spentWanderTime + deathAnimationTicks;
+    }
+
+    public static boolean shouldProcessImplantationTick(AttachmentState state) {
+        return state == AttachmentState.ATTACHING || state == AttachmentState.ATTACHED;
+    }
+
+    public static boolean shouldFacehuggerDieWithHost(AttachmentState state, boolean hostAlive) {
+        if (hostAlive) {
+            return false;
+        }
+        return state == AttachmentState.READY_TO_ATTACH
+                || state == AttachmentState.ATTACHING
+                || state == AttachmentState.ATTACHED;
+    }
+
+    /**
+     * Tick-window check only. AI runs before implantation ticks, so at
+     * {@code attachmentTicks == totalDuration} the goal must also keep running while
+     * {@link #shouldProcessImplantationTick(AttachmentState)} is true — otherwise the
+     * goal cancels and resets to FREE before implant can fire.
+     */
+    public static boolean isAttachmentInProgress(int attachmentTicks, int totalDuration) {
+        return attachmentTicks < totalDuration;
+    }
+
+    public static AttachmentState onAttachmentGoalCancelled() {
+        return AttachmentState.FREE;
+    }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: package-info.java
+----------------------------------------------------------------------------------------------------
+/**
+ * Parasite attachment FSM rules composing level_0 attachment vocabulary.
+ */
+package com.biocraft.alien.layer_0_domain.level_1.parasite;
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: level_1/spatial
+====================================================================================================
+
+FILE: AvoidancePolicy.java
+----------------------------------------------------------------------------------------------------
+package com.biocraft.alien.layer_0_domain.level_1.spatial;
+
+import com.biocraft.alien.layer_0_domain.level_0.spatial.Vec3Ref;
+
+/**
+ * Domain policy for spatial avoidance strength and flee direction.
+ *
+ * FILE STATUS: STABLE
+ */
+public final class AvoidancePolicy {
+
+    private AvoidancePolicy() {
+    }
+
+    /**
+     * Avoidance strength from {@code 0.0} (at or beyond min distance) to {@code 1.0} (coincident).
+     */
+    public static double computeAvoidanceStrength(double distance, int minDistance) {
+        if (minDistance <= 0 || distance >= minDistance) {
+            return 0.0;
+        }
+        return 1.0 - (distance / minDistance);
+    }
+
+    public static boolean shouldFlee(double avoidanceStrength) {
+        return avoidanceStrength > 0.0;
+    }
+
+    public static boolean shouldLogStrongAvoidance(double avoidanceStrength) {
+        return avoidanceStrength > 0.5;
+    }
+
+    /**
+     * Unit vector away from {@code other}, scaled by {@code avoidanceStrength}.
+     */
+    public static Vec3Ref fleeDirection(Vec3Ref self, Vec3Ref other, double avoidanceStrength) {
+        if (avoidanceStrength <= 0.0 || self == null || other == null) {
+            return new Vec3Ref(0.0, 0.0, 0.0);
+        }
+        return self.subtract(other).normalize().scale(avoidanceStrength);
+    }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: AxisAlignedRegion.java
+----------------------------------------------------------------------------------------------------
+package com.biocraft.alien.layer_0_domain.level_1.spatial;
+
+import com.biocraft.alien.layer_0_domain.level_0.spatial.BlockPosRef;
+
+public record AxisAlignedRegion(BlockPosRef min, BlockPosRef max) {}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: package-info.java
+----------------------------------------------------------------------------------------------------
+/**
+ * Composed spatial types: axis-aligned regions and avoidance policy.
+ */
+package com.biocraft.alien.layer_0_domain.level_1.spatial;
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: level_1/spawn
+====================================================================================================
+
+FILE: package-info.java
+----------------------------------------------------------------------------------------------------
+/**
+ * Spawn context composing world refs.
+ */
+package com.biocraft.alien.layer_0_domain.level_1.spawn;
+
+----------------------------------------------------------------------------------------------------
+
+FILE: SpawnContext.java
+----------------------------------------------------------------------------------------------------
+package com.biocraft.alien.layer_0_domain.level_1.spawn;
+
+import com.biocraft.alien.layer_0_domain.level_0.spatial.WorldRef;
+
+public record SpawnContext(WorldRef world, double x, double y, double z, float yRot, float xRot, float headYaw) {
+
+    public static SpawnContext at(WorldRef world, double x, double y, double z, float yRot, float xRot, float headYaw) {
+        return new SpawnContext(world, x, y, z, yRot, xRot, headYaw);
+    }
+}
+
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: level_1/world
+====================================================================================================
+
+FILE: package-info.java
+----------------------------------------------------------------------------------------------------
+/**
+ * World mutation port interface.
+ */
+package com.biocraft.alien.layer_0_domain.level_1.world;
+
+----------------------------------------------------------------------------------------------------
+
+FILE: WorldMutationPort.java
+----------------------------------------------------------------------------------------------------
+package com.biocraft.alien.layer_0_domain.level_1.world;
+
+import com.biocraft.alien.layer_0_domain.level_0.spatial.BlockPosRef;
+import com.biocraft.alien.layer_0_domain.level_0.spatial.WorldRef;
+
+public interface WorldMutationPort {
+    boolean breakBlock(WorldRef world, BlockPosRef pos);
+
+    default boolean breakBlock(WorldRef world, BlockPosRef pos, boolean dropLoot) {
+        return breakBlock(world, pos);
+    }
+
+    boolean placeBlock(WorldRef world, BlockPosRef pos, String blockId);
+}
+
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: level_2
+====================================================================================================
+
+FILE: package-info.java
+----------------------------------------------------------------------------------------------------
+/**
+ * Level 2 domain port interfaces for boundary adapters.
+ */
+package com.biocraft.alien.layer_0_domain.level_2;
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: level_2/admission
+====================================================================================================
+
+FILE: package-info.java
+----------------------------------------------------------------------------------------------------
+/**
+ * Specimen-admission domain ports.
+ */
+package com.biocraft.alien.layer_0_domain.level_2.admission;
+
+----------------------------------------------------------------------------------------------------
+
+FILE: SpecimenRealizationPort.java
+----------------------------------------------------------------------------------------------------
+package com.biocraft.alien.layer_0_domain.level_2.admission;
+
+import java.util.Optional;
+
+import com.biocraft.alien.layer_0_domain.level_1.admission.AdmissionContext;
+import com.biocraft.alien.layer_0_domain.level_1.admission.PortableSpecimen;
+import com.biocraft.alien.layer_0_domain.level_1.entity.LivingEntityRef;
+
+/**
+ * Produce a live world entity from a {@link PortableSpecimen}.
+ *
+ * <p>Neutral realization API: adapters Instantiate (blueprint) or Reconstitute (captured).
+ * Distinct from xenomorph lifecycle spawn ports.
+ *
+ * <p>TODO(FEATURE-ADMIT-001): wired by Minecraft adapter in FEATURE-ADMIT-EGG-001.
+ */
+public interface SpecimenRealizationPort {
+
+    /**
+     * Realize the portable specimen at the pose in {@code context}.
+     *
+     * @return living entity ref, or empty on failure
+     */
+    Optional<LivingEntityRef> realize(PortableSpecimen specimen, AdmissionContext context);
+
+    /**
+     * Discard a realized entity during Admission Transaction rollback (no settle).
+     */
+    void discard(LivingEntityRef entity);
+}
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: level_2/ai
+====================================================================================================
+
+FILE: CombatThreatQueryPort.java
+----------------------------------------------------------------------------------------------------
+package com.biocraft.alien.layer_0_domain.level_2.ai;
+
+import com.biocraft.alien.layer_0_domain.level_1.entity.LivingEntityRef;
+
+import java.util.Optional;
+
+/**
+ * Domain port for locating combat-viable threats near an observer.
+ * MC-specific scans are implemented in L3 {@code NeoForgeCombatThreatAdapter}.
+ */
+public interface CombatThreatQueryPort {
+
+  /**
+   * @return nearest combat threat within {@code radius}, or empty if none
+   */
+  Optional<LivingEntityRef> findNearestCombatThreat(LivingEntityRef observer, double radius);
+
+  default boolean hasCombatThreatNearby(LivingEntityRef observer, double radius) {
+    return findNearestCombatThreat(observer, radius).isPresent();
+  }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: package-info.java
+----------------------------------------------------------------------------------------------------
+/**
+ * Combat threat query port interface.
+ */
+package com.biocraft.alien.layer_0_domain.level_2.ai;
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: level_2/effects
+====================================================================================================
+
+FILE: EffectApplicationPort.java
+----------------------------------------------------------------------------------------------------
+package com.biocraft.alien.layer_0_domain.level_2.effects;
+
+import com.biocraft.alien.layer_0_domain.level_0.effects.DomainEffectKey;
+import com.biocraft.alien.layer_0_domain.level_0.effects.EffectApplyOptions;
+import com.biocraft.alien.layer_0_domain.level_0.effects.StandardMobEffectKey;
+import com.biocraft.alien.layer_0_domain.level_1.entity.LivingEntityRef;
+
+public interface EffectApplicationPort {
+    void apply(LivingEntityRef target, DomainEffectKey key, int durationTicks, int amplifier, EffectApplyOptions options);
+
+    void applyStandard(LivingEntityRef target, StandardMobEffectKey key, int durationTicks, int amplifier, EffectApplyOptions options);
+
+    void remove(LivingEntityRef target, DomainEffectKey key);
+
+    void removeStandard(LivingEntityRef target, StandardMobEffectKey key);
+
+    boolean hasEffect(LivingEntityRef target, DomainEffectKey key);
+
+    boolean hasStandardEffect(LivingEntityRef target, StandardMobEffectKey key);
+
+    int getRemainingDuration(LivingEntityRef target, DomainEffectKey key);
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: package-info.java
+----------------------------------------------------------------------------------------------------
+/**
+ * Effect application port interface.
+ */
+package com.biocraft.alien.layer_0_domain.level_2.effects;
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: level_2/entity
+====================================================================================================
+
+FILE: EntityPresentationPort.java
+----------------------------------------------------------------------------------------------------
+package com.biocraft.alien.layer_0_domain.level_2.entity;
+
+import com.biocraft.alien.layer_0_domain.level_0.parasite.AttachmentCondition;
+import com.biocraft.alien.layer_0_domain.level_0.spatial.Vec3Ref;
+import com.biocraft.alien.layer_0_domain.level_1.entity.LivingEntityRef;
+import com.biocraft.alien.layer_0_domain.level_1.spawn.SpawnContext;
+
+public interface EntityPresentationPort {
+    String displayName(LivingEntityRef ref);
+
+    float healthRatio(LivingEntityRef ref);
+
+    /** Max health for percent-based damage; 0 if entity unavailable. */
+    float maxHealth(LivingEntityRef ref);
+
+    void applyMagicDamage(LivingEntityRef ref, float amount);
+
+    /** Kill the entity (lethal magic / kill). */
+    void kill(LivingEntityRef ref);
+
+    void spawnDamageIndicatorParticles(LivingEntityRef ref, int count, float spread);
+
+    void spawnExplosionParticles(LivingEntityRef ref, int count, float spread);
+
+    SpawnContext spawnContextAt(LivingEntityRef ref);
+
+    void setInvulnerable(LivingEntityRef ref, boolean value);
+
+    void setNoGravity(LivingEntityRef ref, boolean value);
+
+    void setDeltaMovement(LivingEntityRef ref, double x, double y, double z);
+
+    void setRotation(LivingEntityRef ref, float yRot, float xRot);
+
+    /**
+     * Attachment seat on the host AABB (face region). Same formula family as {@link #positionOnHost}.
+     * Null when either entity cannot be resolved.
+     */
+    Vec3Ref getAttachmentPoint(LivingEntityRef host, double heightRatio);
+
+    /** Distance from parasite position to {@link #getAttachmentPoint}; {@code Double.MAX_VALUE} if unresolved. */
+    double distanceToAttachmentPoint(LivingEntityRef parasite, LivingEntityRef host, double heightRatio);
+
+    /** Horizontal distance from parasite to the host attachment point. */
+    double horizontalDistanceToAttachmentPoint(
+            LivingEntityRef parasite, LivingEntityRef host, double heightRatio);
+
+    /**
+     * Performs or advances the presentation-owned attachment entry.
+     *
+     * @return true when the entry presentation is complete and the FSM may enter READY_TO_ATTACH
+     */
+    boolean performAttachmentEntry(
+            LivingEntityRef parasite,
+            LivingEntityRef host,
+            double heightRatio,
+            double latchReach);
+
+    void positionOnHost(LivingEntityRef facehugger, LivingEntityRef host, double faceHeightRatio);
+
+    double distance(LivingEntityRef a, LivingEntityRef b);
+
+    int tickCount(LivingEntityRef ref);
+
+    long currentGameTime(LivingEntityRef ref);
+
+    void releaseUsingItem(LivingEntityRef ref);
+
+    void applyPlayerAttachmentPose(LivingEntityRef ref);
+
+    void restorePlayerAttachmentPose(LivingEntityRef ref);
+
+    /** Freeze Mob AI/navigation during facehugger attachment (no-op for non-mobs). */
+    void freezeMobHost(LivingEntityRef ref);
+
+    /** Restore Mob AI after facehugger attachment ends. */
+    void unfreezeMobHost(LivingEntityRef ref);
+
+    /** Apply one platform-agnostic attachment condition to the host. */
+    void applyAttachmentCondition(LivingEntityRef ref, AttachmentCondition condition);
+
+    /** Clear all attachment conditions previously applied to the host. */
+    void clearAttachmentConditions(LivingEntityRef ref);
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: EntityQueryPort.java
+----------------------------------------------------------------------------------------------------
+package com.biocraft.alien.layer_0_domain.level_2.entity;
+
+import com.biocraft.alien.layer_0_domain.level_0.entity.EntityKind;
+import com.biocraft.alien.layer_0_domain.level_1.entity.LivingEntityRef;
+
+import java.util.Optional;
+
+public interface EntityQueryPort {
+    boolean isValid(LivingEntityRef ref);
+
+    boolean isClientSide(LivingEntityRef ref);
+
+    Optional<String> encodeId(LivingEntityRef ref);
+
+    EntityKind classify(LivingEntityRef ref);
+
+    boolean isPlayer(LivingEntityRef ref);
+
+    String typeDescriptionId(LivingEntityRef ref);
+
+    int countAttachedFacehuggers(LivingEntityRef host);
+
+    boolean isAlive(LivingEntityRef ref);
+
+    boolean isRemoved(LivingEntityRef ref);
+
+    boolean isCreativePlayer(LivingEntityRef ref);
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: package-info.java
+----------------------------------------------------------------------------------------------------
+/**
+ * Entity presentation and capability domain ports.
+ */
+package com.biocraft.alien.layer_0_domain.level_2.entity;
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: level_2/handling
+====================================================================================================
+
+FILE: HandlingRequest.java
+----------------------------------------------------------------------------------------------------
+package com.biocraft.alien.layer_0_domain.level_2.handling;
+
+import java.util.Objects;
+import java.util.Optional;
+
+import com.biocraft.alien.layer_0_domain.level_0.handling.HandlingAction;
+import com.biocraft.alien.layer_0_domain.level_0.lab.ContainmentVolumeId;
+import com.biocraft.alien.layer_0_domain.level_1.entity.LivingEntityRef;
+
+/**
+ * Command requesting a controlled interaction for an existing living entity.
+ */
+public record HandlingRequest(
+        HandlingAction action,
+        LivingEntityRef entity,
+        Optional<ContainmentVolumeId> volumeId
+) {
+
+    public HandlingRequest {
+        action = Objects.requireNonNull(action, "action required");
+        entity = Objects.requireNonNull(entity, "entity required");
+        volumeId = Objects.requireNonNull(volumeId, "volumeId optional required");
+    }
+
+    public static HandlingRequest admit(LivingEntityRef entity, ContainmentVolumeId volumeId) {
+        return new HandlingRequest(HandlingAction.ADMIT, entity, Optional.ofNullable(volumeId));
+    }
+
+    public static HandlingRequest release(LivingEntityRef entity, ContainmentVolumeId volumeId) {
+        return new HandlingRequest(HandlingAction.RELEASE, entity, Optional.ofNullable(volumeId));
+    }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: package-info.java
+----------------------------------------------------------------------------------------------------
+/**
+ * Composite handling requests that depend on LivingEntityRef.
+ */
+package com.biocraft.alien.layer_0_domain.level_2.handling;
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: level_2/lab
+====================================================================================================
+
+FILE: ContainmentPenBlueprint.java
+----------------------------------------------------------------------------------------------------
+package com.biocraft.alien.layer_0_domain.level_2.lab;
+
+import com.biocraft.alien.layer_0_domain.level_0.lab.ContainmentFitRules;
+import com.biocraft.alien.layer_0_domain.level_0.lab.HorizontalFacing;
+import com.biocraft.alien.layer_0_domain.level_0.lab.InteriorVolume;
+import com.biocraft.alien.layer_0_domain.level_1.lab.ShellCell;
+import com.biocraft.alien.layer_0_domain.level_0.lab.ShellRole;
+import com.biocraft.alien.layer_0_domain.level_0.spatial.BlockPosRef;
+import com.biocraft.alien.layer_0_domain.level_0.validation.ValidationResult;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+/**
+ * Orientation-first layout rules for containment pen multiblocks.
+ *
+ * <p>Controller at the origin is the entrance on the bottom outer wall.
+ * Discovery: outward → inward → left/right → depth → height → continuous enclosure.
+ * {@link InteriorVolume} is the capacity SSOT.
+ */
+public final class ContainmentPenBlueprint {
+
+    public static final int MIN_SIZE = 3;
+    public static final int MAX_WIDTH = 9;
+    public static final int MAX_DEPTH = 9;
+    public static final int MAX_HEIGHT = 9;
+
+    /** @deprecated Prefer extents from a validated {@link InteriorVolume}. */
+    @Deprecated
+    public static final double INTERIOR_EXTENT = ContainmentFitRules.DEFAULT_PEN_INTERIOR_EXTENT;
+
+    private ContainmentPenBlueprint() {
+    }
+
+    public static ValidationResult validateLayout(int width, int depth) {
+        return width >= MIN_SIZE && depth >= MIN_SIZE && width <= MAX_WIDTH && depth <= MAX_DEPTH
+                ? ValidationResult.success()
+                : ValidationResult.failure("invalid pen layout");
+    }
+
+    public static ContainmentPenValidationResult validate(OccupancyCheck check) {
+        Optional<HorizontalFacing> outwardOpt = resolveOutward(check);
+        if (outwardOpt.isEmpty()) {
+            return ContainmentPenValidationResult.invalid("ambiguous or missing entrance outward face");
+        }
+        HorizontalFacing outward = outwardOpt.get();
+        HorizontalFacing inward = outward.opposite();
+        HorizontalFacing left = outward.left();
+        HorizontalFacing right = outward.right();
+
+        int leftExtent = span(check, left);
+        int rightExtent = span(check, right);
+        int width = leftExtent + rightExtent + 1;
+        if (width < MIN_SIZE || width > MAX_WIDTH) {
+            return ContainmentPenValidationResult.invalid("width out of range: " + width);
+        }
+
+        int depth = measureDepth(check, inward, left, right, leftExtent, rightExtent);
+        if (depth < MIN_SIZE || depth > MAX_DEPTH) {
+            return ContainmentPenValidationResult.invalid("depth out of range: " + depth);
+        }
+
+        Footprint foot = footprint(inward, left, right, leftExtent, rightExtent, depth);
+        int height = measureHeight(check, foot);
+        if (height < MIN_SIZE || height > MAX_HEIGHT) {
+            return ContainmentPenValidationResult.invalid("height out of range: " + height);
+        }
+
+        if (!enclosureComplete(check, foot, height)) {
+            return ContainmentPenValidationResult.invalid("enclosure incomplete");
+        }
+
+        InteriorVolume interior = new InteriorVolume(
+                foot.minX + 1, 1, foot.minZ + 1,
+                foot.maxX - 1, height - 2, foot.maxZ - 1);
+        if (interior.sizeX() < 1 || interior.sizeY() < 1 || interior.sizeZ() < 1) {
+            return ContainmentPenValidationResult.invalid("interior too small");
+        }
+        if (!interiorClear(check, interior)) {
+            return ContainmentPenValidationResult.invalid("interior not empty");
+        }
+
+        List<ShellCell> shells = shellCells(foot, height);
+        return new ContainmentPenValidationResult(
+                true, List.copyOf(shells), interior, outward, width, depth, height, "ok");
+    }
+
+    private static Optional<HorizontalFacing> resolveOutward(OccupancyCheck check) {
+        List<HorizontalFacing> open = new ArrayList<>(4);
+        for (HorizontalFacing facing : HorizontalFacing.values()) {
+            if (!check.isOccupied(facing.dx(), 0, facing.dz())) {
+                open.add(facing);
+            }
+        }
+        if (open.size() != 1) {
+            return Optional.empty();
+        }
+        HorizontalFacing outward = open.get(0);
+        HorizontalFacing inward = outward.opposite();
+        boolean anchored = check.isOccupied(outward.left().dx(), 0, outward.left().dz())
+                || check.isOccupied(outward.right().dx(), 0, outward.right().dz())
+                || check.isOccupied(inward.dx(), 0, inward.dz());
+        return anchored ? Optional.of(outward) : Optional.empty();
+    }
+
+    /** How far continuous floor shell extends from controller along {@code dir}. */
+    private static int span(OccupancyCheck check, HorizontalFacing dir) {
+        int extent = 0;
+        for (int i = 1; i < MAX_WIDTH; i++) {
+            if (!check.isOccupied(dir.dx() * i, 0, dir.dz() * i)) {
+                break;
+            }
+            extent = i;
+        }
+        return extent;
+    }
+
+    private static int measureDepth(
+            OccupancyCheck check,
+            HorizontalFacing inward,
+            HorizontalFacing left,
+            HorizontalFacing right,
+            int leftExtent,
+            int rightExtent) {
+        int depth = 1;
+        for (int d = 1; d < MAX_DEPTH; d++) {
+            if (!floorRowPresent(check, inward, left, right, leftExtent, rightExtent, d)) {
+                break;
+            }
+            depth = d + 1;
+        }
+        return depth;
+    }
+
+    private static boolean floorRowPresent(
+            OccupancyCheck check,
+            HorizontalFacing inward,
+            HorizontalFacing left,
+            HorizontalFacing right,
+            int leftExtent,
+            int rightExtent,
+            int depthIndex) {
+        for (int l = 0; l <= leftExtent; l++) {
+            int x = inward.dx() * depthIndex + left.dx() * l;
+            int z = inward.dz() * depthIndex + left.dz() * l;
+            if (depthIndex == 0 && l == 0) {
+                continue;
+            }
+            if (!check.isOccupied(x, 0, z)) {
+                return false;
+            }
+        }
+        for (int r = 1; r <= rightExtent; r++) {
+            int x = inward.dx() * depthIndex + right.dx() * r;
+            int z = inward.dz() * depthIndex + right.dz() * r;
+            if (!check.isOccupied(x, 0, z)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private static Footprint footprint(
+            HorizontalFacing inward,
+            HorizontalFacing left,
+            HorizontalFacing right,
+            int leftExtent,
+            int rightExtent,
+            int depth) {
+        int minX = 0;
+        int maxX = 0;
+        int minZ = 0;
+        int maxZ = 0;
+        for (int d = 0; d < depth; d++) {
+            for (int l = 0; l <= leftExtent; l++) {
+                int x = inward.dx() * d + left.dx() * l;
+                int z = inward.dz() * d + left.dz() * l;
+                minX = Math.min(minX, x);
+                maxX = Math.max(maxX, x);
+                minZ = Math.min(minZ, z);
+                maxZ = Math.max(maxZ, z);
+            }
+            for (int r = 1; r <= rightExtent; r++) {
+                int x = inward.dx() * d + right.dx() * r;
+                int z = inward.dz() * d + right.dz() * r;
+                minX = Math.min(minX, x);
+                maxX = Math.max(maxX, x);
+                minZ = Math.min(minZ, z);
+                maxZ = Math.max(maxZ, z);
+            }
+        }
+        return new Footprint(minX, maxX, minZ, maxZ);
+    }
+
+    private static int measureHeight(OccupancyCheck check, Footprint foot) {
+        int height = 1;
+        for (int y = 1; y < MAX_HEIGHT; y++) {
+            boolean perimeterOk = true;
+            for (int x = foot.minX; x <= foot.maxX && perimeterOk; x++) {
+                for (int z = foot.minZ; z <= foot.maxZ; z++) {
+                    boolean onPerimeter = x == foot.minX || x == foot.maxX || z == foot.minZ || z == foot.maxZ;
+                    if (onPerimeter && !check.isOccupied(x, y, z)) {
+                        perimeterOk = false;
+                        break;
+                    }
+                }
+            }
+            if (!perimeterOk) {
+                break;
+            }
+            height = y + 1;
+        }
+        // Require a complete ceiling slab at top
+        while (height >= MIN_SIZE) {
+            int top = height - 1;
+            boolean ceilingOk = true;
+            for (int x = foot.minX; x <= foot.maxX && ceilingOk; x++) {
+                for (int z = foot.minZ; z <= foot.maxZ; z++) {
+                    if (!check.isOccupied(x, top, z)) {
+                        ceilingOk = false;
+                        break;
+                    }
+                }
+            }
+            if (ceilingOk) {
+                return height;
+            }
+            height--;
+        }
+        return height;
+    }
+
+    private static boolean enclosureComplete(OccupancyCheck check, Footprint foot, int height) {
+        int maxY = height - 1;
+        for (int y = 0; y <= maxY; y++) {
+            for (int x = foot.minX; x <= foot.maxX; x++) {
+                for (int z = foot.minZ; z <= foot.maxZ; z++) {
+                    if (x == 0 && y == 0 && z == 0) {
+                        continue;
+                    }
+                    boolean shell = y == 0 || y == maxY
+                            || x == foot.minX || x == foot.maxX
+                            || z == foot.minZ || z == foot.maxZ;
+                    if (shell && !check.isOccupied(x, y, z)) {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
+    }
+
+    private static boolean interiorClear(OccupancyCheck check, InteriorVolume interior) {
+        for (int y = interior.minY(); y <= interior.maxY(); y++) {
+            for (int x = interior.minX(); x <= interior.maxX(); x++) {
+                for (int z = interior.minZ(); z <= interior.maxZ(); z++) {
+                    if (check.isOccupied(x, y, z)) {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
+    }
+
+    private static List<ShellCell> shellCells(Footprint foot, int height) {
+        int maxY = height - 1;
+        List<ShellCell> cells = new ArrayList<>();
+        for (int y = 0; y <= maxY; y++) {
+            for (int x = foot.minX; x <= foot.maxX; x++) {
+                for (int z = foot.minZ; z <= foot.maxZ; z++) {
+                    if (x == 0 && y == 0 && z == 0) {
+                        continue;
+                    }
+                    boolean shell = y == 0 || y == maxY
+                            || x == foot.minX || x == foot.maxX
+                            || z == foot.minZ || z == foot.maxZ;
+                    if (!shell) {
+                        continue;
+                    }
+                    ShellRole role = y == 0 ? ShellRole.FLOOR : (y == maxY ? ShellRole.CEILING : ShellRole.WALL);
+                    cells.add(new ShellCell(x, y, z, role));
+                }
+            }
+        }
+        return cells;
+    }
+
+    private record Footprint(int minX, int maxX, int minZ, int maxZ) {
+    }
+
+    public record ContainmentPenValidationResult(
+            boolean isValid,
+            List<ShellCell> shellCells,
+            InteriorVolume interior,
+            HorizontalFacing outward,
+            int width,
+            int depth,
+            int height,
+            String reason) {
+
+        public static ContainmentPenValidationResult invalid(String reason) {
+            return new ContainmentPenValidationResult(false, List.of(), null, null, 0, 0, 0, reason);
+        }
+
+        @Deprecated
+        public int structureHeight() {
+            return height;
+        }
+
+        public List<BlockOffset> occupiedOffsets() {
+            List<BlockOffset> list = new ArrayList<>(shellCells.size());
+            for (ShellCell cell : shellCells) {
+                list.add(new BlockOffset(cell.x(), cell.y(), cell.z(), true));
+            }
+            return list;
+        }
+    }
+
+    public record BlockOffset(int x, int y, int z, boolean required) {
+    }
+
+    @FunctionalInterface
+    public interface OccupancyCheck {
+        boolean isOccupied(int offsetX, int offsetY, int offsetZ);
+    }
+
+    public static List<BlockPosRef> toWorldOffsets(BlockPosRef center, List<BlockOffset> offsets) {
+        List<BlockPosRef> world = new ArrayList<>(offsets.size());
+        for (BlockOffset offset : offsets) {
+            world.add(center.offset(offset.x(), offset.y(), offset.z()));
+        }
+        return world;
+    }
+
+    public static List<BlockPosRef> shellCellsToWorld(BlockPosRef center, List<ShellCell> cells) {
+        List<BlockPosRef> world = new ArrayList<>(cells.size());
+        for (ShellCell cell : cells) {
+            world.add(center.offset(cell.x(), cell.y(), cell.z()));
+        }
+        return world;
+    }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: package-info.java
+----------------------------------------------------------------------------------------------------
+/** Domain lab blueprints that compose L1 shell cells. */
+package com.biocraft.alien.layer_0_domain.level_2.lab;
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: level_2/observation
+====================================================================================================
+
+FILE: ObservationSnapshot.java
+----------------------------------------------------------------------------------------------------
+package com.biocraft.alien.layer_0_domain.level_2.observation;
+
+import java.util.Objects;
+
+import com.biocraft.alien.layer_0_domain.level_0.observation.MovementState;
+import com.biocraft.alien.layer_0_domain.level_0.observation.ObservationInstant;
+import com.biocraft.alien.layer_0_domain.level_1.entity.LivingEntityRef;
+
+/**
+ * Immutable observation fact for a living entity. Does not embed containment.
+ */
+public record ObservationSnapshot(
+        LivingEntityRef entity,
+        ObservationInstant instant,
+        MovementState movement
+) {
+
+    public ObservationSnapshot {
+        entity = Objects.requireNonNull(entity, "entity required");
+        instant = Objects.requireNonNull(instant, "instant required");
+        movement = Objects.requireNonNull(movement, "movement required");
+    }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: package-info.java
+----------------------------------------------------------------------------------------------------
+/**
+ * Composite observation snapshots that depend on LivingEntityRef.
+ */
+package com.biocraft.alien.layer_0_domain.level_2.observation;
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: level_2/parasite
+====================================================================================================
+
+FILE: AttachmentBinding.java
+----------------------------------------------------------------------------------------------------
+package com.biocraft.alien.layer_0_domain.level_2.parasite;
+
+import com.biocraft.alien.layer_0_domain.level_1.entity.LivingEntityRef;
+import java.util.UUID;
+import javax.annotation.Nullable;
+
+/**
+ * Ownership of the latched host for the attachment lifecycle.
+ *
+ * <p>Combat owns {@code Mob.getTarget()}. Attachment owns this binding. They are related but
+ * must never be aliases — attachment systems must not use combat target to identify the host.
+ */
+public final class AttachmentBinding {
+
+    @Nullable
+    private LivingEntityRef host;
+
+    public void bind(@Nullable LivingEntityRef host) {
+        this.host = host;
+    }
+
+    @Nullable
+    public LivingEntityRef host() {
+        return host;
+    }
+
+    @Nullable
+    public UUID hostUUID() {
+        return host != null ? host.entityId() : null;
+    }
+
+    public boolean isBound() {
+        return host != null;
+    }
+
+    public void clear() {
+        this.host = null;
+    }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: AttachmentStatePort.java
+----------------------------------------------------------------------------------------------------
+package com.biocraft.alien.layer_0_domain.level_2.parasite;
+
+import com.biocraft.alien.layer_0_domain.level_0.parasite.AttachmentState;
+import com.biocraft.alien.layer_0_domain.level_1.entity.LivingEntityRef;
+
+public interface AttachmentStatePort {
+    boolean supports(LivingEntityRef ref);
+    AttachmentState getState(LivingEntityRef ref);
+    void setState(LivingEntityRef ref, AttachmentState state);
+    int getTicks(LivingEntityRef ref);
+    void setTicks(LivingEntityRef ref, int ticks);
+    LivingEntityRef getTarget(LivingEntityRef ref);
+    void setTarget(LivingEntityRef ref, LivingEntityRef target);
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: MaturationStatePort.java
+----------------------------------------------------------------------------------------------------
+package com.biocraft.alien.layer_0_domain.level_2.parasite;
+
+import com.biocraft.alien.layer_0_domain.level_1.entity.LivingEntityRef;
+
+public interface MaturationStatePort {
+    boolean supports(LivingEntityRef ref);
+    int getMaturationTimer(LivingEntityRef ref);
+    void setMaturationTimer(LivingEntityRef ref, int ticks);
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: package-info.java
+----------------------------------------------------------------------------------------------------
+/**
+ * Parasite lifecycle at formula tier 2: attachment binding DTO and state port interfaces.
+ */
+package com.biocraft.alien.layer_0_domain.level_2.parasite;
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: level_2/research
+====================================================================================================
+
+FILE: package-info.java
+----------------------------------------------------------------------------------------------------
+/**
+ * Composite research domain types that may reference LivingEntityRef.
+ *
+ * <p>Current S3E subject model intentionally supports LivingEntity subjects only.
+ * Generalized research subjects deferred until a consumer requires them.
+ */
+package com.biocraft.alien.layer_0_domain.level_2.research;
+
+----------------------------------------------------------------------------------------------------
+
+FILE: ResearchRecord.java
+----------------------------------------------------------------------------------------------------
+package com.biocraft.alien.layer_0_domain.level_2.research;
+
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+
+import com.biocraft.alien.layer_0_domain.level_0.research.ResearchCategory;
+import com.biocraft.alien.layer_0_domain.level_0.research.ResearchFact;
+import com.biocraft.alien.layer_0_domain.level_0.research.ResearchInstant;
+import com.biocraft.alien.layer_0_domain.level_0.research.ResearchRecordId;
+import com.biocraft.alien.layer_0_domain.level_1.entity.LivingEntityRef;
+
+/**
+ * Immutable historical research evidence. Corrections append a new record —
+ * this type has no mutators or withers that rewrite facts.
+ *
+ * <p>Current S3E subject model intentionally supports LivingEntity subjects only.
+ * Generalized research subjects deferred until a consumer requires them.
+ */
+public record ResearchRecord(
+        ResearchRecordId id,
+        Optional<LivingEntityRef> subject,
+        ResearchCategory category,
+        ResearchInstant instant,
+        List<ResearchFact> facts
+) {
+
+    public ResearchRecord {
+        id = Objects.requireNonNull(id, "id required");
+        subject = Objects.requireNonNull(subject, "subject optional required");
+        category = Objects.requireNonNull(category, "category required");
+        instant = Objects.requireNonNull(instant, "instant required");
+        Objects.requireNonNull(facts, "facts required");
+        for (ResearchFact fact : facts) {
+            Objects.requireNonNull(fact, "fact required");
+        }
+        facts = List.copyOf(facts);
+    }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: SampleRecord.java
+----------------------------------------------------------------------------------------------------
+package com.biocraft.alien.layer_0_domain.level_2.research;
+
+import java.util.Objects;
+
+import com.biocraft.alien.layer_0_domain.level_0.research.ResearchInstant;
+import com.biocraft.alien.layer_0_domain.level_0.research.SampleId;
+import com.biocraft.alien.layer_0_domain.level_0.research.SampleKind;
+import com.biocraft.alien.layer_0_domain.level_1.entity.LivingEntityRef;
+
+/**
+ * Historical sample custody record. Remains valid when the source entity no longer
+ * exists — identity is a stored ref, not a live resolve requirement.
+ *
+ * <p>No DNA payload, composition, viability, or mutation fields in S3E.
+ */
+public record SampleRecord(
+        SampleId id,
+        LivingEntityRef sourceEntity,
+        ResearchInstant instant,
+        SampleKind kind
+) {
+
+    public SampleRecord {
+        id = Objects.requireNonNull(id, "id required");
+        sourceEntity = Objects.requireNonNull(sourceEntity, "sourceEntity required");
+        instant = Objects.requireNonNull(instant, "instant required");
+        kind = Objects.requireNonNull(kind, "kind required");
+    }
+}
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: level_2/spawn
+====================================================================================================
+
+FILE: EntitySpawnPort.java
+----------------------------------------------------------------------------------------------------
+package com.biocraft.alien.layer_0_domain.level_2.spawn;
+
+import com.biocraft.alien.layer_0_domain.level_1.entity.LivingEntityRef;
+import com.biocraft.alien.layer_0_domain.level_1.entity.XenomorphType;
+import com.biocraft.alien.layer_0_domain.level_1.spawn.SpawnContext;
+
+public interface EntitySpawnPort {
+    LivingEntityRef spawnXenomorph(SpawnContext context, XenomorphType type);
+
+    LivingEntityRef transformXenomorph(LivingEntityRef source, XenomorphType targetType);
+
+    default boolean spawnForm(XenomorphType type, SpawnContext context) {
+        return spawnXenomorph(context, type) != null;
+    }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: package-info.java
+----------------------------------------------------------------------------------------------------
+/**
+ * Entity spawn port interface.
+ */
+package com.biocraft.alien.layer_0_domain.level_2.spawn;
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: level_2/world
+====================================================================================================
+
+FILE: package-info.java
+----------------------------------------------------------------------------------------------------
+/**
+ * World query port interface.
+ */
+package com.biocraft.alien.layer_0_domain.level_2.world;
+
+----------------------------------------------------------------------------------------------------
+
+FILE: WorldQueryPort.java
+----------------------------------------------------------------------------------------------------
+package com.biocraft.alien.layer_0_domain.level_2.world;
+
+import com.biocraft.alien.layer_0_domain.level_0.spatial.BlockPosRef;
+import com.biocraft.alien.layer_0_domain.level_0.spatial.EntityScanHit;
+import com.biocraft.alien.layer_0_domain.level_0.spatial.WorldRef;
+import com.biocraft.alien.layer_0_domain.level_1.spatial.AxisAlignedRegion;
+
+import java.util.List;
+
+public interface WorldQueryPort {
+    List<EntityScanHit> scanLivingEntities(WorldRef world, AxisAlignedRegion region);
+    boolean isAirAt(WorldRef world, BlockPosRef pos);
+    boolean canOccludeAt(WorldRef world, BlockPosRef pos);
+    boolean isInBounds(WorldRef world, BlockPosRef pos);
+    boolean isUnbreakableAt(WorldRef world, BlockPosRef pos);
+    String blockIdAt(WorldRef world, BlockPosRef pos);
+}
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: level_2/xenomorph
+====================================================================================================
+
+FILE: package-info.java
+----------------------------------------------------------------------------------------------------
+/**
+ * Xenomorph form query port interface.
+ */
+package com.biocraft.alien.layer_0_domain.level_2.xenomorph;
+
+----------------------------------------------------------------------------------------------------
+
+FILE: XenomorphFormQueryPort.java
+----------------------------------------------------------------------------------------------------
+package com.biocraft.alien.layer_0_domain.level_2.xenomorph;
+
+import com.biocraft.alien.layer_0_domain.level_1.entity.LivingEntityRef;
+import com.biocraft.alien.layer_0_domain.level_1.entity.XenomorphType;
+
+public interface XenomorphFormQueryPort {
+    XenomorphType resolveForm(LivingEntityRef ref);
+}
+
+----------------------------------------------------------------------------------------------------
+
+
+END OF DUMP

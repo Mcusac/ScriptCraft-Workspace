@@ -1,8 +1,8 @@
-Root: C:\Users\mdc0431\dev\ScriptCraft-Workspace\implementations\minecraft\AlienCraft\weyland-yutani-core\src\main\resources
+Root: E:\Docs\Personal\Projects\ScriptCraft-Workspace\implementations\minecraft\AlienCraft\biocraft-alien\src\main\resources
 ====================================================================================================
-JSON Files: 122
+JSON Files: 125
 
-PACKAGE: assets/weylandyutani/blockstates
+PACKAGE: assets/biocraft_alien/blockstates
 ====================================================================================================
 
 FILE: cocoon_block.json
@@ -10,9 +10,147 @@ FILE: cocoon_block.json
 {
   "variants": {
     "": {
-      "model": "weylandyutani:block/cocoon_block"
+      "model": "biocraft_alien:block/cocoon_block"
     }
   }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: containment_pen_controller.json
+----------------------------------------------------------------------------------------------------
+{
+  "variants": {
+    "facing=north": {
+      "model": "biocraft_alien:block/containment_pen_controller"
+    },
+    "facing=south": {
+      "model": "biocraft_alien:block/containment_pen_controller",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "biocraft_alien:block/containment_pen_controller",
+      "y": 270
+    },
+    "facing=east": {
+      "model": "biocraft_alien:block/containment_pen_controller",
+      "y": 90
+    }
+  }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: containment_pen_shell.json
+----------------------------------------------------------------------------------------------------
+{
+  "multipart": [
+    {
+      "when": {
+        "north": "true"
+      },
+      "apply": {
+        "model": "biocraft_alien:block/containment_pen_shell_pane_north"
+      }
+    },
+    {
+      "when": {
+        "south": "true"
+      },
+      "apply": {
+        "model": "biocraft_alien:block/containment_pen_shell_pane_south"
+      }
+    },
+    {
+      "when": {
+        "west": "true"
+      },
+      "apply": {
+        "model": "biocraft_alien:block/containment_pen_shell_pane_west"
+      }
+    },
+    {
+      "when": {
+        "east": "true"
+      },
+      "apply": {
+        "model": "biocraft_alien:block/containment_pen_shell_pane_east"
+      }
+    },
+    {
+      "when": {
+        "up": "true"
+      },
+      "apply": {
+        "model": "biocraft_alien:block/containment_pen_shell_pane_up"
+      }
+    },
+    {
+      "when": {
+        "down": "true"
+      },
+      "apply": {
+        "model": "biocraft_alien:block/containment_pen_shell_pane_down"
+      }
+    }
+  ]
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: containment_pen_shell_iron.json
+----------------------------------------------------------------------------------------------------
+{
+  "multipart": [
+    {
+      "when": {
+        "north": "true"
+      },
+      "apply": {
+        "model": "biocraft_alien:block/containment_pen_shell_floor_pane_north"
+      }
+    },
+    {
+      "when": {
+        "south": "true"
+      },
+      "apply": {
+        "model": "biocraft_alien:block/containment_pen_shell_floor_pane_south"
+      }
+    },
+    {
+      "when": {
+        "west": "true"
+      },
+      "apply": {
+        "model": "biocraft_alien:block/containment_pen_shell_floor_pane_west"
+      }
+    },
+    {
+      "when": {
+        "east": "true"
+      },
+      "apply": {
+        "model": "biocraft_alien:block/containment_pen_shell_floor_pane_east"
+      }
+    },
+    {
+      "when": {
+        "up": "true"
+      },
+      "apply": {
+        "model": "biocraft_alien:block/containment_pen_shell_floor_pane_up"
+      }
+    },
+    {
+      "when": {
+        "down": "true"
+      },
+      "apply": {
+        "model": "biocraft_alien:block/containment_pen_shell_floor_pane_down"
+      }
+    }
+  ]
 }
 
 ----------------------------------------------------------------------------------------------------
@@ -22,7 +160,19 @@ FILE: lab_machine.json
 {
   "variants": {
     "": {
-      "model": "weylandyutani:block/lab_machine"
+      "model": "biocraft_alien:block/lab_machine"
+    }
+  }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: observation_capture_terminal.json
+----------------------------------------------------------------------------------------------------
+{
+  "variants": {
+    "": {
+      "model": "biocraft_alien:block/observation_capture_terminal"
     }
   }
 }
@@ -34,7 +184,7 @@ FILE: resin_block.json
 {
   "variants": {
     "": {
-      "model": "weylandyutani:block/resin_block"
+      "model": "biocraft_alien:block/resin_block"
     }
   }
 }
@@ -46,19 +196,7 @@ FILE: specimen_glass.json
 {
   "variants": {
     "": {
-      "model": "weylandyutani:block/specimen_glass"
-    }
-  }
-}
-
-----------------------------------------------------------------------------------------------------
-
-FILE: specimen_pod_controller.json
-----------------------------------------------------------------------------------------------------
-{
-  "variants": {
-    "": {
-      "model": "weylandyutani:block/specimen_pod_controller"
+      "model": "biocraft_alien:block/specimen_glass"
     }
   }
 }
@@ -70,38 +208,114 @@ FILE: spiny_block.json
 {
   "variants": {
     "": {
-      "model": "weylandyutani:block/spiny_block"
+      "model": "biocraft_alien:block/spiny_block"
     }
   }
 }
 
 ----------------------------------------------------------------------------------------------------
 
-PACKAGE: assets/weylandyutani/lang
+PACKAGE: assets/biocraft_alien/lang
 ====================================================================================================
 
 FILE: en_us.json
 ----------------------------------------------------------------------------------------------------
 {
-  "block.weylandyutani.resin_block": "Resin Block",
-  "block.weylandyutani.spiny_block": "Spiny Block",
-  "block.weylandyutani.cocoon_block": "Cocoon Block",
-  "block.weylandyutani.lab_machine": "Lab Machine",
-  "block.weylandyutani.specimen_glass": "Specimen Glass",
-  "block.weylandyutani.specimen_pod_controller": "Specimen Pod Controller",
-  "entity.weylandyutani.facehugger": "Facehugger",
-  "entity.weylandyutani.ovomorph": "Ovomorph",
-  "entity.weylandyutani.chestburster": "Chestburster",
-  "entity.weylandyutani.growth": "Growth",
-  "entity.weylandyutani.drone": "Drone",
-  "entity.weylandyutani.praetor": "Praetor",
-  "entity.weylandyutani.queen": "Xenomorph Queen",
-  "entity.weylandyutani.human": "Human"
+  "block.biocraft_alien.resin_block": "Resin Block",
+  "block.biocraft_alien.spiny_block": "Spiny Block",
+  "block.biocraft_alien.cocoon_block": "Cocoon Block",
+  "block.biocraft_alien.lab_machine": "Lab Machine",
+  "block.biocraft_alien.specimen_glass": "Specimen Glass",
+  "block.biocraft_alien.containment_pen_controller": "Containment Pen Controller",
+  "block.biocraft_alien.containment_pen_shell": "Containment Pen Shell",
+  "block.biocraft_alien.containment_pen_shell_iron": "Containment Pen Iron Shell",
+  "block.biocraft_alien.observation_capture_terminal": "Observation Capture Terminal",
+  "item.biocraft_alien.observation_capture_terminal": "Observation Capture Terminal",
+  "item.biocraft_alien.containment_pen_controller": "Containment Pen Controller",
+  "item.biocraft_alien.containment_pen_shell": "Containment Pen Shell",
+  "item.biocraft_alien.containment_pen_shell_iron": "Containment Pen Iron Shell",
+  "item.biocraft_alien.lab_machine": "Lab Machine",
+  "item.biocraft_alien.specimen_glass": "Specimen Glass",
+  "item.biocraft_alien.resin_block": "Resin Block",
+  "item.biocraft_alien.spiny_block": "Spiny Block",
+  "item.biocraft_alien.cocoon_block": "Cocoon Block",
+  "item.biocraft_alien.facehugger_spawn_egg": "Facehugger Spawn Egg",
+  "item.biocraft_alien.chestburster_spawn_egg": "Chestburster Spawn Egg",
+  "item.biocraft_alien.drone_spawn_egg": "Drone Spawn Egg",
+  "item.biocraft_alien.human_spawn_egg": "Human Spawn Egg",
+  "item.biocraft_alien.queen_spawn_egg": "Queen Spawn Egg",
+  "item.biocraft_alien.ovomorph_spawn_egg": "Ovomorph Spawn Egg",
+  "item.biocraft_alien.gestation_potion": "Gestation Potion",
+  "item.biocraft_alien.gestation_splash_potion": "Gestation Splash Potion",
+  "item.biocraft_alien.motion_tracker": "Motion Tracker",
+  "item.biocraft_alien.capture_net": "Capture Net",
+  "tooltip.biocraft_alien.capture_net.empty": "Empty — use on a living creature to capture",
+  "tooltip.biocraft_alien.capture_net.filled": "Contains: %s",
+  "tooltip.biocraft_alien.capture_net.release": "Right-click to release",
+  "message.biocraft_alien.containment_pen.structure_formed": "Containment pen structure formed.",
+  "message.biocraft_alien.containment_pen.invalid_structure": "Invalid containment pen structure.",
+  "message.biocraft_alien.containment_pen.empty": "empty",
+  "message.biocraft_alien.containment_pen.contains": "contains %s",
+  "message.biocraft_alien.containment_pen.status": "Pen %sx%sx%s — %s",
+  "message.biocraft_alien.containment_pen.admitted": "Admitted %s into containment.",
+  "message.biocraft_alien.containment_pen.admit_failed": "Admit failed: %s",
+  "message.biocraft_alien.containment_pen.too_large": "That creature does not fit inside the containment pen.",
+  "message.biocraft_alien.containment_pen.released": "Released occupant from containment.",
+  "message.biocraft_alien.containment_pen.release_failed": "Release failed: %s",
+  "message.biocraft_alien.containment_pen.admission_committed": "Specimen admitted into containment.",
+  "message.biocraft_alien.containment_pen.admission_rolled_back": "Admission failed: %s",
+  "message.biocraft_alien.containment_pen.extraction_committed": "Specimen extracted into Capture Net.",
+  "message.biocraft_alien.containment_pen.extraction_failed": "Extraction failed: %s",
+  "menu.biocraft_alien.containment_pen_admission": "Containment",
+  "gui.biocraft_alien.containment_pen_admission.contain": "Contain",
+  "gui.biocraft_alien.containment_pen_admission.extract": "Extract",
+  "gui.biocraft_alien.containment_ui.subject_type": "Subject Type",
+  "gui.biocraft_alien.containment_ui.subject_name": "Subject Name",
+  "gui.biocraft_alien.containment_ui.unnamed": "Unnamed",
+  "gui.biocraft_alien.containment_ui.unknown": "Unknown",
+  "gui.biocraft_alien.containment_ui.apply_name": "Apply",
+  "gui.biocraft_alien.containment_ui.cleanse": "Cleanse",
+  "gui.biocraft_alien.containment_ui.cleanse_confirm": "Incinerate specimen?",
+  "gui.biocraft_alien.containment_ui.cleanse_confirm_detail": "This cannot be undone.",
+  "gui.biocraft_alien.containment_ui.cleanse_yes": "Yes",
+  "gui.biocraft_alien.containment_ui.cleanse_cancel": "Cancel",
+  "gui.biocraft_alien.containment_ui.page_dna": "DNA",
+  "gui.biocraft_alien.containment_ui.page_back": "Back",
+  "gui.biocraft_alien.containment_ui.dna_title": "DNA Information",
+  "gui.biocraft_alien.containment_ui.dna_profile": "DNA Profile",
+  "gui.biocraft_alien.containment_ui.dna_stub": "DNA biology is still under development.",
+  "gui.biocraft_alien.containment_ui.dna_stub_future": "Future versions will support DNA sampling and injection.",
+  "gui.biocraft_alien.containment_ui.sample": "Sample",
+  "gui.biocraft_alien.containment_ui.inject": "Inject",
+  "itemGroup.biocraft_alien.main": "BioCraft: Alien",
+  "item.biocraft_alien.dna_vial": "DNA Vial",
+  "item.biocraft_alien.dna_vial.empty": "Empty",
+  "item.biocraft_alien.dna_vial.filled": "Filled (opaque sample)",
+  "message.biocraft_alien.containment_ui.name_applied": "Specimen named.",
+  "message.biocraft_alien.containment_ui.cleanse_started": "Cleanse sequence started.",
+  "message.biocraft_alien.containment_ui.cleanse_failed": "Cleanse failed.",
+  "message.biocraft_alien.containment_ui.sample_ok": "Sample collected into DNA vial.",
+  "message.biocraft_alien.containment_ui.inject_unavailable": "Injection unavailable. Not implemented yet.",
+  "message.biocraft_alien.containment_ui.vial_failed": "DNA vial action failed.",
+  "message.biocraft_alien.research.capture_accepted": "Observation recorded.",
+  "message.biocraft_alien.research.capture_rejected": "Capture rejected: %s",
+  "message.biocraft_alien.research.no_target": "No living entity nearby to observe.",
+  "message.biocraft_alien.motion_tracker.charging": "Motion tracker charging...",
+  "message.biocraft_alien.motion_tracker.detected": "Detected %s nearby (%s)",
+  "message.biocraft_alien.motion_tracker.no_entities": "No moving contacts.",
+  "entity.biocraft_alien.facehugger": "Facehugger",
+  "entity.biocraft_alien.ovomorph": "Ovomorph",
+  "entity.biocraft_alien.chestburster": "Chestburster",
+  "entity.biocraft_alien.growth": "Growth",
+  "entity.biocraft_alien.drone": "Drone",
+  "entity.biocraft_alien.praetor": "Praetor",
+  "entity.biocraft_alien.queen": "Xenomorph Queen",
+  "entity.biocraft_alien.human": "Human"
 }
 
 ----------------------------------------------------------------------------------------------------
 
-PACKAGE: assets/weylandyutani/models/block
+PACKAGE: assets/biocraft_alien/models/block
 ====================================================================================================
 
 FILE: cocoon_block.json
@@ -109,8 +323,1028 @@ FILE: cocoon_block.json
 {
   "parent": "minecraft:block/cube_all",
   "textures": {
-    "all": "weylandyutani:block/cocoon_block"
+    "all": "biocraft_alien:block/cocoon_block"
   }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: containment_pen_controller.json
+----------------------------------------------------------------------------------------------------
+{
+  "parent": "minecraft:block/orientable",
+  "textures": {
+    "top": "biocraft_alien:block/containment_pen_controller",
+    "front": "biocraft_alien:block/containment_pen_controller_front",
+    "side": "biocraft_alien:block/containment_pen_controller"
+  }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: containment_pen_shell_floor_pane_down.json
+----------------------------------------------------------------------------------------------------
+{
+  "render_type": "minecraft:cutout",
+  "textures": {
+    "pane": "biocraft_alien:block/lab_machine",
+    "edge": "biocraft_alien:block/lab_machine",
+    "particle": "biocraft_alien:block/lab_machine"
+  },
+  "elements": [
+    {
+      "from": [
+        0,
+        0,
+        0
+      ],
+      "to": [
+        16,
+        2,
+        16
+      ],
+      "faces": {
+        "up": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#pane"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#pane"
+        },
+        "north": {
+          "uv": [
+            0,
+            0,
+            16,
+            2
+          ],
+          "texture": "#edge"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            16,
+            2
+          ],
+          "texture": "#edge"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            16,
+            2
+          ],
+          "texture": "#edge"
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            16,
+            2
+          ],
+          "texture": "#edge"
+        }
+      }
+    }
+  ]
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: containment_pen_shell_floor_pane_east.json
+----------------------------------------------------------------------------------------------------
+{
+  "render_type": "minecraft:cutout",
+  "textures": {
+    "pane": "biocraft_alien:block/lab_machine",
+    "edge": "biocraft_alien:block/lab_machine",
+    "particle": "biocraft_alien:block/lab_machine"
+  },
+  "elements": [
+    {
+      "from": [
+        14,
+        0,
+        0
+      ],
+      "to": [
+        16,
+        16,
+        16
+      ],
+      "faces": {
+        "west": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#pane"
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#pane"
+        },
+        "north": {
+          "uv": [
+            14,
+            0,
+            16,
+            16
+          ],
+          "texture": "#edge"
+        },
+        "south": {
+          "uv": [
+            14,
+            0,
+            16,
+            16
+          ],
+          "texture": "#edge"
+        },
+        "up": {
+          "uv": [
+            14,
+            0,
+            16,
+            16
+          ],
+          "texture": "#edge"
+        },
+        "down": {
+          "uv": [
+            14,
+            0,
+            16,
+            16
+          ],
+          "texture": "#edge"
+        }
+      }
+    }
+  ]
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: containment_pen_shell_floor_pane_north.json
+----------------------------------------------------------------------------------------------------
+{
+  "render_type": "minecraft:cutout",
+  "textures": {
+    "pane": "biocraft_alien:block/lab_machine",
+    "edge": "biocraft_alien:block/lab_machine",
+    "particle": "biocraft_alien:block/lab_machine"
+  },
+  "elements": [
+    {
+      "from": [
+        0,
+        0,
+        0
+      ],
+      "to": [
+        16,
+        16,
+        2
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#pane"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#pane"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            2,
+            16
+          ],
+          "texture": "#edge"
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            2,
+            16
+          ],
+          "texture": "#edge"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            16,
+            2
+          ],
+          "texture": "#edge"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            16,
+            2
+          ],
+          "texture": "#edge"
+        }
+      }
+    }
+  ]
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: containment_pen_shell_floor_pane_south.json
+----------------------------------------------------------------------------------------------------
+{
+  "render_type": "minecraft:cutout",
+  "textures": {
+    "pane": "biocraft_alien:block/lab_machine",
+    "edge": "biocraft_alien:block/lab_machine",
+    "particle": "biocraft_alien:block/lab_machine"
+  },
+  "elements": [
+    {
+      "from": [
+        0,
+        0,
+        14
+      ],
+      "to": [
+        16,
+        16,
+        16
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#pane"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#pane"
+        },
+        "west": {
+          "uv": [
+            14,
+            0,
+            16,
+            16
+          ],
+          "texture": "#edge"
+        },
+        "east": {
+          "uv": [
+            14,
+            0,
+            16,
+            16
+          ],
+          "texture": "#edge"
+        },
+        "up": {
+          "uv": [
+            0,
+            14,
+            16,
+            16
+          ],
+          "texture": "#edge"
+        },
+        "down": {
+          "uv": [
+            0,
+            14,
+            16,
+            16
+          ],
+          "texture": "#edge"
+        }
+      }
+    }
+  ]
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: containment_pen_shell_floor_pane_up.json
+----------------------------------------------------------------------------------------------------
+{
+  "render_type": "minecraft:cutout",
+  "textures": {
+    "pane": "biocraft_alien:block/lab_machine",
+    "edge": "biocraft_alien:block/lab_machine",
+    "particle": "biocraft_alien:block/lab_machine"
+  },
+  "elements": [
+    {
+      "from": [
+        0,
+        14,
+        0
+      ],
+      "to": [
+        16,
+        16,
+        16
+      ],
+      "faces": {
+        "up": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#pane"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#pane"
+        },
+        "north": {
+          "uv": [
+            0,
+            14,
+            16,
+            16
+          ],
+          "texture": "#edge"
+        },
+        "south": {
+          "uv": [
+            0,
+            14,
+            16,
+            16
+          ],
+          "texture": "#edge"
+        },
+        "west": {
+          "uv": [
+            0,
+            14,
+            16,
+            16
+          ],
+          "texture": "#edge"
+        },
+        "east": {
+          "uv": [
+            0,
+            14,
+            16,
+            16
+          ],
+          "texture": "#edge"
+        }
+      }
+    }
+  ]
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: containment_pen_shell_floor_pane_west.json
+----------------------------------------------------------------------------------------------------
+{
+  "render_type": "minecraft:cutout",
+  "textures": {
+    "pane": "biocraft_alien:block/lab_machine",
+    "edge": "biocraft_alien:block/lab_machine",
+    "particle": "biocraft_alien:block/lab_machine"
+  },
+  "elements": [
+    {
+      "from": [
+        0,
+        0,
+        0
+      ],
+      "to": [
+        2,
+        16,
+        16
+      ],
+      "faces": {
+        "west": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#pane"
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#pane"
+        },
+        "north": {
+          "uv": [
+            0,
+            0,
+            2,
+            16
+          ],
+          "texture": "#edge"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            2,
+            16
+          ],
+          "texture": "#edge"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            2,
+            16
+          ],
+          "texture": "#edge"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            2,
+            16
+          ],
+          "texture": "#edge"
+        }
+      }
+    }
+  ]
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: containment_pen_shell_iron.json
+----------------------------------------------------------------------------------------------------
+{
+  "parent": "minecraft:block/cube_all",
+  "textures": {
+    "all": "biocraft_alien:block/containment_pen_shell_iron"
+  }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: containment_pen_shell_pane_down.json
+----------------------------------------------------------------------------------------------------
+{
+  "render_type": "minecraft:cutout",
+  "textures": {
+    "pane": "minecraft:block/glass",
+    "edge": "minecraft:block/glass_pane_top",
+    "particle": "minecraft:block/glass"
+  },
+  "elements": [
+    {
+      "from": [
+        0,
+        0,
+        0
+      ],
+      "to": [
+        16,
+        2,
+        16
+      ],
+      "faces": {
+        "up": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#pane"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#pane"
+        },
+        "north": {
+          "uv": [
+            0,
+            0,
+            16,
+            2
+          ],
+          "texture": "#edge"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            16,
+            2
+          ],
+          "texture": "#edge"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            16,
+            2
+          ],
+          "texture": "#edge"
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            16,
+            2
+          ],
+          "texture": "#edge"
+        }
+      }
+    }
+  ]
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: containment_pen_shell_pane_east.json
+----------------------------------------------------------------------------------------------------
+{
+  "render_type": "minecraft:cutout",
+  "textures": {
+    "pane": "minecraft:block/glass",
+    "edge": "minecraft:block/glass_pane_top",
+    "particle": "minecraft:block/glass"
+  },
+  "elements": [
+    {
+      "from": [
+        14,
+        0,
+        0
+      ],
+      "to": [
+        16,
+        16,
+        16
+      ],
+      "faces": {
+        "west": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#pane"
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#pane"
+        },
+        "north": {
+          "uv": [
+            14,
+            0,
+            16,
+            16
+          ],
+          "texture": "#edge"
+        },
+        "south": {
+          "uv": [
+            14,
+            0,
+            16,
+            16
+          ],
+          "texture": "#edge"
+        },
+        "up": {
+          "uv": [
+            14,
+            0,
+            16,
+            16
+          ],
+          "texture": "#edge"
+        },
+        "down": {
+          "uv": [
+            14,
+            0,
+            16,
+            16
+          ],
+          "texture": "#edge"
+        }
+      }
+    }
+  ]
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: containment_pen_shell_pane_north.json
+----------------------------------------------------------------------------------------------------
+{
+  "render_type": "minecraft:cutout",
+  "textures": {
+    "pane": "minecraft:block/glass",
+    "edge": "minecraft:block/glass_pane_top",
+    "particle": "minecraft:block/glass"
+  },
+  "elements": [
+    {
+      "from": [
+        0,
+        0,
+        0
+      ],
+      "to": [
+        16,
+        16,
+        2
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#pane"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#pane"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            2,
+            16
+          ],
+          "texture": "#edge"
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            2,
+            16
+          ],
+          "texture": "#edge"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            16,
+            2
+          ],
+          "texture": "#edge"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            16,
+            2
+          ],
+          "texture": "#edge"
+        }
+      }
+    }
+  ]
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: containment_pen_shell_pane_south.json
+----------------------------------------------------------------------------------------------------
+{
+  "render_type": "minecraft:cutout",
+  "textures": {
+    "pane": "minecraft:block/glass",
+    "edge": "minecraft:block/glass_pane_top",
+    "particle": "minecraft:block/glass"
+  },
+  "elements": [
+    {
+      "from": [
+        0,
+        0,
+        14
+      ],
+      "to": [
+        16,
+        16,
+        16
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#pane"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#pane"
+        },
+        "west": {
+          "uv": [
+            14,
+            0,
+            16,
+            16
+          ],
+          "texture": "#edge"
+        },
+        "east": {
+          "uv": [
+            14,
+            0,
+            16,
+            16
+          ],
+          "texture": "#edge"
+        },
+        "up": {
+          "uv": [
+            0,
+            14,
+            16,
+            16
+          ],
+          "texture": "#edge"
+        },
+        "down": {
+          "uv": [
+            0,
+            14,
+            16,
+            16
+          ],
+          "texture": "#edge"
+        }
+      }
+    }
+  ]
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: containment_pen_shell_pane_up.json
+----------------------------------------------------------------------------------------------------
+{
+  "render_type": "minecraft:cutout",
+  "textures": {
+    "pane": "minecraft:block/glass",
+    "edge": "minecraft:block/glass_pane_top",
+    "particle": "minecraft:block/glass"
+  },
+  "elements": [
+    {
+      "from": [
+        0,
+        14,
+        0
+      ],
+      "to": [
+        16,
+        16,
+        16
+      ],
+      "faces": {
+        "up": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#pane"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#pane"
+        },
+        "north": {
+          "uv": [
+            0,
+            14,
+            16,
+            16
+          ],
+          "texture": "#edge"
+        },
+        "south": {
+          "uv": [
+            0,
+            14,
+            16,
+            16
+          ],
+          "texture": "#edge"
+        },
+        "west": {
+          "uv": [
+            0,
+            14,
+            16,
+            16
+          ],
+          "texture": "#edge"
+        },
+        "east": {
+          "uv": [
+            0,
+            14,
+            16,
+            16
+          ],
+          "texture": "#edge"
+        }
+      }
+    }
+  ]
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: containment_pen_shell_pane_west.json
+----------------------------------------------------------------------------------------------------
+{
+  "render_type": "minecraft:cutout",
+  "textures": {
+    "pane": "minecraft:block/glass",
+    "edge": "minecraft:block/glass_pane_top",
+    "particle": "minecraft:block/glass"
+  },
+  "elements": [
+    {
+      "from": [
+        0,
+        0,
+        0
+      ],
+      "to": [
+        2,
+        16,
+        16
+      ],
+      "faces": {
+        "west": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#pane"
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#pane"
+        },
+        "north": {
+          "uv": [
+            0,
+            0,
+            2,
+            16
+          ],
+          "texture": "#edge"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            2,
+            16
+          ],
+          "texture": "#edge"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            2,
+            16
+          ],
+          "texture": "#edge"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            2,
+            16
+          ],
+          "texture": "#edge"
+        }
+      }
+    }
+  ]
 }
 
 ----------------------------------------------------------------------------------------------------
@@ -120,7 +1354,18 @@ FILE: lab_machine.json
 {
   "parent": "minecraft:block/cube_all",
   "textures": {
-    "all": "weylandyutani:block/lab_machine"
+    "all": "biocraft_alien:block/lab_machine"
+  }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: observation_capture_terminal.json
+----------------------------------------------------------------------------------------------------
+{
+  "parent": "minecraft:block/cube_all",
+  "textures": {
+    "all": "biocraft_alien:block/observation_capture_terminal"
   }
 }
 
@@ -129,9 +1374,10 @@ FILE: lab_machine.json
 FILE: resin_block.json
 ----------------------------------------------------------------------------------------------------
 {
+  "_comment": "TODO: decide whether to switch all to resin_block_v1 (16x64 animated strip + .mcmeta) instead of this flat 16x16.",
   "parent": "minecraft:block/cube_all",
   "textures": {
-    "all": "weylandyutani:block/resin_block"
+    "all": "biocraft_alien:block/resin_block"
   }
 }
 
@@ -140,20 +1386,10 @@ FILE: resin_block.json
 FILE: specimen_glass.json
 ----------------------------------------------------------------------------------------------------
 {
+  "render_type": "minecraft:translucent",
   "parent": "minecraft:block/cube_all",
   "textures": {
-    "all": "weylandyutani:block/specimen_glass"
-  }
-}
-
-----------------------------------------------------------------------------------------------------
-
-FILE: specimen_pod_controller.json
-----------------------------------------------------------------------------------------------------
-{
-  "parent": "minecraft:block/cube_all",
-  "textures": {
-    "all": "weylandyutani:block/specimen_pod_controller"
+    "all": "biocraft_alien:block/specimen_glass"
   }
 }
 
@@ -162,33 +1398,46 @@ FILE: specimen_pod_controller.json
 FILE: spiny_block.json
 ----------------------------------------------------------------------------------------------------
 {
-  "parent": "minecraft:block/cube_all",
+  "parent": "minecraft:block/cube_bottom_top",
   "textures": {
-    "all": "weylandyutani:block/spiny_block"
+    "bottom": "biocraft_alien:block/spiny_block_top",
+    "top": "biocraft_alien:block/spiny_block_top",
+    "side": "biocraft_alien:block/spiny_block"
   }
 }
 
 ----------------------------------------------------------------------------------------------------
 
-PACKAGE: assets/weylandyutani/models/item
+PACKAGE: assets/biocraft_alien/models/item
 ====================================================================================================
+
+FILE: capture_net.json
+----------------------------------------------------------------------------------------------------
+{
+  "parent": "minecraft:item/handheld",
+  "textures": {
+    "layer0": "biocraft_alien:item/capture_net"
+  }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: chestburster_containment_pen_controller.json
+----------------------------------------------------------------------------------------------------
+{
+  "parent": "biocraft_alien:block/containment_pen_controller"
+}
+
+----------------------------------------------------------------------------------------------------
 
 FILE: chestburster_spawn_egg.json
 ----------------------------------------------------------------------------------------------------
 {
   "parent": "item/generated",
   "textures": {
-    "layer0": "weylandyutani:item/chestburster_spawn_egg",
-    "layer1": "weylandyutani:item/chestburster_spawn_egg_overlay"
+    "layer0": "biocraft_alien:item/chestburster_spawn_egg",
+    "layer1": "biocraft_alien:item/chestburster_spawn_egg_overlay"
   }
-}
-
-----------------------------------------------------------------------------------------------------
-
-FILE: chestburster_specimen_pod_controller.json
-----------------------------------------------------------------------------------------------------
-{
-  "parent": "weylandyutani:block/specimen_pod_controller"
 }
 
 ----------------------------------------------------------------------------------------------------
@@ -196,7 +1445,63 @@ FILE: chestburster_specimen_pod_controller.json
 FILE: cocoon_block.json
 ----------------------------------------------------------------------------------------------------
 {
-  "parent": "weylandyutani:block/cocoon_block"
+  "parent": "biocraft_alien:block/cocoon_block"
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: containment_pen_controller.json
+----------------------------------------------------------------------------------------------------
+{
+  "parent": "biocraft_alien:block/containment_pen_controller"
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: containment_pen_shell.json
+----------------------------------------------------------------------------------------------------
+{
+  "render_type": "minecraft:cutout",
+  "parent": "biocraft_alien:block/containment_pen_shell_pane_north"
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: containment_pen_shell_iron.json
+----------------------------------------------------------------------------------------------------
+{
+  "parent": "biocraft_alien:block/containment_pen_shell_floor_pane_down"
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: dna_vial.json
+----------------------------------------------------------------------------------------------------
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "biocraft_alien:item/dna_vial"
+  },
+  "overrides": [
+    {
+      "predicate": {
+        "biocraft_alien:filled": 1.0
+      },
+      "model": "biocraft_alien:item/dna_vial_filled"
+    }
+  ]
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: dna_vial_filled.json
+----------------------------------------------------------------------------------------------------
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "biocraft_alien:item/potion_overlay",
+    "layer1": "biocraft_alien:item/dna_vial"
+  }
 }
 
 ----------------------------------------------------------------------------------------------------
@@ -206,9 +1511,17 @@ FILE: drone_spawn_egg.json
 {
   "parent": "item/generated",
   "textures": {
-    "layer0": "weylandyutani:item/drone_spawn_egg",
-    "layer1": "weylandyutani:item/drone_spawn_egg_overlay"
+    "layer0": "biocraft_alien:item/drone_spawn_egg",
+    "layer1": "biocraft_alien:item/drone_spawn_egg_overlay"
   }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: facehugger_containment_pen_controller.json
+----------------------------------------------------------------------------------------------------
+{
+  "parent": "biocraft_alien:block/containment_pen_controller"
 }
 
 ----------------------------------------------------------------------------------------------------
@@ -218,17 +1531,9 @@ FILE: facehugger_spawn_egg.json
 {
   "parent": "item/generated",
   "textures": {
-    "layer0": "weylandyutani:item/facehugger_spawn_egg",
-    "layer1": "weylandyutani:item/facehugger_spawn_egg_overlay"
+    "layer0": "biocraft_alien:item/facehugger_spawn_egg",
+    "layer1": "biocraft_alien:item/facehugger_spawn_egg_overlay"
   }
-}
-
-----------------------------------------------------------------------------------------------------
-
-FILE: facehugger_specimen_pod_controller.json
-----------------------------------------------------------------------------------------------------
-{
-  "parent": "weylandyutani:block/specimen_pod_controller"
 }
 
 ----------------------------------------------------------------------------------------------------
@@ -238,7 +1543,8 @@ FILE: gestation_potion.json
 {
   "parent": "item/generated",
   "textures": {
-    "layer0": "weylandyutani:item/gestation_potion"
+    "layer0": "biocraft_alien:item/potion_overlay",
+    "layer1": "biocraft_alien:item/potion"
   }
 }
 
@@ -249,7 +1555,8 @@ FILE: gestation_splash_potion.json
 {
   "parent": "item/generated",
   "textures": {
-    "layer0": "weylandyutani:item/gestation_splash_potion"
+    "layer0": "biocraft_alien:item/potion_overlay",
+    "layer1": "biocraft_alien:item/splash_potion"
   }
 }
 
@@ -260,7 +1567,7 @@ FILE: growth_spawn_egg.json
 {
   "parent": "item/template_spawn_egg",
   "textures": {
-    "0": "weylandyutani:item/growth_spawn_egg"
+    "0": "biocraft_alien:item/growth_spawn_egg"
   }
 }
 
@@ -271,8 +1578,8 @@ FILE: human_spawn_egg.json
 {
   "parent": "item/generated",
   "textures": {
-    "layer0": "weylandyutani:item/human_spawn_egg",
-    "layer1": "weylandyutani:item/human_spawn_egg_overlay"
+    "layer0": "biocraft_alien:item/spawn_egg",
+    "layer1": "biocraft_alien:item/spawn_egg_overlay"
   }
 }
 
@@ -283,7 +1590,7 @@ FILE: intermediate_growth_spawn_egg.json
 {
   "parent": "item/template_spawn_egg",
   "textures": {
-    "0": "weylandyutani:item/intermediate_growth_spawn_egg"
+    "0": "biocraft_alien:item/intermediate_growth_spawn_egg"
   }
 }
 
@@ -292,7 +1599,19 @@ FILE: intermediate_growth_spawn_egg.json
 FILE: lab_machine.json
 ----------------------------------------------------------------------------------------------------
 {
-  "parent": "weylandyutani:block/lab_machine"
+  "parent": "biocraft_alien:block/lab_machine"
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: lingering_potion.json
+----------------------------------------------------------------------------------------------------
+{
+  "parent": "item/generated",
+  "textures": {
+    "layer0": "biocraft_alien:item/potion_overlay",
+    "layer1": "biocraft_alien:item/lingering_potion"
+  }
 }
 
 ----------------------------------------------------------------------------------------------------
@@ -300,10 +1619,18 @@ FILE: lab_machine.json
 FILE: motion_tracker.json
 ----------------------------------------------------------------------------------------------------
 {
-  "parent": "item/generated",
+  "parent": "minecraft:item/handheld",
   "textures": {
-    "layer0": "weylandyutani:item/motion_tracker"
+    "layer0": "biocraft_alien:item/motion_tracker"
   }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: observation_capture_terminal.json
+----------------------------------------------------------------------------------------------------
+{
+  "parent": "biocraft_alien:block/observation_capture_terminal"
 }
 
 ----------------------------------------------------------------------------------------------------
@@ -313,8 +1640,8 @@ FILE: ovomorph_spawn_egg.json
 {
   "parent": "item/generated",
   "textures": {
-    "layer0": "weylandyutani:item/ovomorph_spawn_egg",
-    "layer1": "weylandyutani:item/ovomorph_spawn_egg_overlay"
+    "layer0": "biocraft_alien:item/ovomorph_spawn_egg",
+    "layer1": "biocraft_alien:item/ovomorph_spawn_egg_overlay"
   }
 }
 
@@ -325,7 +1652,7 @@ FILE: praetor_spawn_egg.json
 {
   "parent": "item/template_spawn_egg",
   "textures": {
-    "0": "weylandyutani:item/praetor_spawn_egg"
+    "0": "biocraft_alien:item/praetor_spawn_egg"
   }
 }
 
@@ -336,8 +1663,8 @@ FILE: queen_spawn_egg.json
 {
   "parent": "item/generated",
   "textures": {
-    "layer0": "weylandyutani:item/queen_spawn_egg",
-    "layer1": "weylandyutani:item/queen_spawn_egg_overlay"
+    "layer0": "biocraft_alien:item/queen_spawn_egg",
+    "layer1": "biocraft_alien:item/queen_spawn_egg_overlay"
   }
 }
 
@@ -346,7 +1673,7 @@ FILE: queen_spawn_egg.json
 FILE: resin_block.json
 ----------------------------------------------------------------------------------------------------
 {
-  "parent": "weylandyutani:block/resin_block"
+  "parent": "biocraft_alien:block/resin_block"
 }
 
 ----------------------------------------------------------------------------------------------------
@@ -354,15 +1681,7 @@ FILE: resin_block.json
 FILE: specimen_glass.json
 ----------------------------------------------------------------------------------------------------
 {
-  "parent": "weylandyutani:block/specimen_glass"
-}
-
-----------------------------------------------------------------------------------------------------
-
-FILE: specimen_pod_controller.json
-----------------------------------------------------------------------------------------------------
-{
-  "parent": "weylandyutani:block/specimen_pod_controller"
+  "parent": "biocraft_alien:block/specimen_glass"
 }
 
 ----------------------------------------------------------------------------------------------------
@@ -370,187 +1689,12 @@ FILE: specimen_pod_controller.json
 FILE: spiny_block.json
 ----------------------------------------------------------------------------------------------------
 {
-  "parent": "weylandyutani:block/spiny_block"
+  "parent": "biocraft_alien:block/spiny_block"
 }
 
 ----------------------------------------------------------------------------------------------------
 
-PACKAGE: assets/weylandyutani/sounds
-====================================================================================================
-
-FILE: sounds.json
-----------------------------------------------------------------------------------------------------
-{
-  "entity.chestburster.ambient": {
-    "sounds": [
-      "weylandyutani:entity/chestburster/ambient1",
-      "weylandyutani:entity/chestburster/ambient2"
-    ],
-    "subtitle": "subtitles.entity.chestburster.ambient"
-  },
-  "entity.chestburster.hurt": {
-    "sounds": [
-      "weylandyutani:entity/chestburster/hurt1",
-      "weylandyutani:entity/chestburster/hurt2"
-    ],
-    "subtitle": "subtitles.entity.chestburster.hurt"
-  },
-  "entity.chestburster.death": {
-    "sounds": [
-      "weylandyutani:entity/chestburster/death"
-    ],
-    "subtitle": "subtitles.entity.chestburster.death"
-  },
-  "entity.drone.ambient": {
-    "sounds": [
-      "weylandyutani:entity/drone/ambient1",
-      "weylandyutani:entity/drone/ambient2"
-    ],
-    "subtitle": "subtitles.entity.drone.ambient"
-  },
-  "entity.drone.hurt": {
-    "sounds": [
-      "weylandyutani:entity/drone/hurt1",
-      "weylandyutani:entity/drone/hurt2"
-    ],
-    "subtitle": "subtitles.entity.drone.hurt"
-  },
-  "entity.drone.death": {
-    "sounds": [
-      "weylandyutani:entity/drone/death"
-    ],
-    "subtitle": "subtitles.entity.drone.death"
-  },
-  "entity.facehugger.ambient": {
-    "sounds": [
-      "weylandyutani:entity/facehugger/ambient1",
-      "weylandyutani:entity/facehugger/ambient2"
-    ],
-    "subtitle": "subtitles.entity.facehugger.ambient"
-  },
-  "entity.facehugger.hurt": {
-    "sounds": [
-      "weylandyutani:entity/facehugger/hurt1",
-      "weylandyutani:entity/facehugger/hurt2"
-    ],
-    "subtitle": "subtitles.entity.facehugger.hurt"
-  },
-  "entity.facehugger.death": {
-    "sounds": [
-      "weylandyutani:entity/facehugger/death"
-    ],
-    "subtitle": "subtitles.entity.facehugger.death"
-  },
-  "entity.growth.ambient": {
-    "sounds": [
-      "weylandyutani:entity/growth/ambient1",
-      "weylandyutani:entity/growth/ambient2"
-    ],
-    "subtitle": "subtitles.entity.growth.ambient"
-  },
-  "entity.growth.hurt": {
-    "sounds": [
-      "weylandyutani:entity/growth/hurt1",
-      "weylandyutani:entity/growth/hurt2"
-    ],
-    "subtitle": "subtitles.entity.growth.hurt"
-  },
-  "entity.growth.death": {
-    "sounds": [
-      "weylandyutani:entity/growth/death"
-    ],
-    "subtitle": "subtitles.entity.growth.death"
-  },
-  "entity.praetor.ambient": {
-    "sounds": [
-      "weylandyutani:entity/praetor/ambient1",
-      "weylandyutani:entity/praetor/ambient2"
-    ],
-    "subtitle": "subtitles.entity.praetor.ambient"
-  },
-  "entity.praetor.hurt": {
-    "sounds": [
-      "weylandyutani:entity/praetor/hurt1",
-      "weylandyutani:entity/praetor/hurt2"
-    ],
-    "subtitle": "subtitles.entity.praetor.hurt"
-  },
-  "entity.praetor.death": {
-    "sounds": [
-      "weylandyutani:entity/praetor/death"
-    ],
-    "subtitle": "subtitles.entity.praetor.death"
-  },
-  "entity.queen.ambient": {
-    "sounds": [
-      "weylandyutani:entity/queen/ambient1",
-      "weylandyutani:entity/queen/ambient2"
-    ],
-    "subtitle": "subtitles.entity.queen.ambient"
-  },
-  "entity.queen.hurt": {
-    "sounds": [
-      "weylandyutani:entity/queen/hurt1",
-      "weylandyutani:entity/queen/hurt2"
-    ],
-    "subtitle": "subtitles.entity.queen.hurt"
-  },
-  "entity.queen.death": {
-    "sounds": [
-      "weylandyutani:entity/queen/death"
-    ],
-    "subtitle": "subtitles.entity.queen.death"
-  },
-  "entity.ovomorph.ambient": {
-    "sounds": [
-      "weylandyutani:entity/player/ovomorph/ambient1",
-      "weylandyutani:entity/player/ovomorph/ambient2"
-    ],
-    "subtitle": "subtitles.entity.ovomorph.ambient"
-  },
-  "entity.ovomorph.hurt": {
-    "sounds": [
-      "weylandyutani:entity/player/ovomorph/hurt1",
-      "weylandyutani:entity/player/ovomorph/hurt2"
-    ],
-    "subtitle": "subtitles.entity.ovomorph.hurt"
-  },
-  "entity.ovomorph.death": {
-    "sounds": [
-      "weylandyutani:entity/player/ovomorph/death"
-    ],
-    "subtitle": "subtitles.entity.ovomorph.death"
-  },
-  "entity.ovomorph.hatch": {
-    "sounds": [
-      "weylandyutani:entity/player/ovomorph/hatch"
-    ],
-    "subtitle": "subtitles.entity.ovomorph.hatch"
-  },
-  "xenomorph.intelligence_activate": {
-    "sounds": [
-      "weylandyutani:entity/special/intelligence_activate"
-    ],
-    "subtitle": "subtitles.xenomorph.intelligence_activate"
-  },
-  "xenomorph.special_ability": {
-    "sounds": [
-      "weylandyutani:entity/special/ability1",
-      "weylandyutani:entity/special/ability2"
-    ],
-    "subtitle": "subtitles.xenomorph.special_ability"
-  },
-  "xenomorph.group_coordination": {
-    "sounds": [
-      "weylandyutani:entity/special/group_coordination"
-    ],
-    "subtitle": "subtitles.xenomorph.group_coordination"
-  }
-}
-
-----------------------------------------------------------------------------------------------------
-
-PACKAGE: assets/weylandyutani
+PACKAGE: assets/biocraft_alien
 ====================================================================================================
 
 FILE: sounds.json
@@ -577,7 +1721,7 @@ FILE: sounds.json
   },
   "entity.ovomorph.hatch": {
     "sounds": [
-      "entity/xenomorph/human/ovomorph/hatch"
+      "entity/ovomorph/hatch"
     ]
   },
   "entity.facehugger.ambient": {
@@ -705,12 +1849,63 @@ FILE: sounds.json
     "sounds": [
       "entity/human/death"
     ]
+  },
+  "xenomorph_intelligence_activate": {
+    "subtitle": "subtitles.xenomorph.intelligence_activate",
+    "sounds": [
+      "entity/special/intelligence_activate"
+    ]
+  },
+  "xenomorph_special_ability": {
+    "subtitle": "subtitles.xenomorph.special_ability",
+    "sounds": [
+      "entity/special/ability1",
+      "entity/special/ability2"
+    ]
+  },
+  "xenomorph_group_coordination": {
+    "subtitle": "subtitles.xenomorph.group_coordination",
+    "sounds": [
+      "entity/special/group_coordination"
+    ]
   }
 }
 
 ----------------------------------------------------------------------------------------------------
 
-PACKAGE: data/weylandyutani/ai_behaviors
+PACKAGE: .
+====================================================================================================
+
+FILE: biocraft_alien.json
+----------------------------------------------------------------------------------------------------
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.biocraft.alien.mixins",
+  "compatibilityLevel": "JAVA_21",
+  "refmap": "biocraft_alien.refmap.json",
+  "mixins": [],
+  "client": [],
+  "server": []
+}
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: data/biocraft_alien/ai
+====================================================================================================
+
+FILE: survival_ai.json
+----------------------------------------------------------------------------------------------------
+{
+  "escapeAttemptIntervalTicks": 5,
+  "stuckThresholdTicks": 20,
+  "suffocationLowThreshold": 0.3,
+  "suffocationCriticalThreshold": 0.1
+}
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: data/biocraft_alien/ai_behaviors
 ====================================================================================================
 
 FILE: aggressive_queen.json
@@ -872,17 +2067,6 @@ FILE: strategic_commander.json
 
 ----------------------------------------------------------------------------------------------------
 
-FILE: survival_ai.json
-----------------------------------------------------------------------------------------------------
-{
-  "escapeAttemptIntervalTicks": 5,
-  "stuckThresholdTicks": 20,
-  "suffocationLowThreshold": 0.3,
-  "suffocationCriticalThreshold": 0.1
-}
-
-----------------------------------------------------------------------------------------------------
-
 FILE: swarm_killer.json
 ----------------------------------------------------------------------------------------------------
 {
@@ -900,41 +2084,59 @@ FILE: swarm_killer.json
 
 ----------------------------------------------------------------------------------------------------
 
-PACKAGE: data/weylandyutani/blocks
+PACKAGE: data/biocraft_alien/blocks
 ====================================================================================================
 
 FILE: block_textures.json
 ----------------------------------------------------------------------------------------------------
 {
-  "_comment": "Single source of truth for block texture assets. Block configs reference keys via visual.texture_key.",
+  "_comment": "Single source of truth for block texture assets. Block configs reference keys via visual.texture_key. Lab metal blocks use biocraft_alien paths with iron PNG stand-ins until custom art is polished in place.",
   "resin_block": {
+    "_todo": "Decide whether to switch to resin_block_v1.png (16x64 animated strip + .mcmeta) vs keep current flat 16x16 resin_block.png",
     "type": "single",
-    "texture": "weylandyutani:block/resin_block",
+    "texture": "biocraft_alien:block/resin_block",
     "fallback": "minecraft:block/black_concrete"
   },
   "spiny_block": {
-    "type": "single",
-    "texture": "weylandyutani:block/spiny_block",
+    "type": "multi",
+    "texture": "biocraft_alien:block/spiny_block",
+    "sides": "biocraft_alien:block/spiny_block",
+    "top": "biocraft_alien:block/spiny_block_top",
+    "bottom": "biocraft_alien:block/spiny_block_top",
     "fallback": "minecraft:block/black_concrete"
   },
   "cocoon_block": {
     "type": "single",
-    "texture": "weylandyutani:block/cocoon_block",
+    "texture": "biocraft_alien:block/cocoon_block",
     "fallback": "minecraft:block/black_concrete"
   },
   "lab_machine": {
     "type": "single",
-    "texture": "weylandyutani:block/lab_machine",
+    "texture": "biocraft_alien:block/lab_machine",
     "fallback": "minecraft:block/iron_block"
   },
   "specimen_glass": {
     "type": "single",
-    "texture": "weylandyutani:block/specimen_glass",
+    "texture": "biocraft_alien:block/specimen_glass",
     "fallback": "minecraft:block/glass"
   },
-  "specimen_pod_controller": {
+  "containment_pen_controller": {
+    "type": "multi",
+    "texture": "biocraft_alien:block/containment_pen_controller",
+    "sides": "biocraft_alien:block/containment_pen_controller",
+    "front": "biocraft_alien:block/containment_pen_controller_front",
+    "top": "biocraft_alien:block/containment_pen_controller",
+    "bottom": "biocraft_alien:block/containment_pen_controller",
+    "fallback": "minecraft:block/iron_block"
+  },
+  "containment_pen_shell_iron": {
     "type": "single",
-    "texture": "weylandyutani:block/specimen_pod_controller",
+    "texture": "biocraft_alien:block/containment_pen_shell_iron",
+    "fallback": "minecraft:block/iron_block"
+  },
+  "observation_capture_terminal": {
+    "type": "single",
+    "texture": "biocraft_alien:block/observation_capture_terminal",
     "fallback": "minecraft:block/iron_block"
   }
 }
@@ -955,6 +2157,49 @@ FILE: cocoon_block.json
 
 ----------------------------------------------------------------------------------------------------
 
+FILE: containment_pen_controller.json
+----------------------------------------------------------------------------------------------------
+{
+  "visual": {
+    "texture_key": "containment_pen_controller"
+  },
+  "gameplay": {
+    "destroy_time": 2.5,
+    "blast_resistance": 7.0,
+    "validation_interval_ticks": 100
+  }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: containment_pen_shell.json
+----------------------------------------------------------------------------------------------------
+{
+  "visual": {
+    "texture_key": "specimen_glass"
+  },
+  "gameplay": {
+    "destroy_time": 2.0,
+    "blast_resistance": 6.0
+  }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: containment_pen_shell_iron.json
+----------------------------------------------------------------------------------------------------
+{
+  "visual": {
+    "texture_key": "containment_pen_shell_iron"
+  },
+  "gameplay": {
+    "destroy_time": 5.0,
+    "blast_resistance": 6.0
+  }
+}
+
+----------------------------------------------------------------------------------------------------
+
 FILE: lab_machine.json
 ----------------------------------------------------------------------------------------------------
 {
@@ -964,6 +2209,20 @@ FILE: lab_machine.json
   "gameplay": {
     "destroy_time": 4.0,
     "blast_resistance": 12.0
+  }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: observation_capture_terminal.json
+----------------------------------------------------------------------------------------------------
+{
+  "visual": {
+    "texture_key": "observation_capture_terminal"
+  },
+  "gameplay": {
+    "destroy_time": 2.5,
+    "blast_resistance": 7.0
   }
 }
 
@@ -997,21 +2256,6 @@ FILE: specimen_glass.json
 
 ----------------------------------------------------------------------------------------------------
 
-FILE: specimen_pod_controller.json
-----------------------------------------------------------------------------------------------------
-{
-  "visual": {
-    "texture_key": "specimen_pod_controller"
-  },
-  "gameplay": {
-    "destroy_time": 2.5,
-    "blast_resistance": 7.0,
-    "validation_interval_ticks": 100
-  }
-}
-
-----------------------------------------------------------------------------------------------------
-
 FILE: spiny_block.json
 ----------------------------------------------------------------------------------------------------
 {
@@ -1026,7 +2270,7 @@ FILE: spiny_block.json
 
 ----------------------------------------------------------------------------------------------------
 
-PACKAGE: data/weylandyutani/effects
+PACKAGE: data/biocraft_alien/effects
 ====================================================================================================
 
 FILE: gestation.json
@@ -1056,12 +2300,12 @@ FILE: gestation.json
     "warning_phase": {
       "start_ticks": 200,
       "damage_interval": 40,
-      "damage_amount": 2.0,
+      "damage_amount": 0.05,
       "damage_type": "magic"
     },
     "final_phase": {
       "start_ticks": 20,
-      "damage_amount": 500.0,
+      "damage_amount": 1.0,
       "damage_type": "magic",
       "instant_kill": true
     }
@@ -1087,7 +2331,7 @@ FILE: gestation.json
 
 ----------------------------------------------------------------------------------------------------
 
-PACKAGE: data/weylandyutani/entity/human
+PACKAGE: data/biocraft_alien/entity/human
 ====================================================================================================
 
 FILE: human.json
@@ -1117,9 +2361,9 @@ FILE: human.json
     "model": "player",
     "texture": "minecraft:textures/entity/player/wide/steve.png",
     "texture_fallback": "minecraft:textures/block/black_concrete.png",
-    "ambient_sound": "weylandyutani:entity.human.ambient",
-    "hurt_sound": "weylandyutani:entity.human.hurt",
-    "death_sound": "weylandyutani:entity.human.death"
+    "ambient_sound": "biocraft_alien:entity.human.ambient",
+    "hurt_sound": "biocraft_alien:entity.human.hurt",
+    "death_sound": "biocraft_alien:entity.human.death"
   },
   "client_parameters": {
     "tracking_range": 64,
@@ -1133,6 +2377,9 @@ FILE: human.json
     }
   },
   "ai_goals": {
+    "health_threshold_for_food": 0.75,
+    "low_air_supply_threshold": 0.3,
+    "critical_air_supply_threshold": 0.15,
     "behavior_type": "standard",
     "aggression_level": 5,
     "melee_attack_speed": 1.0,
@@ -1158,7 +2405,7 @@ FILE: human.json
 
 ----------------------------------------------------------------------------------------------------
 
-PACKAGE: data/weylandyutani/entity/xenomorph/human
+PACKAGE: data/biocraft_alien/entity/xenomorph/human
 ====================================================================================================
 
 FILE: chestburster.json
@@ -1173,7 +2420,8 @@ FILE: chestburster.json
   "implantation_delay": 200,
   "lifecycle": {
     "can_mature": true,
-    "mature_to": "growth",
+    "maturation_time": 6000,
+    "mature_to": "drone",
     "stage": "juvenile"
   },
   "spawning": {
@@ -1187,11 +2435,11 @@ FILE: chestburster.json
   },
   "visual": {
     "model": "chestburster_custom",
-    "texture": "weylandyutani:textures/entity/xenomorph/human/chestburster/v1/chestburster.png",
+    "texture": "biocraft_alien:textures/entity/xenomorph/human/chestburster.png",
     "texture_fallback": "minecraft:textures/block/black_concrete.png",
-    "ambient_sound": "weylandyutani:entity.chestburster.ambient",
-    "hurt_sound": "weylandyutani:entity.chestburster.hurt",
-    "death_sound": "weylandyutani:entity.chestburster.death"
+    "ambient_sound": "biocraft_alien:entity.chestburster.ambient",
+    "hurt_sound": "biocraft_alien:entity.chestburster.hurt",
+    "death_sound": "biocraft_alien:entity.chestburster.death"
   },
   "client_parameters": {
     "tracking_range": 64,
@@ -1205,6 +2453,9 @@ FILE: chestburster.json
     }
   },
   "ai_goals": {
+    "health_threshold_for_food": 0.75,
+    "low_air_supply_threshold": 0.3,
+    "critical_air_supply_threshold": 0.15,
     "behavior_type": "escape_and_hide",
     "aggression_level": 3,
     "melee_attack_speed": 1.2,
@@ -1217,14 +2468,17 @@ FILE: chestburster.json
       "food_healing": 2.0,
       "maturation_timer_reduction": 100
     },
+    "target_selection": {
+      "avoid_all_threats": true
+    },
     "goal_priorities": {
       "survival": 0,
       "float": 1,
-      "stroll": 2,
-      "random_look": 3,
       "flee": 2,
       "hide": 3,
-      "hunt": 4
+      "hunt": 4,
+      "stroll": 5,
+      "random_look": 6
     },
     "movement": {
       "light_level_dark": 4,
@@ -1236,7 +2490,10 @@ FILE: chestburster.json
       "flee_distance": 16.0,
       "escape_speed_multiplier": 2.0,
       "movement_speed_multiplier": 1.5,
-      "safety_search_radius": 16.0
+      "safety_search_radius": 16.0,
+      "hide_search_radius": 16.0,
+      "search_attempts": 12,
+      "hide_in_dark_places": false
     }
   },
   "sound_parameters": {
@@ -1252,9 +2509,9 @@ FILE: chestburster.json
 FILE: drone.json
 ----------------------------------------------------------------------------------------------------
 {
-  "health": 20.0,
-  "speed": 0.25,
-  "damage": 2.0,
+  "health": 140.0,
+  "speed": 0.35,
+  "damage": 22.0,
   "shadow_size": 0.5,
   "follow_range": 16.0,
   "attachment_duration": 200,
@@ -1270,15 +2527,17 @@ FILE: drone.json
   },
   "entity_size": {
     "width": 0.6,
-    "height": 1.8
+    "height": 1.8,
+    "crawl_width": 0.9,
+    "crawl_height": 0.9
   },
   "visual": {
     "model": "drone_custom",
-    "texture": "weylandyutani:textures/entity/xenomorph/human/drone/v1/drone.png",
+    "texture": "biocraft_alien:textures/entity/xenomorph/human/drone.png",
     "texture_fallback": "minecraft:textures/block/black_concrete.png",
-    "ambient_sound": "weylandyutani:entity.drone.ambient",
-    "hurt_sound": "weylandyutani:entity.drone.hurt",
-    "death_sound": "weylandyutani:entity.drone.death"
+    "ambient_sound": "biocraft_alien:entity.drone.ambient",
+    "hurt_sound": "biocraft_alien:entity.drone.hurt",
+    "death_sound": "biocraft_alien:entity.drone.death"
   },
   "client_parameters": {
     "tracking_range": 64,
@@ -1292,12 +2551,15 @@ FILE: drone.json
     }
   },
   "ai_goals": {
+    "health_threshold_for_food": 0.75,
+    "low_air_supply_threshold": 0.3,
+    "critical_air_supply_threshold": 0.15,
     "behavior_type": "swarm_killer",
     "aggression_level": 7,
     "melee_attack_speed": 1.0,
     "look_at_player_range": 8.0,
     "stroll_speed": 1.0,
-    "attack_knockback": 0.5,
+    "attack_knockback": 1.0,
     "special_abilities": {
       "patrol_interval": 100,
       "swarm_stroll_speed_multiplier": 1.5,
@@ -1305,7 +2567,8 @@ FILE: drone.json
     },
     "goal_priorities": {
       "survival": 0,
-      "patrol": 3,
+      "avoid_hosts": 1,
+      "patrol": 4,
       "float": 1,
       "stroll": 3,
       "swarm": 2,
@@ -1363,11 +2626,11 @@ FILE: facehugger.json
   },
   "visual": {
     "model": "facehugger_custom",
-    "texture": "weylandyutani:textures/entity/xenomorph/human/facehugger/v1/facehugger.png",
+    "texture": "biocraft_alien:textures/entity/xenomorph/human/facehugger.png",
     "texture_fallback": "minecraft:textures/block/black_concrete.png",
-    "ambient_sound": "weylandyutani:entity.facehugger.ambient",
-    "hurt_sound": "weylandyutani:entity.facehugger.hurt",
-    "death_sound": "weylandyutani:entity.facehugger.death"
+    "ambient_sound": "biocraft_alien:entity.facehugger.ambient",
+    "hurt_sound": "biocraft_alien:entity.facehugger.hurt",
+    "death_sound": "biocraft_alien:entity.facehugger.death"
   },
   "client_parameters": {
     "tracking_range": 64,
@@ -1381,19 +2644,15 @@ FILE: facehugger.json
     }
   },
   "ai_goals": {
+    "health_threshold_for_food": 0.75,
+    "low_air_supply_threshold": 0.3,
+    "critical_air_supply_threshold": 0.15,
     "behavior_type": "stealthy_hunter",
     "aggression_level": 5,
     "melee_attack_speed": 1.0,
     "look_at_player_range": 32.0,
     "stroll_speed": 1.0,
     "attack_knockback": 0.0,
-    "basic_movement": {
-      "stroll_speed": 1.0,
-      "look_at_player_range": 32.0,
-      "float_priority": 1,
-      "stroll_priority": 3,
-      "look_priority": 4
-    },
     "goal_priorities": {
       "float": 1,
       "attachment": 2,
@@ -1422,9 +2681,23 @@ FILE: facehugger.json
     "look_angle": 30.0,
     "face_height_multiplier": 0.8,
     "rotation_offset": 180.0,
-    "spent_wander_ticks": 100,
+    "spent_wander_ticks": 200,
     "death_animation_ticks": 40,
     "effect_refresh_ticks": 20,
+    "attachment_conditions": [
+      "disable_attacking",
+      "disable_movement",
+      "disable_looking",
+      "disable_jumping",
+      "disable_sprinting",
+      "disable_swimming",
+      "disable_flying",
+      "disable_riding",
+      "disable_using_items",
+      "disable_breaking_blocks",
+      "disable_placing_blocks",
+      "disable_interacting"
+    ],
     "paralysis": {
       "disable_attacking": true,
       "disable_movement": true,
@@ -1462,6 +2735,7 @@ FILE: growth.json
   "implantation_delay": 200,
   "lifecycle": {
     "can_mature": true,
+    "maturation_time": 6000,
     "mature_to": "drone",
     "stage": "growth"
   },
@@ -1475,12 +2749,12 @@ FILE: growth.json
     "height": 1.2
   },
   "visual": {
-    "model": "growth_custom",
-    "texture": "weylandyutani:textures/entity/xenomorph/human/growth/v1/growth.png",
+    "model": "chestburster_custom",
+    "texture": "biocraft_alien:textures/entity/xenomorph/human/chestburster.png",
     "texture_fallback": "minecraft:textures/block/black_concrete.png",
-    "ambient_sound": "weylandyutani:entity.growth.ambient",
-    "hurt_sound": "weylandyutani:entity.growth.hurt",
-    "death_sound": "weylandyutani:entity.growth.death"
+    "ambient_sound": "biocraft_alien:entity.growth.ambient",
+    "hurt_sound": "biocraft_alien:entity.growth.hurt",
+    "death_sound": "biocraft_alien:entity.growth.death"
   },
   "client_parameters": {
     "tracking_range": 64,
@@ -1494,6 +2768,9 @@ FILE: growth.json
     }
   },
   "ai_goals": {
+    "health_threshold_for_food": 0.75,
+    "low_air_supply_threshold": 0.3,
+    "critical_air_supply_threshold": 0.15,
     "behavior_type": "passive_development",
     "aggression_level": 2,
     "melee_attack_speed": 0.8,
@@ -1581,11 +2858,11 @@ FILE: ovomorph.json
   },
   "visual": {
     "model": "ovomorph_custom",
-    "texture": "weylandyutani:textures/entity/xenomorph/human/ovomorph/v1/ovomorph.png",
+    "texture": "biocraft_alien:textures/entity/xenomorph/human/ovomorph.png",
     "texture_fallback": "minecraft:textures/block/black_concrete.png",
-    "ambient_sound": "weylandyutani:entity.ovomorph.ambient",
-    "hurt_sound": "weylandyutani:entity.ovomorph.hurt",
-    "death_sound": "weylandyutani:entity.ovomorph.death"
+    "ambient_sound": "biocraft_alien:entity.ovomorph.ambient",
+    "hurt_sound": "biocraft_alien:entity.ovomorph.hurt",
+    "death_sound": "biocraft_alien:entity.ovomorph.death"
   },
   "client_parameters": {
     "tracking_range": 8,
@@ -1599,16 +2876,19 @@ FILE: ovomorph.json
     }
   },
   "hatching": {
-    "hatch_time": 600,
+    "hatch_time": 300,
     "proximity_required": true,
     "proximity_distance": 8.0,
     "spawn_entity": "facehugger",
-    "hatch_sound": "weylandyutani:entity.ovomorph.hatch",
+    "hatch_sound": "biocraft_alien:entity.ovomorph.hatch",
     "spawn_offset_x": 0.0,
     "spawn_offset_y": 0.5,
     "spawn_offset_z": 0.0
   },
   "ai_goals": {
+    "health_threshold_for_food": 0.75,
+    "low_air_supply_threshold": 0.3,
+    "critical_air_supply_threshold": 0.15,
     "behavior_type": "patient_egg",
     "aggression_level": 0,
     "melee_attack_speed": 0.0,
@@ -1668,11 +2948,11 @@ FILE: praetor.json
   },
   "visual": {
     "model": "praetor_custom",
-    "texture": "weylandyutani:textures/entity/xenomorph/human/praetor/v1/praetor.png",
+    "texture": "biocraft_alien:textures/entity/xenomorph/human/praetor.png",
     "texture_fallback": "minecraft:textures/block/black_concrete.png",
-    "ambient_sound": "weylandyutani:entity.praetor.ambient",
-    "hurt_sound": "weylandyutani:entity.praetor.hurt",
-    "death_sound": "weylandyutani:entity.praetor.death"
+    "ambient_sound": "biocraft_alien:entity.praetor.ambient",
+    "hurt_sound": "biocraft_alien:entity.praetor.hurt",
+    "death_sound": "biocraft_alien:entity.praetor.death"
   },
   "client_parameters": {
     "tracking_range": 64,
@@ -1686,6 +2966,9 @@ FILE: praetor.json
     }
   },
   "ai_goals": {
+    "health_threshold_for_food": 0.75,
+    "low_air_supply_threshold": 0.3,
+    "critical_air_supply_threshold": 0.15,
     "behavior_type": "strategic_commander",
     "aggression_level": 6,
     "melee_attack_speed": 0.8,
@@ -1728,9 +3011,9 @@ FILE: praetor.json
 FILE: queen.json
 ----------------------------------------------------------------------------------------------------
 {
-  "health": 100.0,
-  "speed": 0.2,
-  "damage": 6.0,
+  "health": 220.0,
+  "speed": 0.24,
+  "damage": 28.0,
   "shadow_size": 1.0,
   "follow_range": 32.0,
   "attachment_duration": 200,
@@ -1745,16 +3028,19 @@ FILE: queen.json
     "max_group_size": 1
   },
   "entity_size": {
-    "width": 1.2,
-    "height": 3.0
+    "width": 2.0,
+    "height": 3.6,
+    "crawl_width": 2.4,
+    "crawl_height": 1.6,
+    "scale": 2.0
   },
   "visual": {
     "model": "queen_custom",
-    "texture": "weylandyutani:textures/entity/xenomorph/human/queen/v1/queen.png",
+    "texture": "biocraft_alien:textures/entity/xenomorph/human/queen.png",
     "texture_fallback": "minecraft:textures/block/black_concrete.png",
-    "ambient_sound": "weylandyutani:entity.queen.ambient",
-    "hurt_sound": "weylandyutani:entity.queen.hurt",
-    "death_sound": "weylandyutani:entity.queen.death"
+    "ambient_sound": "biocraft_alien:entity.queen.ambient",
+    "hurt_sound": "biocraft_alien:entity.queen.hurt",
+    "death_sound": "biocraft_alien:entity.queen.death"
   },
   "client_parameters": {
     "tracking_range": 64,
@@ -1772,6 +3058,9 @@ FILE: queen.json
     "nest_radius": 16
   },
   "ai_goals": {
+    "health_threshold_for_food": 0.75,
+    "low_air_supply_threshold": 0.3,
+    "critical_air_supply_threshold": 0.15,
     "behavior_type": "hive_mother",
     "aggression_level": 8,
     "melee_attack_speed": 1.0,
@@ -1784,7 +3073,7 @@ FILE: queen.json
       "min_distance_between_eggs": 5,
       "max_eggs_per_chunk": 4,
       "egg_search_radius": 16,
-      "egg_placement_radius": 2,
+      "egg_placement_radius": 4,
       "max_eggs_in_area": 10,
       "vertical_search_range": 5,
       "nest_building_phases": 5,
@@ -1799,14 +3088,15 @@ FILE: queen.json
     },
     "goal_priorities": {
       "survival": 0,
-      "nest": 1,
-      "avoidance": 2,
-      "wander_near_nest": 3,
       "float": 1,
+      "avoid_hosts": 2,
       "melee": 2,
-      "stroll": 3,
-      "look": 4,
-      "random_look": 5,
+      "nest": 3,
+      "avoidance": 4,
+      "wander_near_nest": 5,
+      "stroll": 6,
+      "look": 7,
+      "random_look": 8,
       "hurt_by_target": 1,
       "target_player": 2,
       "target_villager": 3,
@@ -1834,69 +3124,15 @@ FILE: queen.json
 
 ----------------------------------------------------------------------------------------------------
 
-PACKAGE: data/weylandyutani/entity/xenomorph/mob-based/aggressive
-====================================================================================================
-
-FILE: creeper.json
-----------------------------------------------------------------------------------------------------
-{
-  "variant_id": "creeper",
-  "host_type": "organic",
-  "description": "Aggressive creeper species variant",
-  "health_multiplier": 1.2,
-  "speed_multiplier": 0.9,
-  "damage_multiplier": 1.5,
-  "infection_spread": true,
-  "aggression_bonus": 1.3,
-  "surface_biomes": true
-}
-
-----------------------------------------------------------------------------------------------------
-
-FILE: spider.json
-----------------------------------------------------------------------------------------------------
-{
-  "variant_id": "spider",
-  "host_type": "organic",
-  "description": "Aggressive spider species variant",
-  "health_multiplier": 1.0,
-  "speed_multiplier": 1.1,
-  "damage_multiplier": 1.0,
-  "climbing_ability": true,
-  "web_abilities": true,
-  "aggression_bonus": 1.2,
-  "stealth_bonus": 1.1,
-  "nocturnal_preference": true,
-  "cave_biomes": true
-}
-
-----------------------------------------------------------------------------------------------------
-
-PACKAGE: data/weylandyutani/entity/xenomorph/mob-based/boss/construct/ender_dragon/v1
-====================================================================================================
-
-FILE: ender_dragon.json
-----------------------------------------------------------------------------------------------------
-{
-  "variant_id": "ender_dragon",
-  "host_type": "construct",
-  "description": "Ender_Dragon-hosted xenomorph variant (boss/construct catalog stub)",
-  "health_multiplier": 1.0,
-  "speed_multiplier": 1.0,
-  "damage_multiplier": 1.0
-}
-
-----------------------------------------------------------------------------------------------------
-
-PACKAGE: data/weylandyutani/entity/xenomorph/mob-based/boss/construct/warden/v1
+PACKAGE: data/biocraft_alien/entity/xenomorph/mob-based/boss/inorganic
 ====================================================================================================
 
 FILE: warden.json
 ----------------------------------------------------------------------------------------------------
 {
   "variant_id": "warden",
-  "host_type": "construct",
-  "description": "Warden-hosted xenomorph variant (boss/construct catalog stub)",
+  "host_type": "inorganic",
+  "description": "Warden-hosted xenomorph variant (boss/inorganic catalog stub)",
   "health_multiplier": 1.0,
   "speed_multiplier": 1.0,
   "damage_multiplier": 1.0
@@ -1904,30 +3140,14 @@ FILE: warden.json
 
 ----------------------------------------------------------------------------------------------------
 
-PACKAGE: data/weylandyutani/entity/xenomorph/mob-based/boss/construct/wither/v1
-====================================================================================================
-
-FILE: wither.json
-----------------------------------------------------------------------------------------------------
-{
-  "variant_id": "wither",
-  "host_type": "construct",
-  "description": "Wither-hosted xenomorph variant (boss/construct catalog stub)",
-  "health_multiplier": 1.0,
-  "speed_multiplier": 1.0,
-  "damage_multiplier": 1.0
-}
-
-----------------------------------------------------------------------------------------------------
-
-PACKAGE: data/weylandyutani/entity/xenomorph/mob-based/boss/organic/ender_dragon/v1
+PACKAGE: data/biocraft_alien/entity/xenomorph/mob-based/boss/organic
 ====================================================================================================
 
 FILE: ender_dragon.json
 ----------------------------------------------------------------------------------------------------
 {
   "variant_id": "ender_dragon",
-  "host_type": "organic",
+  "host_type": "living_biological",
   "description": "Ender_Dragon-hosted xenomorph variant (boss/organic catalog stub)",
   "health_multiplier": 1.0,
   "speed_multiplier": 1.0,
@@ -1936,71 +3156,7 @@ FILE: ender_dragon.json
 
 ----------------------------------------------------------------------------------------------------
 
-PACKAGE: data/weylandyutani/entity/xenomorph/mob-based/boss/organic/warden/v1
-====================================================================================================
-
-FILE: warden.json
-----------------------------------------------------------------------------------------------------
-{
-  "variant_id": "warden",
-  "host_type": "organic",
-  "description": "Warden-hosted xenomorph variant (boss/organic catalog stub)",
-  "health_multiplier": 1.0,
-  "speed_multiplier": 1.0,
-  "damage_multiplier": 1.0
-}
-
-----------------------------------------------------------------------------------------------------
-
-PACKAGE: data/weylandyutani/entity/xenomorph/mob-based/boss/organic/wither/v1
-====================================================================================================
-
-FILE: wither.json
-----------------------------------------------------------------------------------------------------
-{
-  "variant_id": "wither",
-  "host_type": "organic",
-  "description": "Wither-hosted xenomorph variant (boss/organic catalog stub)",
-  "health_multiplier": 1.0,
-  "speed_multiplier": 1.0,
-  "damage_multiplier": 1.0
-}
-
-----------------------------------------------------------------------------------------------------
-
-PACKAGE: data/weylandyutani/entity/xenomorph/mob-based/boss/undead/ender_dragon/v1
-====================================================================================================
-
-FILE: ender_dragon.json
-----------------------------------------------------------------------------------------------------
-{
-  "variant_id": "ender_dragon",
-  "host_type": "undead",
-  "description": "Ender_Dragon-hosted xenomorph variant (boss/undead catalog stub)",
-  "health_multiplier": 1.0,
-  "speed_multiplier": 1.0,
-  "damage_multiplier": 1.0
-}
-
-----------------------------------------------------------------------------------------------------
-
-PACKAGE: data/weylandyutani/entity/xenomorph/mob-based/boss/undead/warden/v1
-====================================================================================================
-
-FILE: warden.json
-----------------------------------------------------------------------------------------------------
-{
-  "variant_id": "warden",
-  "host_type": "undead",
-  "description": "Warden-hosted xenomorph variant (boss/undead catalog stub)",
-  "health_multiplier": 1.0,
-  "speed_multiplier": 1.0,
-  "damage_multiplier": 1.0
-}
-
-----------------------------------------------------------------------------------------------------
-
-PACKAGE: data/weylandyutani/entity/xenomorph/mob-based/boss/undead/wither/v1
+PACKAGE: data/biocraft_alien/entity/xenomorph/mob-based/boss/undead
 ====================================================================================================
 
 FILE: wither.json
@@ -2016,44 +3172,7 @@ FILE: wither.json
 
 ----------------------------------------------------------------------------------------------------
 
-PACKAGE: data/weylandyutani/entity/xenomorph/mob-based/hostile/inorganic/cave_spider/v1
-====================================================================================================
-
-FILE: cave_spider.json
-----------------------------------------------------------------------------------------------------
-{
-  "variant_id": "cave_spider",
-  "host_type": "inorganic",
-  "description": "Cave_Spider-hosted xenomorph variant (hostile/inorganic catalog stub)",
-  "health_multiplier": 1.0,
-  "speed_multiplier": 1.0,
-  "damage_multiplier": 1.0
-}
-
-----------------------------------------------------------------------------------------------------
-
-PACKAGE: data/weylandyutani/entity/xenomorph/mob-based/hostile/inorganic/creeper/v1
-====================================================================================================
-
-FILE: creeper.json
-----------------------------------------------------------------------------------------------------
-{
-  "variant_id": "creeper",
-  "host_type": "inorganic",
-  "description": "Inorganic creeper-hosted xenomorph variant",
-  "health_multiplier": 1.3,
-  "speed_multiplier": 0.85,
-  "damage_multiplier": 1.6,
-  "metal_consumption": true,
-  "construction_ability": true,
-  "infection_spread": true,
-  "aggression_bonus": 1.1,
-  "surface_biomes": true
-}
-
-----------------------------------------------------------------------------------------------------
-
-PACKAGE: data/weylandyutani/entity/xenomorph/mob-based/hostile/inorganic/magma_cube/v1
+PACKAGE: data/biocraft_alien/entity/xenomorph/mob-based/hostile/inorganic
 ====================================================================================================
 
 FILE: magma_cube.json
@@ -2069,25 +3188,6 @@ FILE: magma_cube.json
 
 ----------------------------------------------------------------------------------------------------
 
-PACKAGE: data/weylandyutani/entity/xenomorph/mob-based/hostile/inorganic/skeleton/v1
-====================================================================================================
-
-FILE: skeleton.json
-----------------------------------------------------------------------------------------------------
-{
-  "variant_id": "skeleton",
-  "host_type": "inorganic",
-  "description": "Skeleton-hosted xenomorph variant (hostile/inorganic catalog stub)",
-  "health_multiplier": 1.0,
-  "speed_multiplier": 1.0,
-  "damage_multiplier": 1.0
-}
-
-----------------------------------------------------------------------------------------------------
-
-PACKAGE: data/weylandyutani/entity/xenomorph/mob-based/hostile/inorganic/slime/v1
-====================================================================================================
-
 FILE: slime.json
 ----------------------------------------------------------------------------------------------------
 {
@@ -2101,51 +3201,14 @@ FILE: slime.json
 
 ----------------------------------------------------------------------------------------------------
 
-PACKAGE: data/weylandyutani/entity/xenomorph/mob-based/hostile/inorganic/spider/v1
-====================================================================================================
-
-FILE: spider.json
-----------------------------------------------------------------------------------------------------
-{
-  "variant_id": "spider",
-  "host_type": "inorganic",
-  "description": "Inorganic spider-hosted xenomorph variant",
-  "health_multiplier": 1.1,
-  "speed_multiplier": 1.0,
-  "damage_multiplier": 1.1,
-  "metal_consumption": true,
-  "climbing_ability": true,
-  "aggression_bonus": 1.1,
-  "stealth_bonus": 1.0,
-  "cave_biomes": true
-}
-
-----------------------------------------------------------------------------------------------------
-
-PACKAGE: data/weylandyutani/entity/xenomorph/mob-based/hostile/inorganic/zombie/v1
-====================================================================================================
-
-FILE: zombie.json
-----------------------------------------------------------------------------------------------------
-{
-  "variant_id": "zombie",
-  "host_type": "inorganic",
-  "description": "Zombie-hosted xenomorph variant (hostile/inorganic catalog stub)",
-  "health_multiplier": 1.0,
-  "speed_multiplier": 1.0,
-  "damage_multiplier": 1.0
-}
-
-----------------------------------------------------------------------------------------------------
-
-PACKAGE: data/weylandyutani/entity/xenomorph/mob-based/hostile/organic/cave_spider/v1
+PACKAGE: data/biocraft_alien/entity/xenomorph/mob-based/hostile/organic
 ====================================================================================================
 
 FILE: cave_spider.json
 ----------------------------------------------------------------------------------------------------
 {
   "variant_id": "cave_spider",
-  "host_type": "organic",
+  "host_type": "living_biological",
   "description": "Cave_Spider-hosted xenomorph variant (hostile/organic catalog stub)",
   "health_multiplier": 1.0,
   "speed_multiplier": 1.0,
@@ -2154,14 +3217,11 @@ FILE: cave_spider.json
 
 ----------------------------------------------------------------------------------------------------
 
-PACKAGE: data/weylandyutani/entity/xenomorph/mob-based/hostile/organic/creeper/v1
-====================================================================================================
-
 FILE: creeper.json
 ----------------------------------------------------------------------------------------------------
 {
   "variant_id": "creeper",
-  "host_type": "organic",
+  "host_type": "living_biological",
   "description": "Creeper-hosted xenomorph variant",
   "health_multiplier": 1.2,
   "speed_multiplier": 0.9,
@@ -2173,62 +3233,11 @@ FILE: creeper.json
 
 ----------------------------------------------------------------------------------------------------
 
-PACKAGE: data/weylandyutani/entity/xenomorph/mob-based/hostile/organic/magma_cube/v1
-====================================================================================================
-
-FILE: magma_cube.json
-----------------------------------------------------------------------------------------------------
-{
-  "variant_id": "magma_cube",
-  "host_type": "organic",
-  "description": "Magma_Cube-hosted xenomorph variant (hostile/organic catalog stub)",
-  "health_multiplier": 1.0,
-  "speed_multiplier": 1.0,
-  "damage_multiplier": 1.0
-}
-
-----------------------------------------------------------------------------------------------------
-
-PACKAGE: data/weylandyutani/entity/xenomorph/mob-based/hostile/organic/skeleton/v1
-====================================================================================================
-
-FILE: skeleton.json
-----------------------------------------------------------------------------------------------------
-{
-  "variant_id": "skeleton",
-  "host_type": "organic",
-  "description": "Skeleton-hosted xenomorph variant (hostile/organic catalog stub)",
-  "health_multiplier": 1.0,
-  "speed_multiplier": 1.0,
-  "damage_multiplier": 1.0
-}
-
-----------------------------------------------------------------------------------------------------
-
-PACKAGE: data/weylandyutani/entity/xenomorph/mob-based/hostile/organic/slime/v1
-====================================================================================================
-
-FILE: slime.json
-----------------------------------------------------------------------------------------------------
-{
-  "variant_id": "slime",
-  "host_type": "organic",
-  "description": "Slime-hosted xenomorph variant (hostile/organic catalog stub)",
-  "health_multiplier": 1.0,
-  "speed_multiplier": 1.0,
-  "damage_multiplier": 1.0
-}
-
-----------------------------------------------------------------------------------------------------
-
-PACKAGE: data/weylandyutani/entity/xenomorph/mob-based/hostile/organic/spider/v1
-====================================================================================================
-
 FILE: spider.json
 ----------------------------------------------------------------------------------------------------
 {
   "variant_id": "spider",
-  "host_type": "organic",
+  "host_type": "living_biological",
   "description": "Spider-hosted xenomorph variant",
   "health_multiplier": 1.0,
   "speed_multiplier": 1.1,
@@ -2243,75 +3252,7 @@ FILE: spider.json
 
 ----------------------------------------------------------------------------------------------------
 
-PACKAGE: data/weylandyutani/entity/xenomorph/mob-based/hostile/organic/zombie/v1
-====================================================================================================
-
-FILE: zombie.json
-----------------------------------------------------------------------------------------------------
-{
-  "variant_id": "zombie",
-  "host_type": "organic",
-  "description": "Zombie-hosted xenomorph variant (hostile/organic catalog stub)",
-  "health_multiplier": 1.0,
-  "speed_multiplier": 1.0,
-  "damage_multiplier": 1.0
-}
-
-----------------------------------------------------------------------------------------------------
-
-PACKAGE: data/weylandyutani/entity/xenomorph/mob-based/hostile/undead/cave_spider/v1
-====================================================================================================
-
-FILE: cave_spider.json
-----------------------------------------------------------------------------------------------------
-{
-  "variant_id": "cave_spider",
-  "host_type": "undead",
-  "description": "Cave_Spider-hosted xenomorph variant (hostile/undead catalog stub)",
-  "health_multiplier": 1.0,
-  "speed_multiplier": 1.0,
-  "damage_multiplier": 1.0
-}
-
-----------------------------------------------------------------------------------------------------
-
-PACKAGE: data/weylandyutani/entity/xenomorph/mob-based/hostile/undead/creeper/v1
-====================================================================================================
-
-FILE: creeper.json
-----------------------------------------------------------------------------------------------------
-{
-  "variant_id": "creeper",
-  "host_type": "undead",
-  "description": "Undead creeper-hosted xenomorph variant",
-  "health_multiplier": 1.4,
-  "speed_multiplier": 0.75,
-  "damage_multiplier": 1.4,
-  "decay_resistance": true,
-  "infection_spread": true,
-  "aggression_bonus": 1.2,
-  "surface_biomes": true
-}
-
-----------------------------------------------------------------------------------------------------
-
-PACKAGE: data/weylandyutani/entity/xenomorph/mob-based/hostile/undead/magma_cube/v1
-====================================================================================================
-
-FILE: magma_cube.json
-----------------------------------------------------------------------------------------------------
-{
-  "variant_id": "magma_cube",
-  "host_type": "undead",
-  "description": "Magma_Cube-hosted xenomorph variant (hostile/undead catalog stub)",
-  "health_multiplier": 1.0,
-  "speed_multiplier": 1.0,
-  "damage_multiplier": 1.0
-}
-
-----------------------------------------------------------------------------------------------------
-
-PACKAGE: data/weylandyutani/entity/xenomorph/mob-based/hostile/undead/skeleton/v1
+PACKAGE: data/biocraft_alien/entity/xenomorph/mob-based/hostile/undead
 ====================================================================================================
 
 FILE: skeleton.json
@@ -2327,48 +3268,6 @@ FILE: skeleton.json
 
 ----------------------------------------------------------------------------------------------------
 
-PACKAGE: data/weylandyutani/entity/xenomorph/mob-based/hostile/undead/slime/v1
-====================================================================================================
-
-FILE: slime.json
-----------------------------------------------------------------------------------------------------
-{
-  "variant_id": "slime",
-  "host_type": "undead",
-  "description": "Slime-hosted xenomorph variant (hostile/undead catalog stub)",
-  "health_multiplier": 1.0,
-  "speed_multiplier": 1.0,
-  "damage_multiplier": 1.0
-}
-
-----------------------------------------------------------------------------------------------------
-
-PACKAGE: data/weylandyutani/entity/xenomorph/mob-based/hostile/undead/spider/v1
-====================================================================================================
-
-FILE: spider.json
-----------------------------------------------------------------------------------------------------
-{
-  "variant_id": "spider",
-  "host_type": "undead",
-  "description": "Undead spider-hosted xenomorph variant",
-  "health_multiplier": 1.2,
-  "speed_multiplier": 0.95,
-  "damage_multiplier": 1.0,
-  "decay_resistance": true,
-  "climbing_ability": true,
-  "web_abilities": true,
-  "aggression_bonus": 1.2,
-  "stealth_bonus": 1.0,
-  "nocturnal_preference": true,
-  "cave_biomes": true
-}
-
-----------------------------------------------------------------------------------------------------
-
-PACKAGE: data/weylandyutani/entity/xenomorph/mob-based/hostile/undead/zombie/v1
-====================================================================================================
-
 FILE: zombie.json
 ----------------------------------------------------------------------------------------------------
 {
@@ -2382,15 +3281,15 @@ FILE: zombie.json
 
 ----------------------------------------------------------------------------------------------------
 
-PACKAGE: data/weylandyutani/entity/xenomorph/mob-based/neutral
+PACKAGE: data/biocraft_alien/entity/xenomorph/mob-based/neutral/organic
 ====================================================================================================
 
 FILE: enderman.json
 ----------------------------------------------------------------------------------------------------
 {
   "variant_id": "enderman",
-  "host_type": "organic",
-  "description": "Neutral enderman species variant",
+  "host_type": "living_biological",
+  "description": "Enderman-hosted xenomorph variant",
   "health_multiplier": 1.3,
   "speed_multiplier": 1.0,
   "damage_multiplier": 1.2,
@@ -2405,35 +3304,11 @@ FILE: enderman.json
 
 ----------------------------------------------------------------------------------------------------
 
-PACKAGE: data/weylandyutani/entity/xenomorph/mob-based/neutral/organic/enderman/v1
-====================================================================================================
-
-FILE: enderman.json
-----------------------------------------------------------------------------------------------------
-{
-  "variant_id": "enderman",
-  "host_type": "organic",
-  "description": "Enderman-hosted xenomorph variant",
-  "health_multiplier": 1.3,
-  "speed_multiplier": 1.0,
-  "damage_multiplier": 1.2,
-  "ranged_attacks": false,
-  "aggression_bonus": 1.0,
-  "stealth_bonus": 1.4,
-  "end_biomes": true,
-  "solo_spawn": true
-}
-
-----------------------------------------------------------------------------------------------------
-
-PACKAGE: data/weylandyutani/entity/xenomorph/mob-based/neutral/organic/polar_bear/v1
-====================================================================================================
-
 FILE: polar_bear.json
 ----------------------------------------------------------------------------------------------------
 {
   "variant_id": "polar_bear",
-  "host_type": "organic",
+  "host_type": "living_biological",
   "description": "Polar_Bear-hosted xenomorph variant (neutral/organic catalog stub)",
   "health_multiplier": 1.0,
   "speed_multiplier": 1.0,
@@ -2442,14 +3317,11 @@ FILE: polar_bear.json
 
 ----------------------------------------------------------------------------------------------------
 
-PACKAGE: data/weylandyutani/entity/xenomorph/mob-based/neutral/organic/wolf/v1
-====================================================================================================
-
 FILE: wolf.json
 ----------------------------------------------------------------------------------------------------
 {
   "variant_id": "wolf",
-  "host_type": "organic",
+  "host_type": "living_biological",
   "description": "Wolf-hosted xenomorph variant",
   "health_multiplier": 1.1,
   "speed_multiplier": 1.2,
@@ -2463,35 +3335,14 @@ FILE: wolf.json
 
 ----------------------------------------------------------------------------------------------------
 
-PACKAGE: data/weylandyutani/entity/xenomorph/mob-based/neutral
-====================================================================================================
-
-FILE: wolf.json
-----------------------------------------------------------------------------------------------------
-{
-  "variant_id": "wolf",
-  "host_type": "organic",
-  "description": "Neutral wolf species variant",
-  "health_multiplier": 1.1,
-  "speed_multiplier": 1.2,
-  "damage_multiplier": 1.0,
-  "pack_behavior": true,
-  "enhanced_senses": true,
-  "aggression_bonus": 1.1,
-  "pack_spawn": true,
-  "pack_size": 3
-}
-
-----------------------------------------------------------------------------------------------------
-
-PACKAGE: data/weylandyutani/entity/xenomorph/mob-based/passive/organic/chicken/v1
+PACKAGE: data/biocraft_alien/entity/xenomorph/mob-based/passive/organic
 ====================================================================================================
 
 FILE: chicken.json
 ----------------------------------------------------------------------------------------------------
 {
   "variant_id": "chicken",
-  "host_type": "organic",
+  "host_type": "living_biological",
   "description": "Chicken-hosted xenomorph variant (passive/organic catalog stub)",
   "health_multiplier": 1.0,
   "speed_multiplier": 1.0,
@@ -2500,14 +3351,11 @@ FILE: chicken.json
 
 ----------------------------------------------------------------------------------------------------
 
-PACKAGE: data/weylandyutani/entity/xenomorph/mob-based/passive/organic/cow/v1
-====================================================================================================
-
 FILE: cow.json
 ----------------------------------------------------------------------------------------------------
 {
   "variant_id": "cow",
-  "host_type": "organic",
+  "host_type": "living_biological",
   "description": "Cow-hosted xenomorph variant (passive/organic catalog stub)",
   "health_multiplier": 1.0,
   "speed_multiplier": 1.0,
@@ -2516,14 +3364,11 @@ FILE: cow.json
 
 ----------------------------------------------------------------------------------------------------
 
-PACKAGE: data/weylandyutani/entity/xenomorph/mob-based/passive/organic/pig/v1
-====================================================================================================
-
 FILE: pig.json
 ----------------------------------------------------------------------------------------------------
 {
   "variant_id": "pig",
-  "host_type": "organic",
+  "host_type": "living_biological",
   "description": "Pig-hosted xenomorph variant (passive/organic catalog stub)",
   "health_multiplier": 1.0,
   "speed_multiplier": 1.0,
@@ -2532,23 +3377,7 @@ FILE: pig.json
 
 ----------------------------------------------------------------------------------------------------
 
-PACKAGE: data/weylandyutani/entity/xenomorph/mob-based/utility/construct/allay/v1
-====================================================================================================
-
-FILE: allay.json
-----------------------------------------------------------------------------------------------------
-{
-  "variant_id": "allay",
-  "host_type": "construct",
-  "description": "Allay-hosted xenomorph variant (utility/construct catalog stub)",
-  "health_multiplier": 1.0,
-  "speed_multiplier": 1.0,
-  "damage_multiplier": 1.0
-}
-
-----------------------------------------------------------------------------------------------------
-
-PACKAGE: data/weylandyutani/entity/xenomorph/mob-based/utility/construct/iron_golem/v1
+PACKAGE: data/biocraft_alien/entity/xenomorph/mob-based/utility/construct
 ====================================================================================================
 
 FILE: iron_golem.json
@@ -2564,9 +3393,6 @@ FILE: iron_golem.json
 
 ----------------------------------------------------------------------------------------------------
 
-PACKAGE: data/weylandyutani/entity/xenomorph/mob-based/utility/construct/snow_golem/v1
-====================================================================================================
-
 FILE: snow_golem.json
 ----------------------------------------------------------------------------------------------------
 {
@@ -2580,23 +3406,7 @@ FILE: snow_golem.json
 
 ----------------------------------------------------------------------------------------------------
 
-PACKAGE: data/weylandyutani/entity/xenomorph/mob-based/utility/construct/vex/v1
-====================================================================================================
-
-FILE: vex.json
-----------------------------------------------------------------------------------------------------
-{
-  "variant_id": "vex",
-  "host_type": "construct",
-  "description": "Vex-hosted xenomorph variant (utility/construct catalog stub)",
-  "health_multiplier": 1.0,
-  "speed_multiplier": 1.0,
-  "damage_multiplier": 1.0
-}
-
-----------------------------------------------------------------------------------------------------
-
-PACKAGE: data/weylandyutani/entity/xenomorph/mob-based/utility/spiritual/allay/v1
+PACKAGE: data/biocraft_alien/entity/xenomorph/mob-based/utility/spiritual
 ====================================================================================================
 
 FILE: allay.json
@@ -2612,41 +3422,6 @@ FILE: allay.json
 
 ----------------------------------------------------------------------------------------------------
 
-PACKAGE: data/weylandyutani/entity/xenomorph/mob-based/utility/spiritual/iron_golem/v1
-====================================================================================================
-
-FILE: iron_golem.json
-----------------------------------------------------------------------------------------------------
-{
-  "variant_id": "iron_golem",
-  "host_type": "spiritual",
-  "description": "Iron_Golem-hosted xenomorph variant (utility/spiritual catalog stub)",
-  "health_multiplier": 1.0,
-  "speed_multiplier": 1.0,
-  "damage_multiplier": 1.0
-}
-
-----------------------------------------------------------------------------------------------------
-
-PACKAGE: data/weylandyutani/entity/xenomorph/mob-based/utility/spiritual/snow_golem/v1
-====================================================================================================
-
-FILE: snow_golem.json
-----------------------------------------------------------------------------------------------------
-{
-  "variant_id": "snow_golem",
-  "host_type": "spiritual",
-  "description": "Snow_Golem-hosted xenomorph variant (utility/spiritual catalog stub)",
-  "health_multiplier": 1.0,
-  "speed_multiplier": 1.0,
-  "damage_multiplier": 1.0
-}
-
-----------------------------------------------------------------------------------------------------
-
-PACKAGE: data/weylandyutani/entity/xenomorph/mob-based/utility/spiritual/vex/v1
-====================================================================================================
-
 FILE: vex.json
 ----------------------------------------------------------------------------------------------------
 {
@@ -2660,7 +3435,7 @@ FILE: vex.json
 
 ----------------------------------------------------------------------------------------------------
 
-PACKAGE: data/weylandyutani/items
+PACKAGE: data/biocraft_alien/items
 ====================================================================================================
 
 FILE: motion_tracker.json
@@ -2668,12 +3443,207 @@ FILE: motion_tracker.json
 {
   "detection_radius": 32,
   "cooldown_ticks": 40,
-  "max_entities_to_report": 5
+  "max_entities_to_report": 5,
+  "alert_tone_entity_threshold": 2,
+  "ignore_players": true,
+  "ignore_friendly_mobs": true,
+  "ignore_armor_stands": true,
+  "ignore_spectators": true,
+  "report_still": false
 }
 
 ----------------------------------------------------------------------------------------------------
 
-PACKAGE: data/weylandyutani/systems
+PACKAGE: data/biocraft_alien/parasite/host_effects
+====================================================================================================
+
+FILE: baseline_biological.json
+----------------------------------------------------------------------------------------------------
+{
+  "profile_id": "baseline_biological",
+  "display_name": "Baseline Biological",
+  "description": "Shared attachment-time effects for living biological hosts",
+  "host_effects": {
+    "requires_player_specific_effects": true,
+    "can_be_immobilized": true,
+    "visual_effects": [
+      {
+        "effect": "blindness",
+        "duration": 20,
+        "amplifier": 0,
+        "show_particles": true,
+        "description": "Visual impairment"
+      },
+      {
+        "effect": "weakness",
+        "duration": 20,
+        "amplifier": 4,
+        "show_particles": true,
+        "description": "Prevent fighting back"
+      },
+      {
+        "effect": "hunger",
+        "duration": 20,
+        "amplifier": 2,
+        "show_particles": true,
+        "description": "Show distress"
+      }
+    ],
+    "movement_effects": [
+      {
+        "effect": "movement_slowdown",
+        "duration": 20,
+        "amplifier": 4,
+        "show_particles": true,
+        "description": "Immobilize host"
+      }
+    ]
+  }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: construct.json
+----------------------------------------------------------------------------------------------------
+{
+  "profile_id": "construct",
+  "display_name": "Construct",
+  "description": "Minimal attachment-time effects for unusual construct hosts",
+  "host_effects": {
+    "requires_player_specific_effects": false,
+    "can_be_immobilized": false,
+    "visual_effects": [
+      {
+        "effect": "weakness",
+        "duration": 20,
+        "amplifier": 2,
+        "show_particles": true,
+        "description": "Minimal weakness"
+      }
+    ],
+    "movement_effects": [
+      {
+        "effect": "movement_slowdown",
+        "duration": 20,
+        "amplifier": 2,
+        "show_particles": true,
+        "description": "Minimal slowdown"
+      }
+    ]
+  }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: elemental.json
+----------------------------------------------------------------------------------------------------
+{
+  "profile_id": "elemental",
+  "display_name": "Elemental",
+  "description": "No attachment-time effects; elemental hosts are lifecycle-incompatible",
+  "host_effects": {
+    "requires_player_specific_effects": false,
+    "can_be_immobilized": false,
+    "visual_effects": [],
+    "movement_effects": []
+  }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: inorganic.json
+----------------------------------------------------------------------------------------------------
+{
+  "profile_id": "inorganic",
+  "display_name": "Inorganic",
+  "description": "No attachment-time effects; inorganic hosts are lifecycle-incompatible",
+  "host_effects": {
+    "requires_player_specific_effects": false,
+    "can_be_immobilized": false,
+    "visual_effects": [],
+    "movement_effects": []
+  }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: spiritual.json
+----------------------------------------------------------------------------------------------------
+{
+  "profile_id": "spiritual",
+  "display_name": "Spiritual",
+  "description": "No attachment-time effects; spiritual hosts are lifecycle-incompatible",
+  "host_effects": {
+    "requires_player_specific_effects": false,
+    "can_be_immobilized": false,
+    "visual_effects": [],
+    "movement_effects": []
+  }
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: undead.json
+----------------------------------------------------------------------------------------------------
+{
+  "profile_id": "undead",
+  "display_name": "Undead",
+  "description": "Attachment-time effects reserved for future undead-compatible parasites",
+  "host_effects": {
+    "requires_player_specific_effects": true,
+    "can_be_immobilized": true,
+    "visual_effects": [
+      {
+        "effect": "blindness",
+        "duration": 20,
+        "amplifier": 0,
+        "show_particles": true,
+        "description": "Visual impairment"
+      },
+      {
+        "effect": "weakness",
+        "duration": 20,
+        "amplifier": 6,
+        "show_particles": true,
+        "description": "Enhanced weakness for undead"
+      },
+      {
+        "effect": "hunger",
+        "duration": 20,
+        "amplifier": 3,
+        "show_particles": true,
+        "description": "Enhanced distress"
+      },
+      {
+        "effect": "poison",
+        "duration": 20,
+        "amplifier": 1,
+        "show_particles": true,
+        "description": "Tissue decay resistance"
+      }
+    ],
+    "movement_effects": [
+      {
+        "effect": "movement_slowdown",
+        "duration": 20,
+        "amplifier": 6,
+        "show_particles": true,
+        "description": "Enhanced immobilization"
+      },
+      {
+        "effect": "dig_slowdown",
+        "duration": 20,
+        "amplifier": 4,
+        "show_particles": true,
+        "description": "Prevent digging"
+      }
+    ]
+  }
+}
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: data/biocraft_alien/systems
 ====================================================================================================
 
 FILE: combat.json
@@ -2711,19 +3681,24 @@ FILE: entity_block_interaction.json
   },
   "entities": {
     "chestburster": {
-      "can_break_blocks": false
+      "can_break_blocks": false,
+      "break_scope": "whitelist"
     },
     "growth": {
-      "can_break_blocks": false
+      "can_break_blocks": false,
+      "break_scope": "whitelist"
     },
     "drone": {
-      "can_break_blocks": true
+      "can_break_blocks": true,
+      "break_scope": "whitelist"
     },
     "praetor": {
-      "can_break_blocks": true
+      "can_break_blocks": true,
+      "break_scope": "whitelist"
     },
     "queen": {
-      "can_break_blocks": true
+      "can_break_blocks": true,
+      "break_scope": "all_except_unbreakable"
     }
   },
   "damage": {
@@ -2735,221 +3710,108 @@ FILE: entity_block_interaction.json
 
 ----------------------------------------------------------------------------------------------------
 
-FILE: host_effects.json
-----------------------------------------------------------------------------------------------------
-{
-  "host_types": {
-    "living_biological": {
-      "requires_player_specific_effects": true,
-      "can_be_immobilized": true,
-      "description": "Standard facehugger attachment effects for living biological hosts",
-      "visual_effects": [
-        {
-          "effect": "blindness",
-          "duration": 20,
-          "amplifier": 0,
-          "show_particles": true,
-          "description": "Visual impairment"
-        },
-        {
-          "effect": "weakness",
-          "duration": 20,
-          "amplifier": 4,
-          "show_particles": true,
-          "description": "Prevent fighting back"
-        },
-        {
-          "effect": "hunger",
-          "duration": 20,
-          "amplifier": 2,
-          "show_particles": true,
-          "description": "Show distress"
-        }
-      ],
-      "movement_effects": [
-        {
-          "effect": "movement_slowdown",
-          "duration": 20,
-          "amplifier": 4,
-          "show_particles": true,
-          "description": "Immobilize host"
-        }
-      ]
-    },
-    "undead": {
-      "requires_player_specific_effects": true,
-      "can_be_immobilized": true,
-      "description": "Enhanced facehugger attachment effects for undead hosts",
-      "visual_effects": [
-        {
-          "effect": "blindness",
-          "duration": 20,
-          "amplifier": 0,
-          "show_particles": true,
-          "description": "Visual impairment"
-        },
-        {
-          "effect": "weakness",
-          "duration": 20,
-          "amplifier": 6,
-          "show_particles": true,
-          "description": "Enhanced weakness for undead"
-        },
-        {
-          "effect": "hunger",
-          "duration": 20,
-          "amplifier": 3,
-          "show_particles": true,
-          "description": "Enhanced distress"
-        },
-        {
-          "effect": "poison",
-          "duration": 20,
-          "amplifier": 1,
-          "show_particles": true,
-          "description": "Tissue decay resistance"
-        }
-      ],
-      "movement_effects": [
-        {
-          "effect": "movement_slowdown",
-          "duration": 20,
-          "amplifier": 6,
-          "show_particles": true,
-          "description": "Enhanced immobilization"
-        },
-        {
-          "effect": "dig_slowdown",
-          "duration": 20,
-          "amplifier": 4,
-          "show_particles": true,
-          "description": "Prevent digging"
-        }
-      ]
-    },
-    "construct": {
-      "requires_player_specific_effects": false,
-      "can_be_immobilized": false,
-      "description": "Minimal effects for construct hosts (unusual case)",
-      "visual_effects": [
-        {
-          "effect": "weakness",
-          "duration": 20,
-          "amplifier": 2,
-          "show_particles": true,
-          "description": "Minimal weakness"
-        }
-      ],
-      "movement_effects": [
-        {
-          "effect": "movement_slowdown",
-          "duration": 20,
-          "amplifier": 2,
-          "show_particles": true,
-          "description": "Minimal slowdown"
-        }
-      ]
-    },
-    "inorganic": {
-      "requires_player_specific_effects": false,
-      "can_be_immobilized": false,
-      "description": "No effects for inorganic hosts (should not be facehugged)",
-      "visual_effects": [],
-      "movement_effects": []
-    },
-    "elemental": {
-      "requires_player_specific_effects": false,
-      "can_be_immobilized": false,
-      "description": "No effects for elemental hosts (should not be facehugged)",
-      "visual_effects": [],
-      "movement_effects": []
-    },
-    "spiritual": {
-      "requires_player_specific_effects": false,
-      "can_be_immobilized": false,
-      "description": "No effects for spiritual hosts (should not be facehugged)",
-      "visual_effects": [],
-      "movement_effects": []
-    }
-  }
-}
-
-----------------------------------------------------------------------------------------------------
-
 FILE: hosts.json
 ----------------------------------------------------------------------------------------------------
 {
   "vanilla_hosts": {
-    "living_biological": [
-      "player",
-      "villager",
-      "pig",
-      "cow",
-      "sheep",
-      "chicken",
-      "wolf",
-      "cat",
-      "horse",
-      "donkey",
-      "mule",
-      "llama",
-      "parrot",
-      "rabbit",
-      "fox",
-      "panda",
-      "polar_bear",
-      "dolphin",
-      "squid",
-      "turtle",
-      "cod",
-      "salmon",
-      "tropical_fish",
-      "pufferfish",
-      "bat",
-      "bee",
-      "goat",
-      "axolotl",
-      "glow_squid",
-      "creeper",
-      "spider",
-      "cave_spider",
-      "enderman"
-    ],
-    "undead": [
-      "zombie",
-      "skeleton",
-      "wither_skeleton",
-      "stray",
-      "husk",
-      "drowned",
-      "phantom",
-      "wither",
-      "zombie_villager",
-      "skeleton_horse",
-      "zombie_horse"
-    ],
-    "unsuitable": {
-      "construct": [
-        "iron_golem",
-        "snow_golem",
-        "copper_golem"
-      ],
-      "inorganic": [
-        "slime",
-        "magma_cube",
-        "shulker",
-        "guardian",
-        "elder_guardian",
-        "warden"
-      ],
-      "elemental": [
-        "ghast",
-        "blaze"
-      ],
-      "spiritual": [
-        "vex",
-        "allay"
+    "living_biological": {
+      "default_dna": "baseline_biological",
+      "mobs": [
+        "player",
+        "villager",
+        "pig",
+        "cow",
+        "sheep",
+        "chicken",
+        "wolf",
+        "cat",
+        "horse",
+        "donkey",
+        "mule",
+        "llama",
+        "parrot",
+        "rabbit",
+        "fox",
+        "panda",
+        "polar_bear",
+        "dolphin",
+        "squid",
+        "turtle",
+        "cod",
+        "salmon",
+        "tropical_fish",
+        "pufferfish",
+        "bat",
+        "bee",
+        "goat",
+        "axolotl",
+        "glow_squid",
+        "creeper",
+        "spider",
+        "cave_spider",
+        "enderman"
       ]
+    },
+    "undead": {
+      "default_dna": "undead",
+      "mobs": [
+        "zombie",
+        "skeleton",
+        "wither_skeleton",
+        "stray",
+        "husk",
+        "drowned",
+        "phantom",
+        "wither",
+        "zombie_villager",
+        "skeleton_horse",
+        "zombie_horse"
+      ]
+    },
+    "unsuitable": {
+      "construct": {
+        "default_dna": "construct",
+        "mobs": [
+          "iron_golem",
+          "snow_golem",
+          "copper_golem"
+        ]
+      },
+      "inorganic": {
+        "default_dna": "inorganic",
+        "mobs": [
+          "slime",
+          "magma_cube",
+          "shulker",
+          "guardian",
+          "elder_guardian",
+          "warden"
+        ]
+      },
+      "elemental": {
+        "default_dna": "elemental",
+        "mobs": [
+          "ghast",
+          "blaze"
+        ]
+      },
+      "spiritual": {
+        "default_dna": "spiritual",
+        "mobs": [
+          "vex",
+          "allay"
+        ]
+      }
+    }
+  },
+  "modded_hosts": {
+    "biocraft_alien": {
+      "living_biological": {
+        "default_dna": "baseline_biological",
+        "mobs": [
+          "human"
+        ]
+      }
     }
   },
   "variant_mappings": {
@@ -2957,15 +3819,6 @@ FILE: hosts.json
     "creeper": "aggressive",
     "wolf": "neutral",
     "enderman": "neutral"
-  },
-  "dna_mappings": {
-    "living_biological": "living_biological",
-    "undead": "undead",
-    "construct": "construct",
-    "inorganic": "inorganic",
-    "elemental": "elemental",
-    "spiritual": "spiritual",
-    "player": "player"
   }
 }
 
@@ -3015,8 +3868,27 @@ FILE: lifecycle.json
 FILE: mob_catalog.json
 ----------------------------------------------------------------------------------------------------
 {
-  "_comment": "Manifest of mob-based xenomorph configs. Missing JSON paths warn and skip.",
+  "_comment": "SSOT for mob-based xenomorph bootstrap. MobEntityConfigLoader reads bootstrap_entries.",
+  "bootstrap_entries": [
+    {
+      "folder": "hostile/organic",
+      "mob": "spider"
+    },
+    {
+      "folder": "hostile/organic",
+      "mob": "creeper"
+    },
+    {
+      "folder": "neutral/organic",
+      "mob": "wolf"
+    },
+    {
+      "folder": "neutral/organic",
+      "mob": "enderman"
+    }
+  ],
   "deep_mob_configs": {
+    "_comment": "Full temperament × material × mob matrix for content planning; bootstrap_entries is what loads at init.",
     "hostile": {
       "host_types": [
         "organic",
@@ -3077,17 +3949,6 @@ FILE: mob_catalog.json
         "warden"
       ]
     }
-  },
-  "species_variants": {
-    "aggressive": [
-      "spider",
-      "creeper"
-    ],
-    "neutral": [
-      "wolf",
-      "enderman"
-    ],
-    "passive": []
   }
 }
 
@@ -3120,19 +3981,19 @@ FILE: enumextensions.json
   "entries": [
     {
       "enum": "net/minecraft/world/damagesource/DamageEffects",
-      "name": "WEYLANDYUTANI_ACID",
+      "name": "BIOCRAFT_ALIEN_ACID",
       "constructor": "(Ljava/lang/String;Ljava/util/function/Supplier;)V",
       "parameters": [
-        "weylandyutani:acid",
+        "biocraft_alien:acid",
         null
       ]
     },
     {
       "enum": "net/minecraft/world/damagesource/DamageEffects",
-      "name": "WEYLANDYUTANI_PARASITIC",
+      "name": "BIOCRAFT_ALIEN_PARASITIC",
       "constructor": "(Ljava/lang/String;Ljava/util/function/Supplier;)V",
       "parameters": [
-        "weylandyutani:parasitic",
+        "biocraft_alien:parasitic",
         null
       ]
     }
@@ -3145,28 +4006,10 @@ FILE: feature_flags.json
 ----------------------------------------------------------------------------------------------------
 {
   "flags": [
-    "weylandyutani:experimental_growth",
-    "weylandyutani:experimental_praetor",
-    "weylandyutani:experimental_expansions"
+    "biocraft_alien:experimental_growth",
+    "biocraft_alien:experimental_praetor",
+    "biocraft_alien:experimental_expansions"
   ]
-}
-
-----------------------------------------------------------------------------------------------------
-
-PACKAGE: .
-====================================================================================================
-
-FILE: weylandyutani.mixins.json
-----------------------------------------------------------------------------------------------------
-{
-  "required": true,
-  "minVersion": "0.8",
-  "package": "com.weylandyutani.mixins",
-  "compatibilityLevel": "JAVA_21",
-  "refmap": "weylandyutani.refmap.json",
-  "mixins": [],
-  "client": [],
-  "server": []
 }
 
 ----------------------------------------------------------------------------------------------------
