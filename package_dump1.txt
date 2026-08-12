@@ -1,0 +1,1900 @@
+Root: C:\Users\mdc0431\dev\ScriptCraft-Workspace\implementations\python\python-package\scriptcraft\layers\layer_1_competition\level_1_impl\level_kaggriculture
+File type: .py
+====================================================================================================
+
+PACKAGE: layer_0_reality
+====================================================================================================
+
+FILE: __init__.py
+----------------------------------------------------------------------------------------------------
+
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: layer_0_reality/level_0
+====================================================================================================
+
+FILE: __init__.py
+----------------------------------------------------------------------------------------------------
+
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: layer_0_reality/level_0/definitions
+====================================================================================================
+
+FILE: __init__.py
+----------------------------------------------------------------------------------------------------
+
+
+----------------------------------------------------------------------------------------------------
+
+FILE: actions.py
+----------------------------------------------------------------------------------------------------
+"""
+Kaggriculture action rules.
+
+Defines the actions available to farmers, farm hands, and the market.
+This module does not execute actions or determine whether a particular
+action is currently legal.
+"""
+
+from enum import Enum
+
+
+class FarmAction(Enum):
+    NORTH = "NORTH"
+    SOUTH = "SOUTH"
+    EAST = "EAST"
+    WEST = "WEST"
+
+    PICKUP = "PICKUP"
+    DROP = "DROP"
+    PLACE = "PLACE"
+
+    PLANT = "PLANT"
+    WATER = "WATER"
+    HARVEST = "HARVEST"
+    FERTILIZE = "FERTILIZE"
+
+    FEED = "FEED"
+    COLLECT_FERTILIZER = "COLLECT_FERTILIZER"
+    CARE = "CARE"
+
+    BUILD_COOP = "BUILD_COOP"
+    BUILD_PASTURE = "BUILD_PASTURE"
+    DIG = "DIG"
+
+    PASS = "PASS"
+
+
+class MarketAction(Enum):
+    BUY_SEED = "BUY_SEED"
+    BUY_ANIMAL = "BUY_ANIMAL"
+    BUY_PRODUCT = "BUY_PRODUCT"
+    SELL = "SELL"
+    HIRE = "HIRE"
+    BUY_LAND = "BUY_LAND"
+
+----------------------------------------------------------------------------------------------------
+
+FILE: animals.py
+----------------------------------------------------------------------------------------------------
+"""
+Kaggriculture animal definitions.
+
+Defines static characteristics of animals (geese, cows, sheep) and their
+production/care requirements.
+
+---
+
+## Animal Structure Tile Observation Format
+
+In the competition observation, an animal structure (coop or pasture) appears
+as a dict with:
+
+```python
+{
+    "kind": "COOP" | "PASTURE",
+    "animal": "GOOSE" | "COW" | "SHEEP" | None,  # None if structure is empty
+    "placed_day": int,                          # in-game day animal was placed (or -1 if empty)
+    "yield_units": int,                         # unharvested product on the tile
+    "fed_today": bool,                          # reset to False at end-of-day
+    "consecutive_unfed": int,                   # 2+ at end-of-day → animal escapes
+    "cared_today": bool,                        # reset to False at end-of-day
+    "fertilizer_available": bool,               # set at end-of-day if alive; cleared by COLLECT_FERTILIZER
+    "pending_care_bonus": int,                  # banked care bonus, applied on next production
+}
+```
+
+Animals require:
+
+- A matching structure (GOOSE on coop, COW/SHEEP on pasture)
+- Daily feeding (wheat)
+- Daily care (optional, but enables care bonus accrual)
+
+If an animal is unfed for 2 consecutive days, it escapes (unrecoverable).
+
+A newly placed animal starts with consecutive_unfed = 0, so it survives its
+first day unfed.
+
+---
+
+## Production Behavior
+
+Animals produce indefinitely (unlike crops).
+
+Base production: 1 unit per scheduled production event.
+
+If watered (for ongoing crops only, not applicable to animals) and fertilized:
+production is doubled to 2 units.
+
+Care bonus is accumulated daily (if fed AND cared) and applied in full on the
+next production event, then reset.
+
+Production is capped at max_held (unharvested product on the tile cannot exceed
+this).
+
+---
+
+## Fertilizer
+
+Every surviving animal produces 1 fertilizer per day, available for collection.
+
+Fertilizer does NOT accumulate: an animal left unwatched for 5 days still yields
+only 1 fertilizer unit, not 5.
+"""
+
+from dataclasses import dataclass
+from enum import Enum
+
+
+class AnimalType(Enum):
+    GOOSE = "GOOSE"
+    COW = "COW"
+    SHEEP = "SHEEP"
+
+
+@dataclass(frozen=True)
+class AnimalDefinition:
+    """
+    Immutable definition of an animal.
+
+    production_interval is the number of days between scheduled productions.
+    """
+
+    name: str
+    purchase_cost: int
+    base_market_price: int
+    time_to_first_yield: int
+    production_interval: int
+    max_held: int
+    action_cost: int
+
+
+ANIMALS = {
+    AnimalType.GOOSE: AnimalDefinition(
+        name="Goose",
+        purchase_cost=300,
+        base_market_price=50,
+        time_to_first_yield=4,
+        production_interval=1,
+        max_held=4,
+        action_cost=1,
+    ),
+
+    AnimalType.COW: AnimalDefinition(
+        name="Cow",
+        purchase_cost=400,
+        base_market_price=160,
+        time_to_first_yield=8,
+        production_interval=2,
+        max_held=6,
+        action_cost=1,
+    ),
+
+    AnimalType.SHEEP: AnimalDefinition(
+        name="Sheep",
+        purchase_cost=500,
+        base_market_price=200,
+        time_to_first_yield=6,
+        production_interval=3,
+        max_held=6,
+        action_cost=1,
+    ),
+}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: crops.py
+----------------------------------------------------------------------------------------------------
+"""
+Kaggriculture crop definitions and crop domain rules.
+
+Crop definitions contain static characteristics of each crop.
+
+The functions in this module express crop behavior that can be answered
+without knowing anything about agents, farms, inventories, or gameplay
+adapters. They are deterministic calculations based on crop type, age,
+watering/fertilization history, and current held yield.
+
+This module is the authoritative source for all crop-related calculations,
+including yield, production scheduling, and decay.
+
+---
+
+## Plant Tile Observation Format
+
+In the competition observation, a planted tile appears as a dict with:
+
+```python
+{
+    "kind": "PLANT",
+    "crop": "WHEAT" | "CARROT" | "TOMATO" | "STRAWBERRY" | "MELON",
+    "planted_day": int,              # in-game day when seed was planted
+    "watered_today": bool,           # reset to False at end-of-day
+    "consecutive_unwatered": int,    # 2+ at end-of-day → tile becomes weed
+    "yield_units": int,              # harvestable units currently on tile
+    "max_lifespan_step": int,        # age at which decay begins (or -1 for ongoing)
+    "fertilized_until_day": int,     # last day fertilizer bonus applies (-1 if none)
+}
+```
+
+The age of a plant is `current_day - planted_day`.
+
+The bonus window for a one-time crop is defined in the CropDefinition as
+`bonus_start_day` and `bonus_end_day`.
+
+Decay begins at `decay_start_day(crop)`.
+"""
+
+from dataclasses import dataclass
+from enum import Enum
+
+
+class YieldType(Enum):
+    """The production model used by a crop."""
+
+    ONE_TIME = "one_time"
+    ONGOING = "ongoing"
+
+
+class CropType(Enum):
+    """Supported crop types."""
+
+    WHEAT = "WHEAT"
+    CARROT = "CARROT"
+    TOMATO = "TOMATO"
+    STRAWBERRY = "STRAWBERRY"
+    MELON = "MELON"
+
+
+@dataclass(frozen=True)
+class CropDefinition:
+    """
+    Immutable definition of a crop.
+
+    `time_to_max_yield` means:
+      - for one-time crops, the age at which normal watering reaches
+        the maximum harvestable yield;
+      - for ongoing crops, the age of the final scheduled production.
+
+    `bonus_start_day` and `bonus_end_day` explicitly describe the
+    watering bonus window for one-time crops. These are stored rather than
+    inferred because the README contains crop-specific windows.
+
+    For ongoing crops, `production_interval` is the number of days between
+    scheduled production events.
+    """
+
+    name: str
+    seed_cost: int
+    base_market_price: int
+
+    time_to_first_yield: int
+    time_to_max_yield: int
+    max_yield: int
+
+    action_cost: int
+    yield_per_tile_per_day: float
+
+    yield_type: YieldType
+
+    bonus_start_day: int
+    bonus_end_day: int
+
+    production_interval: int | None = None
+
+
+CROPS = {
+    CropType.WHEAT: CropDefinition(
+        name="Wheat",
+        seed_cost=10,
+        base_market_price=25,
+        time_to_first_yield=2,
+        time_to_max_yield=4,
+        max_yield=6,
+        action_cost=1,
+        yield_per_tile_per_day=0.80,
+        yield_type=YieldType.ONE_TIME,
+        bonus_start_day=2,
+        bonus_end_day=4,
+    ),
+
+    CropType.CARROT: CropDefinition(
+        name="Carrot",
+        seed_cost=20,
+        base_market_price=35,
+        time_to_first_yield=2,
+        time_to_max_yield=3,
+        max_yield=4,
+        action_cost=1,
+        yield_per_tile_per_day=0.75,
+        yield_type=YieldType.ONE_TIME,
+        bonus_start_day=2,
+        bonus_end_day=3,
+    ),
+
+    CropType.TOMATO: CropDefinition(
+        name="Tomato",
+        seed_cost=50,
+        base_market_price=60,
+        time_to_first_yield=8,
+        time_to_max_yield=11,
+        max_yield=4,
+        action_cost=1,
+        yield_per_tile_per_day=0.33,
+        yield_type=YieldType.ONGOING,
+        bonus_start_day=8,
+        bonus_end_day=11,
+        production_interval=1,
+    ),
+
+    CropType.STRAWBERRY: CropDefinition(
+        name="Strawberry",
+        seed_cost=100,
+        base_market_price=120,
+        time_to_first_yield=10,
+        time_to_max_yield=16,
+        max_yield=4,
+        action_cost=1,
+        yield_per_tile_per_day=0.24,
+        yield_type=YieldType.ONGOING,
+        bonus_start_day=10,
+        bonus_end_day=16,
+        production_interval=2,
+    ),
+
+    CropType.MELON: CropDefinition(
+        name="Melon",
+        seed_cost=80,
+        base_market_price=250,
+        time_to_first_yield=10,
+        time_to_max_yield=10,
+        max_yield=6,
+        action_cost=1,
+        yield_per_tile_per_day=0.55,
+        yield_type=YieldType.ONE_TIME,
+        bonus_start_day=6,
+        bonus_end_day=12,
+    ),
+}
+
+
+def crop_definition(crop: CropType) -> CropDefinition:
+    """Return the immutable definition for a crop."""
+    return CROPS[crop]
+
+
+def is_one_time_crop(crop: CropType) -> bool:
+    """Return whether the crop produces a single harvest."""
+    return crop_definition(crop).yield_type is YieldType.ONE_TIME
+
+
+def is_ongoing_crop(crop: CropType) -> bool:
+    """Return whether the crop produces on a recurring schedule."""
+    return crop_definition(crop).yield_type is YieldType.ONGOING
+
+
+def one_time_bonus_start_day(crop: CropType) -> int:
+    """
+    Return the first age at which watering can increase a one-time crop's yield.
+
+    The bonus window begins at the crop's stored bonus_start_day.
+    This is derived from ceil(time_to_max_yield / 2) but is stored explicitly
+    in the definition to preserve competition-specific windows.
+
+    Example: Wheat starts its bonus window at day 2.
+    """
+    definition = crop_definition(crop)
+
+    if not is_one_time_crop(crop):
+        return -1
+
+    return definition.bonus_start_day
+
+
+def one_time_bonus_end_day(crop: CropType) -> int:
+    """
+    Return the last age at which watering can increase a one-time crop's yield.
+
+    The bonus window ends at the crop's stored bonus_end_day.
+
+    Example: Wheat's bonus window ends at day 4.
+    """
+    definition = crop_definition(crop)
+
+    if not is_one_time_crop(crop):
+        return -1
+
+    return definition.bonus_end_day
+
+
+def one_time_bonus_applies(crop: CropType, age: int) -> bool:
+    """
+    Return whether a one-time crop is inside its watering bonus window.
+
+    The bonus window is defined by bonus_start_day and bonus_end_day.
+    Watering during this window increases harvestable yield.
+    """
+    definition = crop_definition(crop)
+
+    if not is_one_time_crop(crop):
+        return False
+
+    return (
+        definition.bonus_start_day
+        <= age
+        <= definition.bonus_end_day
+    )
+
+
+def one_time_watering_bonus(
+    crop: CropType,
+    age: int,
+    *,
+    fertilized: bool,
+) -> int:
+    """
+    Return the yield increment contributed by watering on a given day.
+
+    This is the bonus from a single watering action on a specific age.
+    Fertilized watering contributes two units instead of one.
+
+    Returns 0 if outside the bonus window.
+
+    Args:
+        crop: crop type
+        age: current age of the plant (0 = planting day)
+        fertilized: whether fertilizer was applied this day
+
+    Returns:
+        yield increment from this watering: 0, 1, or 2
+    """
+    if not one_time_bonus_applies(crop, age):
+        return 0
+
+    return 2 if fertilized else 1
+
+
+def one_time_yield(
+    crop: CropType,
+    *,
+    watered_days: int,
+    fertilized_watered_days: int = 0,
+) -> int:
+    """
+    Calculate total harvestable yield for a one-time crop.
+
+    Every one-time crop starts with a base of 1 unit.
+    Each day watered within the bonus window adds 1 unit.
+    Each day with both watering and fertilizer adds 2 units instead.
+
+    The result is capped at the crop's max_yield.
+
+    Args:
+        crop: crop type
+        watered_days: count of days the plant was watered (unrestricted count;
+                     only days within the bonus window contribute)
+        fertilized_watered_days: count of days with both watering and fertilizer
+                                (must be <= watered_days)
+
+    Returns:
+        total harvestable yield units, capped at max_yield
+    """
+    definition = crop_definition(crop)
+
+    if not is_one_time_crop(crop):
+        return 0
+
+    # Count only watered days within the bonus window.
+    max_bonus_days = definition.bonus_end_day - definition.bonus_start_day + 1
+    bonus_days = min(watered_days, max_bonus_days)
+
+    # Of the bonus days, some had fertilizer.
+    fertilized_days = min(fertilized_watered_days, bonus_days)
+    normal_watered_days = bonus_days - fertilized_days
+
+    # Base 1 + normal watered days (1 each) + fertilized days (2 each).
+    yield_units = (
+        1
+        + normal_watered_days
+        + (fertilized_days * 2)
+    )
+
+    return min(yield_units, definition.max_yield)
+
+
+def production_interval(crop: CropType) -> int:
+    """
+    Return the production interval for an ongoing crop in days.
+
+    One-time crops do not have a recurring production interval.
+    Returns 0 for one-time crops.
+
+    Example: Tomato produces every 1 day. Strawberry every 2 days.
+    """
+    definition = crop_definition(crop)
+
+    if not is_ongoing_crop(crop):
+        return 0
+
+    return definition.production_interval or 0
+
+
+def produces_on_day(crop: CropType, age: int) -> bool:
+    """
+    Return whether an ongoing crop has a scheduled production event on this age.
+
+    Age is measured from planting day, where planting day is age 0.
+
+    Production events are scheduled at:
+        age = time_to_first_yield + n * production_interval
+    for n = 0, 1, 2, ... until the production count reaches max_yield.
+
+    Args:
+        crop: crop type (must be ongoing)
+        age: current age of the plant
+
+    Returns:
+        True if a production event fires on this age, False otherwise
+    """
+    definition = crop_definition(crop)
+
+    if not is_ongoing_crop(crop):
+        return False
+
+    if age < definition.time_to_first_yield:
+        return False
+
+    interval = definition.production_interval
+
+    if interval is None:
+        return False
+
+    production_number = (
+        (age - definition.time_to_first_yield) // interval
+    )
+
+    return production_number < definition.max_yield
+
+
+def ongoing_production_count(crop: CropType, age: int) -> int:
+    """
+    Return the number of scheduled production events reached by this age.
+
+    This counts based on the schedule, not on whether harvested.
+    Used to determine when decay begins.
+
+    Example: Tomato with max_yield=4 and interval=1 produces at ages
+        8, 9, 10, 11 (assuming time_to_first_yield=8).
+        At age 10, production_count = 3.
+    """
+    definition = crop_definition(crop)
+
+    if not is_ongoing_crop(crop):
+        return 0
+
+    if age < definition.time_to_first_yield:
+        return 0
+
+    interval = definition.production_interval
+
+    if interval is None:
+        return 0
+
+    count = (
+        (age - definition.time_to_first_yield) // interval
+    ) + 1
+
+    return min(count, definition.max_yield)
+
+
+def ongoing_production_yield(
+    crop: CropType,
+    age: int,
+    *,
+    watered: bool,
+    fertilized: bool,
+    current_held_yield: int = 0,
+) -> int:
+    """
+    Return the actual yield added by an ongoing crop's production event.
+
+    Base production is 1 unit per event.
+    If the crop is both watered and fertilized on the production day,
+    production is doubled to 2 units.
+
+    The crop's max_held cap is respected: production is clamped so that
+    held_yield + production <= max_held.
+
+    Args:
+        crop: crop type
+        age: current age
+        watered: whether the plant was watered today
+        fertilized: whether the plant was fertilized today
+        current_held_yield: current unharvested yield on the tile
+
+    Returns:
+        yield units added from this production event (0 if no event or capped)
+    """
+    definition = crop_definition(crop)
+
+    if not produces_on_day(crop, age):
+        return 0
+
+    if current_held_yield >= definition.max_yield:
+        return 0
+
+    production = 2 if watered and fertilized else 1
+
+    return min(
+        production,
+        definition.max_yield - current_held_yield,
+    )
+
+
+def one_time_decay_start_day(crop: CropType) -> int:
+    """
+    Return the first day of decay for a one-time crop.
+
+    Decay begins one day after time_to_max_yield.
+
+    Example: Wheat has time_to_max_yield=4, so decay begins at day 5.
+    """
+    definition = crop_definition(crop)
+
+    if not is_one_time_crop(crop):
+        return -1
+
+    return definition.time_to_max_yield + 1
+
+
+def ongoing_decay_start_day(crop: CropType) -> int:
+    """
+    Return the first day of decay for an ongoing crop.
+
+    Decay begins one day after the final scheduled production event
+    (the event that would push production_count to max_yield).
+
+    Example: Tomato has time_to_first_yield=8, interval=1, max_yield=4.
+    Final production is at age 11 (8 + 3*1). Decay starts at age 12.
+    """
+    definition = crop_definition(crop)
+
+    if not is_ongoing_crop(crop):
+        return -1
+
+    interval = definition.production_interval
+
+    if interval is None:
+        return -1
+
+    final_production_day = (
+        definition.time_to_first_yield
+        + (definition.max_yield - 1) * interval
+    )
+
+    return final_production_day + 1
+
+
+def decay_start_day(crop: CropType) -> int:
+    """
+    Return the first age at which crop decay begins.
+
+    Returns -1 if decay never occurs (should not happen for valid crops).
+    """
+    if is_one_time_crop(crop):
+        return one_time_decay_start_day(crop)
+
+    return ongoing_decay_start_day(crop)
+
+
+def is_decaying(crop: CropType, age: int) -> bool:
+    """
+    Return whether a crop has reached its decay period.
+
+    Args:
+        crop: crop type
+        age: current age
+
+    Returns:
+        True if age >= decay_start_day, False otherwise
+    """
+    start_day = decay_start_day(crop)
+
+    return start_day >= 0 and age >= start_day
+
+
+def decay_reduction(
+    *,
+    turns_since_decay_start: int,
+) -> int:
+    """
+    Return the cumulative yield reduction from decay.
+
+    Yield decreases by 1 unit every other turn (every 2 turns).
+    The first reduction occurs after 2 elapsed turns.
+
+    Args:
+        turns_since_decay_start: turns elapsed since decay began (>= 0)
+
+    Returns:
+        yield units removed by decay
+    """
+    if turns_since_decay_start < 0:
+        return 0
+
+    return turns_since_decay_start // 2
+
+
+def decayed_yield(
+    current_yield: int,
+    *,
+    turns_since_decay_start: int,
+) -> int:
+    """
+    Return current yield after applying elapsed decay.
+
+    Decay removes units every other turn until yield reaches 0.
+
+    Args:
+        current_yield: the current held/harvestable yield (>= 0)
+        turns_since_decay_start: turns elapsed since decay began
+
+    Returns:
+        remaining yield after decay (>= 0)
+    """
+    if current_yield <= 0:
+        return 0
+
+    reduction = decay_reduction(
+        turns_since_decay_start=turns_since_decay_start,
+    )
+
+    return max(0, current_yield - reduction)
+
+
+def becomes_weed(current_yield: int) -> bool:
+    """
+    Return whether a decaying crop has exhausted its remaining yield.
+
+    When yield reaches 0, the tile can be replaced with a weed.
+
+    Args:
+        current_yield: the current held yield
+
+    Returns:
+        True if yield <= 0, False otherwise
+    """
+    return current_yield <= 0
+
+----------------------------------------------------------------------------------------------------
+
+FILE: game.py
+----------------------------------------------------------------------------------------------------
+"""
+Kaggriculture game definitions.
+
+Contains fixed/default values that describe the Kaggriculture game
+environment. These values are part of the competition's defined rules
+and are not agent strategy.
+"""
+
+
+# ---------------------------------------------------------------------------
+# Configuration defaults
+# ---------------------------------------------------------------------------
+#
+# These values are the default environment configuration. An episode may
+# override the configurable values through its configuration.
+#
+
+EPISODE_STEPS = 720
+
+TURNS_PER_DAY = 24
+DAYS_PER_SEASON = 30
+
+BOARD_SIZE = 10
+STARTING_MONEY = 3_000
+
+MAX_MARKET_ORDERS_PER_TURN = 10
+
+SHED_CAPACITY = 100
+
+WEED_SPAWN_CHANCE = 0.005
+
+TOWN_SHOP_UNLOCK_INTERVAL = 3
+TOWN_SHOP_SELL_INTERVAL = 4
+TOWN_CENTER_SELL_INTERVAL = 24
+
+MAX_TOWN_SHOP_INSTANCES = 8
+
+
+# ---------------------------------------------------------------------------
+# Immutable game constants
+# ---------------------------------------------------------------------------
+#
+# These values describe rules that are intrinsic to the game rather than
+# episode configuration.
+#
+
+LAND_QUADRANT_COUNT = 4
+LAND_QUADRANT_SIZE = 5
+
+LAND_PURCHASE_COSTS = (1_000, 2_000, 4_000)
+
+PRICE_FLOOR = 1
+
+MAX_CONSECUTIVE_UNWATERED_DAYS = 2
+MAX_CONSECUTIVE_UNFED_DAYS = 2
+
+ANIMAL_CARE_BONUS_INCREMENT = 1
+
+ANIMAL_FERTILIZER_PER_DAY = 1
+
+CROP_DECAY_INTERVAL_TURNS = 2
+
+FERTILIZER_DURATION_DAYS = 3
+
+----------------------------------------------------------------------------------------------------
+
+FILE: products.py
+----------------------------------------------------------------------------------------------------
+from enum import Enum
+
+class ProductType(Enum):
+    WHEAT = "WHEAT"
+    CARROT = "CARROT"
+    TOMATO = "TOMATO"
+    STRAWBERRY = "STRAWBERRY"
+    MELON = "MELON"
+    EGG = "EGG"
+    MILK = "MILK"
+    WOOL = "WOOL"
+    FERTILIZER = "FERTILIZER"
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: layer_0_reality/level_1
+====================================================================================================
+
+FILE: __init__.py
+----------------------------------------------------------------------------------------------------
+
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: layer_0_reality/level_1/definitions
+====================================================================================================
+
+FILE: __init__.py
+----------------------------------------------------------------------------------------------------
+
+
+----------------------------------------------------------------------------------------------------
+
+FILE: market.py
+----------------------------------------------------------------------------------------------------
+"""
+Kaggriculture market definitions.
+
+Contains immutable per-product market parameters.
+
+Dynamic market behavior is implemented by market rules/services elsewhere.
+This module defines the data required to calculate those rules.
+"""
+
+from dataclasses import dataclass
+from enum import Enum
+
+from ...level_0.definitions.products import ProductType
+
+
+class PriceShape(Enum):
+    """Supported market price curve shapes."""
+
+    LINEAR = "linear"
+    SQUARE = "sq"
+    SQRT = "sqrt"
+    LOG = "log"
+    LOG10 = "log10"
+
+
+@dataclass(frozen=True)
+class MarketDefinition:
+    """
+    Static parameters defining a product's dynamic market price curve.
+
+    `initial_inventory` is the equilibrium inventory I0.
+
+    `anchor_throughput` is the inventory displacement used to calibrate
+    the price curve.
+
+    The price amplitude is derived from:
+        target * base_price / f(anchor_throughput)
+
+    and therefore is intentionally not stored.
+    """
+
+    base_price: int
+    initial_inventory: int
+    anchor_throughput: int
+
+    below_shape: PriceShape
+    below_target: float
+
+    above_shape: PriceShape
+    above_target: float
+
+
+MARKET = {
+    ProductType.WHEAT: MarketDefinition(
+        base_price=25,
+        initial_inventory=10_000,
+        anchor_throughput=400,
+        below_shape=PriceShape.SQRT,
+        below_target=0.80,
+        above_shape=PriceShape.LOG,
+        above_target=0.20,
+    ),
+
+    ProductType.CARROT: MarketDefinition(
+        base_price=35,
+        initial_inventory=10_000,
+        anchor_throughput=450,
+        below_shape=PriceShape.LOG,
+        below_target=0.20,
+        above_shape=PriceShape.SQRT,
+        above_target=0.70,
+    ),
+
+    ProductType.TOMATO: MarketDefinition(
+        base_price=60,
+        initial_inventory=10_000,
+        anchor_throughput=200,
+        below_shape=PriceShape.LINEAR,
+        below_target=0.40,
+        above_shape=PriceShape.SQRT,
+        above_target=0.60,
+    ),
+
+    ProductType.STRAWBERRY: MarketDefinition(
+        base_price=120,
+        initial_inventory=10_000,
+        anchor_throughput=100,
+        below_shape=PriceShape.SQRT,
+        below_target=0.70,
+        above_shape=PriceShape.LINEAR,
+        above_target=1.60,
+    ),
+
+    ProductType.MELON: MarketDefinition(
+        base_price=250,
+        initial_inventory=10_000,
+        anchor_throughput=300,
+        below_shape=PriceShape.LOG,
+        below_target=0.20,
+        above_shape=PriceShape.SQUARE,
+        above_target=3.60,
+    ),
+
+    ProductType.EGG: MarketDefinition(
+        base_price=50,
+        initial_inventory=10_000,
+        anchor_throughput=332,
+        below_shape=PriceShape.LINEAR,
+        below_target=0.40,
+        above_shape=PriceShape.LOG,
+        above_target=0.20,
+    ),
+
+    ProductType.MILK: MarketDefinition(
+        base_price=160,
+        initial_inventory=10_000,
+        anchor_throughput=122,
+        below_shape=PriceShape.SQRT,
+        below_target=0.60,
+        above_shape=PriceShape.LINEAR,
+        above_target=1.60,
+    ),
+
+    ProductType.WOOL: MarketDefinition(
+        base_price=200,
+        initial_inventory=10_000,
+        anchor_throughput=105,
+        below_shape=PriceShape.LOG,
+        below_target=0.20,
+        above_shape=PriceShape.SQUARE,
+        above_target=3.20,
+    ),
+
+    ProductType.FERTILIZER: MarketDefinition(
+        base_price=100,
+        initial_inventory=10_000,
+        anchor_throughput=200,
+        below_shape=PriceShape.LINEAR,
+        below_target=0.40,
+        above_shape=PriceShape.LINEAR,
+        above_target=0.40,
+    ),
+}
+
+
+def market_definition(product: ProductType) -> MarketDefinition:
+    """Return the immutable market definition for a product."""
+    return MARKET[product]
+
+
+def initial_market_inventory(product: ProductType) -> int:
+    """Return the starting/equilibrium inventory for a product."""
+    return market_definition(product).initial_inventory
+
+
+def base_market_price(product: ProductType) -> int:
+    """Return the equilibrium market price for a product."""
+    return market_definition(product).base_price
+
+
+def anchor_throughput(product: ProductType) -> int:
+    """Return the market calibration throughput for a product."""
+    return market_definition(product).anchor_throughput
+
+
+def price_shape_below(product: ProductType) -> PriceShape:
+    """Return the scarcity-side price curve shape."""
+    return market_definition(product).below_shape
+
+
+def price_shape_above(product: ProductType) -> PriceShape:
+    """Return the glut-side price curve shape."""
+    return market_definition(product).above_shape
+
+
+def price_target_below(product: ProductType) -> float:
+    """Return the scarcity-side target price movement."""
+    return market_definition(product).below_target
+
+
+def price_target_above(product: ProductType) -> float:
+    """Return the glut-side target price movement."""
+    return market_definition(product).above_target
+
+----------------------------------------------------------------------------------------------------
+
+FILE: town.py
+----------------------------------------------------------------------------------------------------
+from enum import Enum
+
+from layer_1_competition.level_1_impl.level_kaggriculture.layer_0_reality.level_0.definitions.products import ProductType
+
+class TownShopType(Enum):
+    BAKERY = "BAKERY"
+    PIZZA_SHOP = "PIZZA_SHOP"
+    BRUNCH_SPOT = "BRUNCH_SPOT"
+    YARN_STORE = "YARN_STORE"
+    ICE_CREAM_SHOP = "ICE_CREAM_SHOP"
+    PET_CAFE = "PET_CAFE"
+    SMOOTHIE_SHOP = "SMOOTHIE_SHOP"
+    FARMERS_MARKET = "FARMERS_MARKET"
+
+
+SHOP_DEMAND = {
+    TownShopType.BAKERY: {
+        ProductType.EGG: 1,
+        ProductType.WHEAT: 1,
+    },
+
+    TownShopType.PIZZA_SHOP: {
+        ProductType.MILK: 1,
+        ProductType.TOMATO: 1,
+        ProductType.WHEAT: 1,
+    },
+
+    TownShopType.BRUNCH_SPOT: {
+        ProductType.EGG: 1,
+        ProductType.WHEAT: 1,
+        ProductType.STRAWBERRY: 1,
+    },
+
+    TownShopType.YARN_STORE: {
+        ProductType.WOOL: 2,
+    },
+
+    TownShopType.ICE_CREAM_SHOP: {
+        ProductType.STRAWBERRY: 1,
+        ProductType.MILK: 1,
+        ProductType.WHEAT: 1,
+    },
+
+    TownShopType.PET_CAFE: {
+        ProductType.CARROT: 2,
+    },
+
+    TownShopType.SMOOTHIE_SHOP: {
+        ProductType.STRAWBERRY: 1,
+        ProductType.MILK: 1,
+    },
+
+    TownShopType.FARMERS_MARKET: {
+        ProductType.WHEAT: 1,
+        ProductType.CARROT: 1,
+        ProductType.TOMATO: 1,
+        ProductType.STRAWBERRY: 1,
+    },
+}
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: layer_0_reality/level_1/rules
+====================================================================================================
+
+FILE: __init__.py
+----------------------------------------------------------------------------------------------------
+
+
+----------------------------------------------------------------------------------------------------
+
+FILE: animals.py
+----------------------------------------------------------------------------------------------------
+"""
+Kaggriculture animal rules.
+
+Defines animal feeding, care, production, fertilizer, and escape rules.
+"""
+
+from layer_1_competition.level_1_impl.level_kaggriculture.layer_0_reality.level_0.definitions import (
+    ANIMALS,
+    AnimalType,
+)
+
+
+def production_interval(animal: AnimalType) -> int:
+    """Return the number of days between scheduled animal yields."""
+    return ANIMALS[animal].production_interval
+
+
+def first_yield_day(animal: AnimalType) -> int:
+    """Return the age at which the animal produces its first yield."""
+    return ANIMALS[animal].time_to_first_yield
+
+
+def max_held_yield(animal: AnimalType) -> int:
+    """Return the maximum unharvested product held by the animal."""
+    return ANIMALS[animal].max_held
+
+
+def base_production_yield(animal: AnimalType) -> int:
+    """Return the base yield on a scheduled production."""
+    return 1
+
+
+def care_bonus_increment() -> int:
+    """
+    Return the amount of care bonus banked by one successful day.
+
+    A successful day is one where the animal was both fed AND cared for.
+    If the animal was unfed on a day, no bonus accrues (basic needs first).
+
+    Returns:
+        1 (one bonus unit per day of proper care)
+    """
+    return 1
+
+
+def care_bonus_accrual(fed_today: bool, cared_today: bool) -> int:
+    """
+    Return the care bonus accrued on a single day.
+
+    Care bonus accrues only if the animal was both fed and cared for.
+    If unfed, no bonus accrues regardless of care status.
+
+    Args:
+        fed_today: whether the animal was fed today
+        cared_today: whether the animal was cared for today
+
+    Returns:
+        1 if both fed and cared, 0 otherwise
+    """
+    if fed_today and cared_today:
+        return care_bonus_increment()
+    return 0
+
+
+def production_yield_with_care(
+    base_yield: int,
+    care_bonus: int,
+) -> int:
+    """
+    Return the total production yield including the care bonus.
+
+    On a scheduled production day, the animal produces its base yield
+    (1 unit by default, or 2 if watered and fertilized) plus the
+    entire accumulated care bonus.
+
+    The care bonus bank resets to 0 after this production.
+
+    Args:
+        base_yield: the base/scheduled production yield (1 or 2)
+        care_bonus: the accumulated pending_care_bonus
+
+    Returns:
+        total yield: base_yield + care_bonus
+    """
+    return base_yield + care_bonus
+
+
+def fertilizer_per_surviving_animal() -> int:
+    """
+    Return the fertilizer made available by each surviving animal daily.
+
+    Every living animal produces 1 fertilizer per day, available for
+    collection via COLLECT_FERTILIZER.
+    """
+    return 1
+
+
+def fertilizer_accumulates() -> bool:
+    """
+    Return whether uncollected fertilizer accumulates over multiple days.
+
+    In Kaggriculture, uncollected fertilizer does NOT accumulate.
+    An animal left alone for five days still yields only 1 unit of fertilizer,
+    not 5.
+    """
+    return False
+
+
+def animal_survives_first_unfed_day() -> bool:
+    """
+    Return whether a newly placed animal begins with a grace period.
+
+    When an animal is first placed on the farm, it starts with
+    consecutive_unfed = 0, meaning it survives its first day unfed.
+
+    After the first day, feeding is required every day.
+    """
+    return True
+
+
+def escape_after_consecutive_unfed_days() -> int:
+    """
+    Return the number of consecutive unfed days before animal escape.
+
+    Animals escape (unrecoverable) after 2 consecutive days without feeding.
+
+    The planting-day equivalence: just as plants planted and unwatered that
+    same day turn into weeds overnight, animals placed and unfed that same day
+    survive (consecutive_unfed starts at 0), but if unfed the next day as well,
+    they escape.
+    """
+    return 2
+
+----------------------------------------------------------------------------------------------------
+
+FILE: crops.py
+----------------------------------------------------------------------------------------------------
+"""
+Kaggriculture crop rules.
+
+Provides rule-level facts about crops and watering/fertilization behavior.
+
+Note: All yield calculations, production scheduling, and decay logic reside in
+layer_0/definitions/crops.py, which is the authoritative source.
+
+This module re-exports classification functions from definitions for convenience
+and provides rule-level predicates about bonus windows and fertilization.
+"""
+
+from layer_1_competition.level_1_impl.level_kaggriculture.layer_0_reality.level_0.definitions import (
+    CropType,
+)
+from layer_1_competition.level_1_impl.level_kaggriculture.layer_0_reality.level_0.definitions.crops import (
+    is_one_time_crop,
+    is_ongoing_crop,
+    one_time_bonus_applies,
+    one_time_watering_bonus,
+    production_interval,
+    produces_on_day,
+    ongoing_production_yield,
+)
+
+
+def one_time_watered_bonus(fertilized: bool) -> int:
+    """
+    Return the daily yield bonus for a watered one-time crop.
+
+    This is a rule-level helper that returns the bonus per day of watering
+    without needing the crop type (the bonus is the same for all one-time crops).
+
+    Fertilized crops receive 2 units of bonus per day instead of 1.
+
+    Args:
+        fertilized: whether fertilizer was applied this day
+
+    Returns:
+        bonus units: 1 or 2
+    """
+    return 2 if fertilized else 1
+
+
+def ongoing_watered_yield(fertilized: bool) -> int:
+    """
+    Return the yield of an ongoing crop on a scheduled production day.
+
+    This is a rule-level helper for the base production calculation.
+
+    Base production is 1 unit.
+    If fertilized and watered, production is doubled to 2 units.
+
+    Args:
+        fertilized: whether fertilizer was applied this day
+
+    Returns:
+        production units: 1 or 2
+    """
+    return 2 if fertilized else 1
+
+
+def ongoing_production_count(crop: CropType) -> int:
+    """
+    Return the maximum number of scheduled productions for an ongoing crop.
+
+    Args:
+        crop: crop type
+
+    Returns:
+        max production count (same as crop's max_yield)
+    """
+    from layer_1_competition.level_1_impl.level_kaggriculture.layer_0_reality.level_0.definitions.crops import (
+        crop_definition,
+    )
+
+    return crop_definition(crop).max_yield
+
+
+def one_time_decay_start_day(crop: CropType) -> int:
+    """
+    Return the day after which a one-time crop begins its decay phase.
+
+    Decay begins one day after the crop reaches its maximum yield potential.
+
+    Args:
+        crop: crop type
+
+    Returns:
+        the first day of decay (or -1 for non-one-time crops)
+    """
+    from layer_1_competition.level_1_impl.level_kaggriculture.layer_0_reality.level_0.definitions.crops import (
+        crop_definition,
+    )
+
+    if not is_one_time_crop(crop):
+        return -1
+
+    return crop_definition(crop).time_to_max_yield + 1
+
+----------------------------------------------------------------------------------------------------
+
+FILE: farming.py
+----------------------------------------------------------------------------------------------------
+"""
+Kaggriculture farming rules.
+
+Defines rules governing land, quadrants, sheds, watering, feeding,
+weeds, farm capacity, and board geometry.
+
+These functions describe game rules and geometry only. They do not
+manage farm state or mutate gameplay objects.
+"""
+
+from enum import Enum
+
+from ...level_0.definitions.game import (
+    BOARD_SIZE,
+    LAND_PURCHASE_COSTS,
+    MAX_CONSECUTIVE_UNFED_DAYS,
+    MAX_CONSECUTIVE_UNWATERED_DAYS,
+    SHED_CAPACITY,
+    WEED_SPAWN_CHANCE,
+)
+
+
+class Quadrant(Enum):
+    """The four land quadrants of a standard square farm."""
+
+    NW = "NW"
+    NE = "NE"
+    SW = "SW"
+    SE = "SE"
+
+
+QUADRANTS = (
+    Quadrant.NW,
+    Quadrant.NE,
+    Quadrant.SW,
+    Quadrant.SE,
+)
+
+INITIAL_UNLOCKED_QUADRANTS = frozenset({Quadrant.NW})
+
+
+def quadrant_size(board_size: int = BOARD_SIZE) -> int:
+    """Return the width and height of one quadrant."""
+    return board_size // 2
+
+
+def total_board_tiles(board_size: int = BOARD_SIZE) -> int:
+    """Return the total number of tiles on a player's board."""
+    return board_size * board_size
+
+
+def quadrant_tiles(board_size: int = BOARD_SIZE) -> int:
+    """Return the number of tiles in one quadrant."""
+    size = quadrant_size(board_size)
+    return size * size
+
+
+def quadrant_bounds(
+    quadrant: Quadrant,
+    board_size: int = BOARD_SIZE,
+) -> tuple[int, int, int, int]:
+    """
+    Return the inclusive/exclusive rectangular bounds of a quadrant.
+
+    The result is `(x_start, y_start, x_end, y_end)`.
+    """
+    half = quadrant_size(board_size)
+
+    if quadrant is Quadrant.NW:
+        return 0, 0, half, half
+
+    if quadrant is Quadrant.NE:
+        return half, 0, board_size, half
+
+    if quadrant is Quadrant.SW:
+        return 0, half, half, board_size
+
+    if quadrant is Quadrant.SE:
+        return half, half, board_size, board_size
+
+    raise ValueError(f"Unsupported quadrant: {quadrant!r}")
+
+
+def quadrant_for_position(
+    x: int,
+    y: int,
+    board_size: int = BOARD_SIZE,
+) -> Quadrant:
+    """Return the quadrant containing a board position."""
+    half = quadrant_size(board_size)
+
+    if not 0 <= x < board_size:
+        raise ValueError(f"x out of bounds: {x}")
+
+    if not 0 <= y < board_size:
+        raise ValueError(f"y out of bounds: {y}")
+
+    if x < half and y < half:
+        return Quadrant.NW
+
+    if x >= half and y < half:
+        return Quadrant.NE
+
+    if x < half and y >= half:
+        return Quadrant.SW
+
+    return Quadrant.SE
+
+
+def is_tile_unlocked(
+    x: int,
+    y: int,
+    unlocked_quadrants: set[Quadrant] | frozenset[Quadrant],
+    board_size: int = BOARD_SIZE,
+) -> bool:
+    """Return whether a board position belongs to unlocked land."""
+    quadrant = quadrant_for_position(x, y, board_size)
+    return quadrant in unlocked_quadrants
+
+
+def initial_unlocked_quadrants() -> frozenset[Quadrant]:
+    """Return the quadrants unlocked at the beginning of an episode."""
+    return INITIAL_UNLOCKED_QUADRANTS
+
+
+def next_land_purchase_cost(unlocked_quadrant_count: int) -> int | None:
+    """
+    Return the cost of the next land purchase.
+
+    One starting quadrant is already owned, so:
+      1 unlocked -> $1,000
+      2 unlocked -> $2,000
+      3 unlocked -> $4,000
+      4 unlocked -> no further purchase
+    """
+    if unlocked_quadrant_count < 1:
+        raise ValueError(
+            "A farm must have at least one unlocked quadrant."
+        )
+
+    purchase_index = unlocked_quadrant_count - 1
+
+    if purchase_index >= len(LAND_PURCHASE_COSTS):
+        return None
+
+    return LAND_PURCHASE_COSTS[purchase_index]
+
+
+def land_purchase_cost(unlocked_quadrant_count: int) -> int | None:
+    """Alias expressing the cost of the next land purchase."""
+    return next_land_purchase_cost(unlocked_quadrant_count)
+
+
+def all_land_unlocked(
+    unlocked_quadrant_count: int,
+) -> bool:
+    """Return whether all four farm quadrants are unlocked."""
+    return unlocked_quadrant_count >= len(QUADRANTS)
+
+
+def shed_capacity() -> int:
+    """Return the maximum number of non-seed items in the shed."""
+    return SHED_CAPACITY
+
+
+def shed_access_tiles(
+    board_size: int = BOARD_SIZE,
+) -> tuple[tuple[int, int], ...]:
+    """
+    Return the four board positions that provide shed access.
+
+    The shed itself is not a board tile. These four center positions are
+    standing positions from which shed operations may be performed.
+    """
+    half = board_size // 2
+
+    return (
+        (half - 1, half - 1),
+        (half, half - 1),
+        (half - 1, half),
+        (half, half),
+    )
+
+
+def is_shed_access_tile(
+    x: int,
+    y: int,
+    board_size: int = BOARD_SIZE,
+) -> bool:
+    """Return whether a position is orthogonally adjacent to the shed."""
+    return (x, y) in shed_access_tiles(board_size)
+
+
+def weed_spawn_chance() -> float:
+    """Return the per-tile weed spawn probability."""
+    return WEED_SPAWN_CHANCE
+
+
+def can_spawn_weed(
+    *,
+    tile_is_empty: bool,
+    tile_is_unlocked: bool,
+) -> bool:
+    """
+    Return whether a tile qualifies for weed spawning.
+
+    The random probability itself is exposed separately through
+    `weed_spawn_chance()`.
+    """
+    return tile_is_empty and tile_is_unlocked
+
+
+def plant_requires_daily_watering() -> bool:
+    """Return whether plants require daily watering."""
+    return True
+
+
+def animal_requires_daily_feeding() -> bool:
+    """Return whether animals require daily feeding."""
+    return True
+
+
+def plant_failure_after_unwatered_days() -> int:
+    """Return consecutive missed watering days before plant failure."""
+    return MAX_CONSECUTIVE_UNWATERED_DAYS
+
+
+def animal_failure_after_unfed_days() -> int:
+    """Return consecutive missed feeding days before animal escape."""
+    return MAX_CONSECUTIVE_UNFED_DAYS
+
+
+def plant_fails_after(
+    consecutive_unwatered_days: int,
+) -> bool:
+    """Return whether a plant has reached its watering failure threshold."""
+    return (
+        consecutive_unwatered_days
+        >= plant_failure_after_unwatered_days()
+    )
+
+
+def animal_fails_after(
+    consecutive_unfed_days: int,
+) -> bool:
+    """Return whether an animal has reached its feeding failure threshold."""
+    return (
+        consecutive_unfed_days
+        >= animal_failure_after_unfed_days()
+    )
+
+
+def valid_board_position(
+    x: int,
+    y: int,
+    board_size: int = BOARD_SIZE,
+) -> bool:
+    """Return whether a coordinate lies within the farm board."""
+    return 0 <= x < board_size and 0 <= y < board_size
+
+----------------------------------------------------------------------------------------------------
+
+FILE: time.py
+----------------------------------------------------------------------------------------------------
+"""
+Kaggriculture time rules.
+
+Defines the relationship between turns, days, and the season.
+These are game rules, not agent strategy.
+"""
+
+from layer_1_competition.level_1_impl.level_kaggriculture.layer_0_reality.level_0.definitions import (
+    DAYS_PER_SEASON,
+    EPISODE_STEPS,
+    TURNS_PER_DAY,
+)
+
+
+def day_from_step(step: int) -> int:
+    """Return the zero-indexed in-game day for a step."""
+    return step // TURNS_PER_DAY
+
+
+def turn_in_day(step: int) -> int:
+    """Return the zero-indexed turn within the current day."""
+    return step % TURNS_PER_DAY
+
+
+def is_end_of_day(step: int) -> bool:
+    """Return whether the step is the final turn of an in-game day."""
+    return (step + 1) % TURNS_PER_DAY == 0
+
+
+def is_end_of_season(step: int) -> bool:
+    """Return whether the step is the final step of the season."""
+    return step == EPISODE_STEPS - 1
+
+
+def season_days() -> int:
+    """Return the configured number of days in the season."""
+    return DAYS_PER_SEASON
+
+----------------------------------------------------------------------------------------------------
+
+FILE: town.py
+----------------------------------------------------------------------------------------------------
+"""
+Kaggriculture town rules.
+
+Defines town shop unlocking and product consumption behavior.
+"""
+
+from layer_1_competition.level_1_impl.level_kaggriculture.layer_0_reality.level_0.definitions import (
+    MAX_TOWN_SHOP_INSTANCES,
+    TOWN_CENTER_SELL_INTERVAL,
+    TOWN_SHOP_SELL_INTERVAL,
+    TOWN_SHOP_UNLOCK_INTERVAL,
+)
+
+
+def shop_unlock_interval() -> int:
+    """Return the number of days between shop unlocks."""
+    return TOWN_SHOP_UNLOCK_INTERVAL
+
+
+def shop_sell_interval() -> int:
+    """Return the number of turns between shop consumption ticks."""
+    return TOWN_SHOP_SELL_INTERVAL
+
+
+def town_center_sell_interval() -> int:
+    """Return the number of turns between town-center consumption ticks."""
+    return TOWN_CENTER_SELL_INTERVAL
+
+
+def max_shop_instances() -> int:
+    """Return the maximum number of unlocked shop instances."""
+    return MAX_TOWN_SHOP_INSTANCES
+
+
+def shops_unlock_with_replacement() -> bool:
+    """Shop types are selected with replacement."""
+    return True
+
+
+def unlocked_shop_instances_are_permanent() -> bool:
+    """An unlocked shop remains active for the rest of the season."""
+    return True
+
+
+def town_center_excludes_fertilizer() -> bool:
+    """The town center consumes every product except fertilizer."""
+    return True
+
+
+def shop_consumption_multiplier(demand_units: int) -> int:
+    """
+    Return the number of units consumed per shop instance per tick.
+
+    The demand table itself determines the units consumed for each product.
+    This function exists to make the rule explicit rather than embedding
+    that interpretation in higher layers.
+    """
+    return demand_units
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: layer_0_reality/level_2
+====================================================================================================
+
+FILE: __init__.py
+----------------------------------------------------------------------------------------------------
+
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: layer_0_reality/level_2/rules
+====================================================================================================
+
+FILE: __init__.py
+----------------------------------------------------------------------------------------------------
+
+
+----------------------------------------------------------------------------------------------------
+
+FILE: market.py
+----------------------------------------------------------------------------------------------------
+"""
+Kaggriculture market rules.
+
+Defines the behavior of the dynamic market independently of any
+particular market implementation.
+"""
+
+from layer_1_competition.level_1_impl.level_kaggriculture.layer_0_reality.level_0.definitions import (
+    MAX_MARKET_ORDERS_PER_TURN,
+    PRICE_FLOOR,
+    ProductType
+)
+from layer_1_competition.level_1_impl.level_kaggriculture.layer_0_reality.level_1.definitions import PriceShape
+
+
+BUYABLE_PRODUCTS = frozenset({
+    ProductType.WHEAT,
+    ProductType.FERTILIZER,
+})
+
+
+def max_market_orders_per_turn() -> int:
+    """Return the maximum number of market orders processed per turn."""
+    return MAX_MARKET_ORDERS_PER_TURN
+
+
+def price_floor() -> int:
+    """Return the minimum possible market price."""
+    return PRICE_FLOOR
+
+
+def can_buy_product(product: ProductType) -> bool:
+    """Return whether a product may be purchased via BUY_PRODUCT."""
+    return product in BUYABLE_PRODUCTS
+
+
+def can_sell_product(product: ProductType) -> bool:
+    """All defined products may be sold to the market."""
+    return True
+
+
+def price_shape_value(shape: PriceShape, distance: float) -> float:
+    """
+    Evaluate a market price shape.
+
+    The logarithmic forms use ln(1 + x) / log10(1 + x), ensuring
+    f(0) = 0.
+    """
+    import math
+
+    if distance < 0:
+        raise ValueError("distance must be non-negative")
+
+    if shape == PriceShape.LINEAR:
+        return distance
+
+    if shape == PriceShape.SQUARE:
+        return distance * distance
+
+    if shape == PriceShape.SQRT:
+        return math.sqrt(distance)
+
+    if shape == PriceShape.LOG:
+        return math.log1p(distance)
+
+    if shape == PriceShape.LOG10:
+        return math.log10(1 + distance)
+
+    raise ValueError(f"Unsupported price shape: {shape}")
+
+
+def market_price(
+    base_price: int,
+    initial_inventory: int,
+    inventory: int,
+    anchor_throughput: int,
+    shape: PriceShape,
+    target: float,
+) -> int:
+    """
+    Calculate the dynamic market price for one side of the curve.
+
+    Price changes are based on distance from the initial inventory.
+    The amplitude is derived from the target move at the anchor
+    throughput and is not stored as a separate parameter.
+    """
+    if anchor_throughput <= 0:
+        raise ValueError("anchor_throughput must be positive")
+
+    if inventory == initial_inventory:
+        return base_price
+
+    distance = abs(inventory - initial_inventory)
+
+    anchor_value = price_shape_value(shape, anchor_throughput)
+
+    if anchor_value == 0:
+        raise ValueError("Price shape must produce a non-zero anchor value")
+
+    amplitude = target * base_price / anchor_value
+    movement = amplitude * price_shape_value(shape, distance)
+
+    if inventory < initial_inventory:
+        raw_price = base_price + movement
+    else:
+        raw_price = base_price - movement
+
+    return max(PRICE_FLOOR, round(raw_price))
+
+----------------------------------------------------------------------------------------------------
+
+
+END OF DUMP
