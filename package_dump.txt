@@ -1,4 +1,4 @@
-Root: C:\Users\mdc0431\dev\ScriptCraft-Workspace\implementations\python\python-package\scriptcraft\layers\layer_1_competition\level_1_impl\level_kaggriculture
+Root: E:\Docs\Personal\Projects\ScriptCraft-Workspace\implementations\python\python-package\scriptcraft\layers\layer_1_competition\level_1_impl\level_kaggriculture
 File type: .py
 ====================================================================================================
 
@@ -384,6 +384,12 @@ class TownShopType(Enum):
 PACKAGE: layer_0_reality/level_0/rules
 ====================================================================================================
 
+FILE: __init__.py
+----------------------------------------------------------------------------------------------------
+
+
+----------------------------------------------------------------------------------------------------
+
 FILE: farm_hand_spawning.py
 ----------------------------------------------------------------------------------------------------
 
@@ -497,7 +503,7 @@ Animal behaviour belongs in level_1/rules/animals.py.
 from dataclasses import dataclass
 from enum import Enum
 
-from ...level_0.definitions.objects import ObjectType
+from scriptcraft.layers.layer_1_competition.level_1_impl.level_kaggriculture.layer_0_reality.level_0.definitions.objects import ObjectType
 
 
 class AnimalType(Enum):
@@ -547,7 +553,7 @@ FILE: crop_catalog.py
 ----------------------------------------------------------------------------------------------------
 from types import MappingProxyType
 
-from ...level_0.definitions.crops import CropDefinition, CropType, YieldType
+from scriptcraft.layers.layer_1_competition.level_1_impl.level_kaggriculture.layer_0_reality.level_0.definitions.crops import CropDefinition, CropType, YieldType
 
 
 CROPS: MappingProxyType = MappingProxyType({
@@ -625,8 +631,8 @@ FILE: market_catalog.py
 ----------------------------------------------------------------------------------------------------
 from types import MappingProxyType
 
-from ...level_0.definitions.objects import ObjectType
-from ...level_0.definitions.market import MarketDefinition, PriceShape
+from scriptcraft.layers.layer_1_competition.level_1_impl.level_kaggriculture.layer_0_reality.level_0.definitions.objects import ObjectType
+from scriptcraft.layers.layer_1_competition.level_1_impl.level_kaggriculture.layer_0_reality.level_0.definitions.market import MarketDefinition, PriceShape
 
 
 MARKET: MappingProxyType = MappingProxyType({
@@ -733,8 +739,8 @@ Contains the static demand composition of each town shop.
 
 from types import MappingProxyType
 
-from ...level_0.definitions.objects import ObjectType
-from ...level_0.definitions.shops import TownShopType
+from scriptcraft.layers.layer_1_competition.level_1_impl.level_kaggriculture.layer_0_reality.level_0.definitions.objects import ObjectType
+from scriptcraft.layers.layer_1_competition.level_1_impl.level_kaggriculture.layer_0_reality.level_0.definitions.shops import TownShopType
 
 SHOP_DEMAND: MappingProxyType = MappingProxyType({
     TownShopType.BAKERY: MappingProxyType({
@@ -803,7 +809,7 @@ and structure-compatibility rules.
 This module does not mutate animal state or orchestrate actions.
 """
 
-from ...level_0.definitions.game import (
+from scriptcraft.layers.layer_1_competition.level_1_impl.level_kaggriculture.layer_0_reality.level_0.definitions.game import (
     ANIMAL_CARE_BONUS_INCREMENT,
     MAX_CONSECUTIVE_UNFED_DAYS,
 )
@@ -833,7 +839,7 @@ def animal_fails_after(consecutive_unfed_days: int) -> bool:
 
 FILE: farm_conditions.py
 ----------------------------------------------------------------------------------------------------
-from ...level_0.definitions.game import (
+from scriptcraft.layers.layer_1_competition.level_1_impl.level_kaggriculture.layer_0_reality.level_0.definitions.game import (
     MAX_CONSECUTIVE_UNFED_DAYS,
     MAX_CONSECUTIVE_UNWATERED_DAYS,
     WEED_SPAWN_CHANCE,
@@ -933,7 +939,7 @@ FILE: farm_geomety.py
 ----------------------------------------------------------------------------------------------------
 from enum import Enum
 
-from ...level_0.definitions.game import (
+from scriptcraft.layers.layer_1_competition.level_1_impl.level_kaggriculture.layer_0_reality.level_0.definitions.game import (
     BOARD_SIZE,
 )
 
@@ -1108,7 +1114,7 @@ No actual spawning, inventory mutation, entity creation, or day orchestration
 is performed here.
 """
 
-from ...level_0.definitions.game import FARM_HAND_COST_MULT
+from scriptcraft.layers.layer_1_competition.level_1_impl.level_kaggriculture.layer_0_reality.level_0.definitions.game import FARM_HAND_COST_MULT
 
 
 def fibonacci(n: int) -> int:
@@ -1189,7 +1195,7 @@ These functions intentionally operate on explicit step/configuration values
 rather than storing any mutable clock state.
 """
 
-from ...level_0.definitions.game import (
+from scriptcraft.layers.layer_1_competition.level_1_impl.level_kaggriculture.layer_0_reality.level_0.definitions.game import (
     DAYS_PER_SEASON,
     EPISODE_STEPS,
     TURNS_PER_DAY,
@@ -1274,8 +1280,8 @@ FILE: animal_catalog.py
 ----------------------------------------------------------------------------------------------------
 from types import MappingProxyType
 
-from ...level_0.definitions.objects import ObjectType
-from ...level_1.definitions.animals import AnimalDefinition, AnimalType
+from scriptcraft.layers.layer_1_competition.level_1_impl.level_kaggriculture.layer_0_reality.level_0.definitions.objects import ObjectType
+from scriptcraft.layers.layer_1_competition.level_1_impl.level_kaggriculture.layer_0_reality.level_1.definitions.animals import AnimalDefinition, AnimalType
 
 ANIMALS: MappingProxyType = MappingProxyType({
     AnimalType.GOOSE: AnimalDefinition(
@@ -1318,9 +1324,9 @@ def animal_definition(animal: AnimalType) -> AnimalDefinition:
 
 FILE: market_accessors.py
 ----------------------------------------------------------------------------------------------------
-from ...level_0.definitions.objects import ObjectType
-from ...level_0.definitions.market import MarketDefinition, PriceShape
-from ...level_1.definitions.market_catalog import MARKET
+from scriptcraft.layers.layer_1_competition.level_1_impl.level_kaggriculture.layer_0_reality.level_0.definitions.objects import ObjectType
+from scriptcraft.layers.layer_1_competition.level_1_impl.level_kaggriculture.layer_0_reality.level_0.definitions.market import MarketDefinition, PriceShape
+from scriptcraft.layers.layer_1_competition.level_1_impl.level_kaggriculture.layer_0_reality.level_1.definitions.market_catalog import MARKET
 
 
 def market_definition(product: ObjectType) -> MarketDefinition:
@@ -1375,7 +1381,7 @@ FILE: __init__.py
 
 FILE: animal_structure.py
 ----------------------------------------------------------------------------------------------------
-from ...level_1.definitions.animals import (
+from scriptcraft.layers.layer_1_competition.level_1_impl.level_kaggriculture.layer_0_reality.level_1.definitions.animals import (
     AnimalType,
     StructureType,
 )
@@ -1401,11 +1407,11 @@ def required_structure(animal: AnimalType) -> StructureType:
 
 FILE: crop_production.py
 ----------------------------------------------------------------------------------------------------
-from ...level_0.definitions.crops import (
+from scriptcraft.layers.layer_1_competition.level_1_impl.level_kaggriculture.layer_0_reality.level_0.definitions.crops import (
     CropType,
     YieldType,
 )
-from ...level_1.definitions.crop_catalog import crop_definition
+from scriptcraft.layers.layer_1_competition.level_1_impl.level_kaggriculture.layer_0_reality.level_1.definitions.crop_catalog import crop_definition
 
 
 def is_one_time_crop(crop: CropType) -> bool:
@@ -1651,12 +1657,12 @@ No farm state is stored or mutated here.
 """
 
 
-from ...level_0.definitions.game import (
+from scriptcraft.layers.layer_1_competition.level_1_impl.level_kaggriculture.layer_0_reality.level_0.definitions.game import (
     LAND_PURCHASE_COSTS,
     SHED_CAPACITY,
     INITIAL_CONSECUTIVE_UNWATERED,
 )
-from ...level_1.rules.farm_geomety import QUADRANTS
+from scriptcraft.layers.layer_1_competition.level_1_impl.level_kaggriculture.layer_0_reality.level_1.rules.farm_geomety import QUADRANTS
 
 
 def initial_consecutive_unwatered_days() -> int:
@@ -1718,9 +1724,9 @@ Defines deterministic shop unlocking, demand access, and town-consumption
 behaviour.
 """
 
-from ...level_0.definitions.game import TOWN_SHOP_UNLOCK_INTERVAL
-from ...level_0.definitions.shops import TownShopType
-from ...level_1.definitions.shop_catalog import SHOP_DEMAND
+from scriptcraft.layers.layer_1_competition.level_1_impl.level_kaggriculture.layer_0_reality.level_0.definitions.game import TOWN_SHOP_UNLOCK_INTERVAL
+from scriptcraft.layers.layer_1_competition.level_1_impl.level_kaggriculture.layer_0_reality.level_0.definitions.shops import TownShopType
+from scriptcraft.layers.layer_1_competition.level_1_impl.level_kaggriculture.layer_0_reality.level_1.definitions.shop_catalog import SHOP_DEMAND
 
 
 def shop_unlocks_on_day(day: int) -> bool:
@@ -1797,10 +1803,10 @@ FILE: __init__.py
 
 FILE: animal_production.py
 ----------------------------------------------------------------------------------------------------
-from ...level_1.definitions.animals import (
+from scriptcraft.layers.layer_1_competition.level_1_impl.level_kaggriculture.layer_0_reality.level_1.definitions.animals import (
     AnimalType,
 )
-from ...level_2.definitions.animal_catalog import animal_definition
+from scriptcraft.layers.layer_1_competition.level_1_impl.level_kaggriculture.layer_0_reality.level_2.definitions.animal_catalog import animal_definition
 
 
 def produces_on_day(animal: AnimalType, age: int) -> bool:
@@ -1899,14 +1905,14 @@ def animal_production_yield(
 
 FILE: crop_decay.py
 ----------------------------------------------------------------------------------------------------
-from ...level_0.definitions.game import (
+from scriptcraft.layers.layer_1_competition.level_1_impl.level_kaggriculture.layer_0_reality.level_0.definitions.game import (
     CROP_DECAY_INTERVAL_TURNS,
 )
-from ...level_0.definitions.crops import (
+from scriptcraft.layers.layer_1_competition.level_1_impl.level_kaggriculture.layer_0_reality.level_0.definitions.crops import (
     CropType,
 )
-from ...level_1.definitions.crop_catalog import crop_definition
-from ...level_2.rules.crop_production import is_one_time_crop, is_ongoing_crop
+from scriptcraft.layers.layer_1_competition.level_1_impl.level_kaggriculture.layer_0_reality.level_1.definitions.crop_catalog import crop_definition
+from scriptcraft.layers.layer_1_competition.level_1_impl.level_kaggriculture.layer_0_reality.level_2.rules.crop_production import is_one_time_crop, is_ongoing_crop
 
 
 def one_time_decay_start_day(crop: CropType) -> int:
@@ -2002,13 +2008,13 @@ pricing algorithm remains separate from its static tuning parameters.
 
 import math
 
-from ...level_0.definitions.game import (
+from scriptcraft.layers.layer_1_competition.level_1_impl.level_kaggriculture.layer_0_reality.level_0.definitions.game import (
     MAX_MARKET_ORDERS_PER_TURN,
     PRICE_FLOOR,
 )
-from ...level_0.definitions.objects import ObjectType
-from ...level_0.definitions.market import PriceShape
-from ...level_2.definitions.market_accessors import market_definition
+from scriptcraft.layers.layer_1_competition.level_1_impl.level_kaggriculture.layer_0_reality.level_0.definitions.objects import ObjectType
+from scriptcraft.layers.layer_1_competition.level_1_impl.level_kaggriculture.layer_0_reality.level_0.definitions.market import PriceShape
+from scriptcraft.layers.layer_1_competition.level_1_impl.level_kaggriculture.layer_0_reality.level_2.definitions.market_accessors import market_definition
 
 
 BUYABLE_PRODUCTS = frozenset({
@@ -2161,181 +2167,3418 @@ def buy_price(product: ObjectType, market_inventory: int) -> int:
 
 ----------------------------------------------------------------------------------------------------
 
+PACKAGE: layer_2_strategy
+====================================================================================================
+
+FILE: __init__.py
+----------------------------------------------------------------------------------------------------
+
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: layer_2_strategy/level_0
+====================================================================================================
+
+FILE: __init__.py
+----------------------------------------------------------------------------------------------------
+
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: layer_2_strategy/level_0/basic
+====================================================================================================
+
+FILE: __init__.py
+----------------------------------------------------------------------------------------------------
+
+
+----------------------------------------------------------------------------------------------------
+
+FILE: buy_once.py
+----------------------------------------------------------------------------------------------------
+"""
+Buy Once strategy.
+
+A minimal baseline strategy that buys one wheat seed on the
+first step and passes on every subsequent step.
+"""
+
+
+class BuyOnceStrategy:
+    """Buy one wheat seed on the first step, then do nothing."""
+
+    def decide(self, obs: dict) -> dict:
+        """Return the actions for the current observation."""
+
+        if obs.get("step", 0) == 0:
+            return {
+                "farmer": ["PASS"],
+                "market": [["BUY_SEED", "WHEAT", 1]],
+            }
+
+        return {
+            "farmer": ["PASS"],
+            "market": [],
+        }
+
+----------------------------------------------------------------------------------------------------
+
+FILE: one_tile_one_crop.py
+----------------------------------------------------------------------------------------------------
+"""
+One tile one crop farming strategy for a specific crop.
+
+This strategy performs a simple crop production cycle:
+    buy seed
+    -> plant crop
+    -> water crop
+    -> harvest mature crop
+    -> sell crop
+    -> repeat
+
+Uses layer_0_reality for crop definitions and production rules.
+Parameterized by crop type at initialization.
+"""
+
+from scriptcraft.layers.layer_1_competition.level_1_impl.level_kaggriculture.layer_0_reality.level_0.definitions.crops import CropType
+from scriptcraft.layers.layer_1_competition.level_1_impl.level_kaggriculture.layer_0_reality.level_1.definitions.crop_catalog import crop_definition
+from scriptcraft.layers.layer_1_competition.level_1_impl.level_kaggriculture.layer_0_reality.level_2.rules.crop_production import (
+    is_one_time_crop,
+    is_ongoing_crop,
+    produces_on_day as crop_produces_on_day,
+)
+
+
+class OneTileOneCropStrategy:
+    """One tile one crop farming strategy focused on one crop type."""
+
+    def __init__(self, crop_type: CropType):
+        """
+        Initialize strategy for a specific crop.
+
+        Args:
+            crop_type: CropType enum value (e.g., CropType.WHEAT)
+        """
+        if not isinstance(crop_type, CropType):
+            raise TypeError(f"crop_type must be CropType, got {type(crop_type)}")
+
+        self.crop_type = crop_type
+        self.crop_name = crop_type.value
+        self.definition = crop_definition(crop_type)
+
+    def decide(self, obs: dict) -> dict:
+        """Return the actions for the current observation."""
+
+        player = obs["player"]
+        me = obs["farms"][player]
+        private = obs["private"]
+        current_day = obs["day"]
+
+        fx, fy = me["farmer"]
+        tile = me["tiles"][fy][fx]
+
+        market = []
+
+        # Buy seed if we have none and can afford it
+        if (
+            private["seeds"].get(self.crop_name, 0) == 0
+            and me["money"] >= self.definition.seed_cost
+        ):
+            market.append(["BUY_SEED", self.crop_name, 1])
+
+        # Sell any harvested crop in the shed
+        crop_in_shed = private["shed"].get(self.crop_name, 0)
+        if crop_in_shed > 0:
+            market.append(["SELL", self.crop_name, crop_in_shed])
+
+        # If standing on an empty tile and we have a seed, plant it
+        if tile is None:
+            if private["seeds"].get(self.crop_name, 0) > 0:
+                return {
+                    "farmer": ["PLANT", self.crop_name],
+                    "hands": [],
+                    "market": market,
+                }
+
+        # If standing on our crop, manage watering and harvesting
+        if isinstance(tile, dict) and tile.get("kind") == "PLANT":
+            if tile["crop"] != self.crop_name:
+                # Different crop on this tile; pass
+                return {
+                    "farmer": ["PASS"],
+                    "hands": [],
+                    "market": market,
+                }
+
+            crop_age = current_day - tile["planted_day"]
+
+            # Determine harvest eligibility based on crop type
+            is_harvestable = False
+
+            if is_one_time_crop(self.crop_type):
+                # One-time crops ready when they reach first yield day
+                is_harvestable = crop_age >= self.definition.time_to_first_yield
+
+            elif is_ongoing_crop(self.crop_type):
+                # Ongoing crops only produce on scheduled days
+                is_harvestable = crop_produces_on_day(self.crop_type, crop_age)
+
+            # Harvest if eligible and we have yield
+            if is_harvestable and tile["yield_units"] > 0:
+                return {
+                    "farmer": ["HARVEST"],
+                    "hands": [],
+                    "market": market,
+                }
+
+            # Water the crop if it has not been watered today
+            if not tile["watered_today"]:
+                return {
+                    "farmer": ["WATER"],
+                    "hands": [],
+                    "market": market,
+                }
+
+        # Nothing else to do this turn
+        return {
+            "farmer": ["PASS"],
+            "hands": [],
+            "market": market,
+        }
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: layer_2_strategy/level_0/maxxer
+====================================================================================================
+
+FILE: __init__.py
+----------------------------------------------------------------------------------------------------
+
+
+----------------------------------------------------------------------------------------------------
+
+FILE: melon_maxxer.py
+----------------------------------------------------------------------------------------------------
+"""
+Melon maximizer strategy.
+
+Plants melons repeatedly and sells them when the market price is above
+a threshold. No hiring, no land expansion, no fertilizer — intentionally
+pure to establish a baseline.
+
+Based on Notebook 2 tutorial (boatlee/kaggriculture-tutorial).
+"""
+
+
+class MelonMaxxerStrategy:
+    """Grow melons and sell when price is favorable."""
+
+    MELON_SEED_COST = 80
+    MELON_FIRST_YIELD_DAY = 10
+    MELON_MAX_YIELD_DAY = 10
+    SELL_THRESHOLD = 200  # Only sell if price >= $200
+
+    def __init__(self):
+        pass
+
+    def _step_toward(self, fx: int, fy: int, tx: int, ty: int) -> str:
+        """Return the direction to move from (fx, fy) toward (tx, ty)."""
+        if fx > tx:
+            return "WEST"
+        if fx < tx:
+            return "EAST"
+        if fy > ty:
+            return "NORTH"
+        if fy < ty:
+            return "SOUTH"
+        return "PASS"
+
+    def _find_target_tile(self, farm: dict, board_size: int, have_seed: bool) -> tuple:
+        """
+        Find the next tile to act on (plant, water, or harvest melon).
+
+        Returns (x, y, action) or None.
+        Priority: harvest > water > plant (sorted by distance).
+        """
+        fx, fy = farm["farmer"]
+        candidates = []
+
+        for y in range(board_size):
+            for x in range(board_size):
+                tile = farm["tiles"][y][x]
+
+                # Existing melon plant: water or harvest
+                if isinstance(tile, dict) and tile.get("kind") == "PLANT" and tile["crop"] == "MELON":
+                    if tile["yield_units"] > 0:
+                        candidates.append((x, y, "harvest"))
+                    elif not tile["watered_today"]:
+                        candidates.append((x, y, "water"))
+
+                # Empty tile: plant if we have seed
+                elif tile is None and have_seed:
+                    candidates.append((x, y, "plant"))
+
+        if not candidates:
+            return None
+
+        # Priority: harvest > water > plant; then by distance
+        priority = {"harvest": 0, "water": 1, "plant": 2}
+        candidates.sort(
+            key=lambda c: (
+                priority[c[2]],
+                abs(c[0] - fx) + abs(c[1] - fy),
+            )
+        )
+        return candidates[0]
+
+    def decide(self, obs: dict) -> dict:
+        """Return actions for this turn."""
+
+        farms = obs.get("farms", [])
+        player = obs.get("player", 0)
+        private = obs.get("private") or {}
+
+        if not farms or player >= len(farms):
+            return {"farmer": ["PASS"], "hands": [], "market": []}
+
+        farm = farms[player]
+        board_size = len(farm["tiles"])
+        fx, fy = farm["farmer"]
+        tile = farm["tiles"][fy][fx]
+        day = obs.get("day", 0)
+
+        seeds = private.get("seeds", {})
+        shed = private.get("shed", {})
+        market_prices = (obs.get("market") or {}).get("prices", {})
+        melon_price = market_prices.get("MELON", 0)
+
+        market = []
+
+        # Sell melons only when price is above threshold
+        melons_in_shed = shed.get("MELON", 0)
+        if melons_in_shed > 0 and melon_price >= self.SELL_THRESHOLD:
+            market.append(["SELL", "MELON", melons_in_shed])
+
+        # Buy melon seed if we're out
+        if seeds.get("MELON", 0) == 0 and farm["money"] >= self.MELON_SEED_COST:
+            market.append(["BUY_SEED", "MELON", 1])
+
+        # Decide farmer action
+        farmer = ["PASS"]
+
+        # If standing on a melon plant
+        if isinstance(tile, dict) and tile.get("kind") == "PLANT" and tile["crop"] == "MELON":
+            age = day - tile["planted_day"]
+            # Harvest if mature and has yield
+            if age >= self.MELON_MAX_YIELD_DAY and tile["yield_units"] > 0:
+                farmer = ["HARVEST"]
+            # Water if not watered today
+            elif not tile["watered_today"]:
+                farmer = ["WATER"]
+            # Otherwise move to next target
+            else:
+                target = self._find_target_tile(farm, board_size, seeds.get("MELON", 0) > 0)
+                if target:
+                    step = self._step_toward(fx, fy, target[0], target[1])
+                    if step != "PASS":
+                        farmer = [step]
+
+        # If standing on empty tile and have seed, plant
+        elif tile is None and seeds.get("MELON", 0) > 0:
+            farmer = ["PLANT", "MELON"]
+
+        # Otherwise move toward target
+        else:
+            target = self._find_target_tile(farm, board_size, seeds.get("MELON", 0) > 0)
+            if target:
+                step = self._step_toward(fx, fy, target[0], target[1])
+                if step != "PASS":
+                    farmer = [step]
+
+        return {"farmer": farmer, "hands": [], "market": market}
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: layer_2_strategy/level_0/meta
+====================================================================================================
+
+FILE: __init__.py
+----------------------------------------------------------------------------------------------------
+
+
+----------------------------------------------------------------------------------------------------
+
+FILE: meta_milk.py
+----------------------------------------------------------------------------------------------------
+"""
+Milk maximizer strategy via cows.
+
+Buys cow animals, builds pastures, feeds them with wheat, harvests milk,
+and sells milk when price is favorable. Grows minimal wheat (only for feed).
+No sheep, no other crops — pure animal focus on cows.
+"""
+
+
+class MetaMilkStrategy:
+    """Grow cows for milk production."""
+
+    WHEAT_SEED_COST = 10
+    COW_COST = 400
+    PASTURE_BUILD_COST = 1  # action cost to build pasture
+    MILK_SELL_THRESHOLD = 120  # Only sell if price >= $120
+
+    TARGET_COWS = 5  # Target number of cows to build toward
+    TARGET_WHEAT_TILES = 2  # Target wheat tiles for cow feed
+
+    def __init__(self):
+        pass
+
+    def _step_toward(self, fx: int, fy: int, tx: int, ty: int) -> str:
+        """Return direction to move from (fx, fy) toward (tx, ty)."""
+        if fx > tx:
+            return "WEST"
+        if fx < tx:
+            return "EAST"
+        if fy > ty:
+            return "NORTH"
+        if fy < ty:
+            return "SOUTH"
+        return "PASS"
+
+    def _count_structures(self, farm: dict, structure_type: str) -> int:
+        """Count existing pastures or coops on the farm."""
+        count = 0
+        for row in farm["tiles"]:
+            for tile in row:
+                if isinstance(tile, dict) and tile.get("kind") == structure_type:
+                    count += 1
+        return count
+
+    def _count_occupied_structures(self, farm: dict, structure_type: str) -> int:
+        """Count occupied pastures/coops (with an animal)."""
+        count = 0
+        for row in farm["tiles"]:
+            for tile in row:
+                if (
+                    isinstance(tile, dict)
+                    and tile.get("kind") == structure_type
+                    and tile.get("animal") is not None
+                ):
+                    count += 1
+        return count
+
+    def _count_crops(self, farm: dict, crop: str) -> int:
+        """Count existing planted crops."""
+        count = 0
+        for row in farm["tiles"]:
+            for tile in row:
+                if isinstance(tile, dict) and tile.get("kind") == "PLANT" and tile.get("crop") == crop:
+                    count += 1
+        return count
+
+    def _find_target_tile(self, farm: dict, board_size: int, task: str) -> tuple:
+        """
+        Find next tile to act on.
+        Tasks: "water_wheat", "harvest_wheat", "feed_cow", "harvest_milk", "build_pasture", "place_cow", "plant_wheat"
+
+        Returns (x, y, task) or None.
+        """
+        fx, fy = farm["farmer"]
+        candidates = []
+
+        for y in range(board_size):
+            for x in range(board_size):
+                tile = farm["tiles"][y][x]
+
+                # Wheat plant: water or harvest
+                if isinstance(tile, dict) and tile.get("kind") == "PLANT" and tile.get("crop") == "WHEAT":
+                    age = tile.get("planted_day", 0)
+                    if tile["yield_units"] > 0 and age >= 2:  # Wheat ready at day 2+
+                        candidates.append((x, y, "harvest_wheat"))
+                    elif not tile["watered_today"]:
+                        candidates.append((x, y, "water_wheat"))
+
+                # Pasture with cow: feed or harvest milk
+                elif isinstance(tile, dict) and tile.get("kind") == "PASTURE":
+                    if tile.get("animal") == "COW":
+                        if not tile["fed_today"]:
+                            candidates.append((x, y, "feed_cow"))
+                        if tile["yield_units"] > 0:
+                            candidates.append((x, y, "harvest_milk"))
+
+                # Empty pasture: place cow if we have one
+                elif isinstance(tile, dict) and tile.get("kind") == "PASTURE" and tile.get("animal") is None:
+                    candidates.append((x, y, "place_cow"))
+
+                # Empty tile: build pasture or plant wheat
+                elif tile is None:
+                    candidates.append((x, y, "build_pasture"))
+                    candidates.append((x, y, "plant_wheat"))
+
+        if not candidates:
+            return None
+
+        # Priority by task
+        priority = {
+            "feed_cow": 0,
+            "harvest_milk": 1,
+            "harvest_wheat": 2,
+            "water_wheat": 3,
+            "place_cow": 4,
+            "build_pasture": 5,
+            "plant_wheat": 6,
+        }
+
+        # Filter to the requested task
+        candidates = [c for c in candidates if c[2] == task]
+        if not candidates:
+            return None
+
+        # Sort by distance
+        candidates.sort(key=lambda c: abs(c[0] - fx) + abs(c[1] - fy))
+        return candidates[0]
+
+    def decide(self, obs: dict) -> dict:
+        """Return actions for this turn."""
+
+        farms = obs.get("farms", [])
+        player = obs.get("player", 0)
+        private = obs.get("private") or {}
+
+        if not farms or player >= len(farms):
+            return {"farmer": ["PASS"], "hands": [], "market": []}
+
+        farm = farms[player]
+        board_size = len(farm["tiles"])
+        fx, fy = farm["farmer"]
+        tile = farm["tiles"][fy][fx]
+        day = obs.get("day", 0)
+
+        seeds = private.get("seeds", {})
+        shed = private.get("shed", {})
+        market_prices = (obs.get("market") or {}).get("prices", {})
+        milk_price = market_prices.get("MILK", 0)
+        wheat_price = market_prices.get("WHEAT", 0)
+
+        market = []
+
+        # Sell milk when price is favorable
+        milk_in_shed = shed.get("MILK", 0)
+        if milk_in_shed > 0 and milk_price >= self.MILK_SELL_THRESHOLD:
+            market.append(["SELL", "MILK", milk_in_shed])
+
+        # Buy wheat seed if we're running low (need it for feed)
+        if seeds.get("WHEAT", 0) < 5 and farm["money"] >= self.WHEAT_SEED_COST * 5:
+            market.append(["BUY_SEED", "WHEAT", 5])
+
+        # Buy cows if we have money and haven't reached target
+        occupied_pastures = self._count_occupied_structures(farm, "PASTURE")
+        if occupied_pastures < self.TARGET_COWS and farm["money"] >= self.COW_COST:
+            market.append(["BUY_ANIMAL", "COW", 1])
+
+        # Sell wheat if we have excess (more than we need for feed)
+        wheat_in_shed = shed.get("WHEAT", 0)
+        if wheat_in_shed > occupied_pastures + 3:  # Keep at least (cows + 3) for buffer
+            market.append(["SELL", "WHEAT", wheat_in_shed - (occupied_pastures + 3)])
+
+        # Decide farmer action
+        farmer = ["PASS"]
+
+        # Priority 1: Feed cows (critical)
+        target = self._find_target_tile(farm, board_size, "feed_cow")
+        if target:
+            step = self._step_toward(fx, fy, target[0], target[1])
+            if step != "PASS":
+                farmer = [step]
+            elif (fx, fy) == (target[0], target[1]):
+                farmer = ["FEED"]
+                return {"farmer": farmer, "hands": [], "market": market}
+
+        # Priority 2: Harvest milk
+        target = self._find_target_tile(farm, board_size, "harvest_milk")
+        if target:
+            step = self._step_toward(fx, fy, target[0], target[1])
+            if step != "PASS":
+                farmer = [step]
+            elif (fx, fy) == (target[0], target[1]):
+                farmer = ["HARVEST"]
+                return {"farmer": farmer, "hands": [], "market": market}
+
+        # Priority 3: Place cows in empty pastures
+        target = self._find_target_tile(farm, board_size, "place_cow")
+        if target and shed.get("COW", 0) > 0:
+            step = self._step_toward(fx, fy, target[0], target[1])
+            if step != "PASS":
+                farmer = [step]
+            elif (fx, fy) == (target[0], target[1]):
+                farmer = ["PLACE", "COW"]
+                return {"farmer": farmer, "hands": [], "market": market}
+
+        # Priority 4: Build pastures (if not at target)
+        if occupied_pastures < self.TARGET_COWS:
+            target = self._find_target_tile(farm, board_size, "build_pasture")
+            if target:
+                step = self._step_toward(fx, fy, target[0], target[1])
+                if step != "PASS":
+                    farmer = [step]
+                elif (fx, fy) == (target[0], target[1]):
+                    farmer = ["BUILD_PASTURE"]
+                    return {"farmer": farmer, "hands": [], "market": market}
+
+        # Priority 5: Harvest wheat
+        target = self._find_target_tile(farm, board_size, "harvest_wheat")
+        if target:
+            step = self._step_toward(fx, fy, target[0], target[1])
+            if step != "PASS":
+                farmer = [step]
+            elif (fx, fy) == (target[0], target[1]):
+                farmer = ["HARVEST"]
+                return {"farmer": farmer, "hands": [], "market": market}
+
+        # Priority 6: Water wheat
+        target = self._find_target_tile(farm, board_size, "water_wheat")
+        if target:
+            step = self._step_toward(fx, fy, target[0], target[1])
+            if step != "PASS":
+                farmer = [step]
+            elif (fx, fy) == (target[0], target[1]):
+                farmer = ["WATER"]
+                return {"farmer": farmer, "hands": [], "market": market}
+
+        # Priority 7: Plant wheat
+        if seeds.get("WHEAT", 0) > 0:
+            target = self._find_target_tile(farm, board_size, "plant_wheat")
+            if target:
+                step = self._step_toward(fx, fy, target[0], target[1])
+                if step != "PASS":
+                    farmer = [step]
+                elif (fx, fy) == (target[0], target[1]):
+                    farmer = ["PLANT", "WHEAT"]
+                    return {"farmer": farmer, "hands": [], "market": market}
+
+        return {"farmer": farmer, "hands": [], "market": market}
+
+----------------------------------------------------------------------------------------------------
+
+FILE: meta_wool.py
+----------------------------------------------------------------------------------------------------
+"""
+Meta Wool maximizer strategy via sheep.
+
+Buys sheep animals, builds pastures, feeds them with wheat, harvests wool,
+and sells wool when price is favorable. Grows minimal wheat (only for feed).
+No cows, no other crops — pure animal focus on sheep.
+"""
+
+
+class MetaWoolStrategy:
+    """Grow sheep for wool production."""
+
+    WHEAT_SEED_COST = 10
+    SHEEP_COST = 500
+    PASTURE_BUILD_COST = 1  # action cost to build pasture
+    WOOL_SELL_THRESHOLD = 150  # Only sell if price >= $150
+
+    TARGET_SHEEP = 6  # Target number of sheep to build toward
+    TARGET_WHEAT_TILES = 2  # Target wheat tiles for sheep feed
+
+    def __init__(self):
+        pass
+
+    def _step_toward(self, fx: int, fy: int, tx: int, ty: int) -> str:
+        """Return direction to move from (fx, fy) toward (tx, ty)."""
+        if fx > tx:
+            return "WEST"
+        if fx < tx:
+            return "EAST"
+        if fy > ty:
+            return "NORTH"
+        if fy < ty:
+            return "SOUTH"
+        return "PASS"
+
+    def _count_occupied_structures(self, farm: dict, structure_type: str) -> int:
+        """Count occupied pastures/coops (with an animal)."""
+        count = 0
+        for row in farm["tiles"]:
+            for tile in row:
+                if (
+                    isinstance(tile, dict)
+                    and tile.get("kind") == structure_type
+                    and tile.get("animal") is not None
+                ):
+                    count += 1
+        return count
+
+    def _find_target_tile(self, farm: dict, board_size: int, task: str) -> tuple:
+        """
+        Find next tile to act on.
+        Tasks: "water_wheat", "harvest_wheat", "feed_sheep", "harvest_wool", "build_pasture", "place_sheep", "plant_wheat"
+
+        Returns (x, y, task) or None.
+        """
+        fx, fy = farm["farmer"]
+        candidates = []
+
+        for y in range(board_size):
+            for x in range(board_size):
+                tile = farm["tiles"][y][x]
+
+                # Wheat plant: water or harvest
+                if isinstance(tile, dict) and tile.get("kind") == "PLANT" and tile.get("crop") == "WHEAT":
+                    age = tile.get("planted_day", 0)
+                    if tile["yield_units"] > 0 and age >= 2:  # Wheat ready at day 2+
+                        candidates.append((x, y, "harvest_wheat"))
+                    elif not tile["watered_today"]:
+                        candidates.append((x, y, "water_wheat"))
+
+                # Pasture with sheep: feed or harvest wool
+                elif isinstance(tile, dict) and tile.get("kind") == "PASTURE":
+                    if tile.get("animal") == "SHEEP":
+                        if not tile["fed_today"]:
+                            candidates.append((x, y, "feed_sheep"))
+                        if tile["yield_units"] > 0:
+                            candidates.append((x, y, "harvest_wool"))
+
+                # Empty pasture: place sheep if we have one
+                elif isinstance(tile, dict) and tile.get("kind") == "PASTURE" and tile.get("animal") is None:
+                    candidates.append((x, y, "place_sheep"))
+
+                # Empty tile: build pasture or plant wheat
+                elif tile is None:
+                    candidates.append((x, y, "build_pasture"))
+                    candidates.append((x, y, "plant_wheat"))
+
+        if not candidates:
+            return None
+
+        # Priority by task
+        priority = {
+            "feed_sheep": 0,
+            "harvest_wool": 1,
+            "harvest_wheat": 2,
+            "water_wheat": 3,
+            "place_sheep": 4,
+            "build_pasture": 5,
+            "plant_wheat": 6,
+        }
+
+        # Filter to the requested task
+        candidates = [c for c in candidates if c[2] == task]
+        if not candidates:
+            return None
+
+        # Sort by distance
+        candidates.sort(key=lambda c: abs(c[0] - fx) + abs(c[1] - fy))
+        return candidates[0]
+
+    def decide(self, obs: dict) -> dict:
+        """Return actions for this turn."""
+
+        farms = obs.get("farms", [])
+        player = obs.get("player", 0)
+        private = obs.get("private") or {}
+
+        if not farms or player >= len(farms):
+            return {"farmer": ["PASS"], "hands": [], "market": []}
+
+        farm = farms[player]
+        board_size = len(farm["tiles"])
+        fx, fy = farm["farmer"]
+        tile = farm["tiles"][fy][fx]
+        day = obs.get("day", 0)
+
+        seeds = private.get("seeds", {})
+        shed = private.get("shed", {})
+        market_prices = (obs.get("market") or {}).get("prices", {})
+        wool_price = market_prices.get("WOOL", 0)
+        wheat_price = market_prices.get("WHEAT", 0)
+
+        market = []
+
+        # Sell wool when price is favorable
+        wool_in_shed = shed.get("WOOL", 0)
+        if wool_in_shed > 0 and wool_price >= self.WOOL_SELL_THRESHOLD:
+            market.append(["SELL", "WOOL", wool_in_shed])
+
+        # Buy wheat seed if we're running low (need it for feed)
+        if seeds.get("WHEAT", 0) < 5 and farm["money"] >= self.WHEAT_SEED_COST * 5:
+            market.append(["BUY_SEED", "WHEAT", 5])
+
+        # Buy sheep if we have money and haven't reached target
+        occupied_pastures = self._count_occupied_structures(farm, "PASTURE")
+        if occupied_pastures < self.TARGET_SHEEP and farm["money"] >= self.SHEEP_COST:
+            market.append(["BUY_ANIMAL", "SHEEP", 1])
+
+        # Sell wheat if we have excess (more than we need for feed)
+        wheat_in_shed = shed.get("WHEAT", 0)
+        if wheat_in_shed > occupied_pastures + 3:  # Keep at least (sheep + 3) for buffer
+            market.append(["SELL", "WHEAT", wheat_in_shed - (occupied_pastures + 3)])
+
+        # Decide farmer action
+        farmer = ["PASS"]
+
+        # Priority 1: Feed sheep (critical)
+        target = self._find_target_tile(farm, board_size, "feed_sheep")
+        if target:
+            step = self._step_toward(fx, fy, target[0], target[1])
+            if step != "PASS":
+                farmer = [step]
+            elif (fx, fy) == (target[0], target[1]):
+                farmer = ["FEED"]
+                return {"farmer": farmer, "hands": [], "market": market}
+
+        # Priority 2: Harvest wool
+        target = self._find_target_tile(farm, board_size, "harvest_wool")
+        if target:
+            step = self._step_toward(fx, fy, target[0], target[1])
+            if step != "PASS":
+                farmer = [step]
+            elif (fx, fy) == (target[0], target[1]):
+                farmer = ["HARVEST"]
+                return {"farmer": farmer, "hands": [], "market": market}
+
+        # Priority 3: Place sheep in empty pastures
+        target = self._find_target_tile(farm, board_size, "place_sheep")
+        if target and shed.get("SHEEP", 0) > 0:
+            step = self._step_toward(fx, fy, target[0], target[1])
+            if step != "PASS":
+                farmer = [step]
+            elif (fx, fy) == (target[0], target[1]):
+                farmer = ["PLACE", "SHEEP"]
+                return {"farmer": farmer, "hands": [], "market": market}
+
+        # Priority 4: Build pastures (if not at target)
+        if occupied_pastures < self.TARGET_SHEEP:
+            target = self._find_target_tile(farm, board_size, "build_pasture")
+            if target:
+                step = self._step_toward(fx, fy, target[0], target[1])
+                if step != "PASS":
+                    farmer = [step]
+                elif (fx, fy) == (target[0], target[1]):
+                    farmer = ["BUILD_PASTURE"]
+                    return {"farmer": farmer, "hands": [], "market": market}
+
+        # Priority 5: Harvest wheat
+        target = self._find_target_tile(farm, board_size, "harvest_wheat")
+        if target:
+            step = self._step_toward(fx, fy, target[0], target[1])
+            if step != "PASS":
+                farmer = [step]
+            elif (fx, fy) == (target[0], target[1]):
+                farmer = ["HARVEST"]
+                return {"farmer": farmer, "hands": [], "market": market}
+
+        # Priority 6: Water wheat
+        target = self._find_target_tile(farm, board_size, "water_wheat")
+        if target:
+            step = self._step_toward(fx, fy, target[0], target[1])
+            if step != "PASS":
+                farmer = [step]
+            elif (fx, fy) == (target[0], target[1]):
+                farmer = ["WATER"]
+                return {"farmer": farmer, "hands": [], "market": market}
+
+        # Priority 7: Plant wheat
+        if seeds.get("WHEAT", 0) > 0:
+            target = self._find_target_tile(farm, board_size, "plant_wheat")
+            if target:
+                step = self._step_toward(fx, fy, target[0], target[1])
+                if step != "PASS":
+                    farmer = [step]
+                elif (fx, fy) == (target[0], target[1]):
+                    farmer = ["PLANT", "WHEAT"]
+                    return {"farmer": farmer, "hands": [], "market": market}
+
+        return {"farmer": farmer, "hands": [], "market": market}
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: layer_3_agents
+====================================================================================================
+
+FILE: __init__.py
+----------------------------------------------------------------------------------------------------
+
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: layer_3_agents/level_0
+====================================================================================================
+
+FILE: __init__.py
+----------------------------------------------------------------------------------------------------
+
+
+----------------------------------------------------------------------------------------------------
+
+FILE: registry.py
+----------------------------------------------------------------------------------------------------
+"""
+Kaggriculture strategy registry.
+
+This module provides the canonical mapping between strategy names and
+their Layer 2 strategy implementations.
+
+Layer 3 uses this registry to construct strategies without maintaining
+one agent adapter per strategy.
+
+Supports both:
+  - Simple strategies: "wheat", "melon_maxxer", etc.
+  - Parametrized strategies: "single_tile:WHEAT", "single_tile:MELON", etc.
+"""
+
+from scriptcraft.layers.layer_1_competition.level_1_impl.level_kaggriculture.layer_0_reality.level_0.definitions.crops import CropType
+from scriptcraft.layers.layer_1_competition.level_1_impl.level_kaggriculture.layer_2_strategy.level_0.basic.wheat import (
+    WheatStrategy,
+)
+from scriptcraft.layers.layer_1_competition.level_1_impl.level_kaggriculture.layer_2_strategy.level_0.basic.tomato import (
+    TomatoStrategy,
+)
+from scriptcraft.layers.layer_1_competition.level_1_impl.level_kaggriculture.layer_2_strategy.level_0.basic.strawberry import (
+    StrawberryStrategy,
+)
+from scriptcraft.layers.layer_1_competition.level_1_impl.level_kaggriculture.layer_2_strategy.level_0.basic.melon import (
+    MelonStrategy,
+)
+from scriptcraft.layers.layer_1_competition.level_1_impl.level_kaggriculture.layer_2_strategy.level_0.basic.carrot import (
+    CarrotStrategy,
+)
+from scriptcraft.layers.layer_1_competition.level_1_impl.level_kaggriculture.layer_2_strategy.level_0.basic.one_tile_one_crop import (
+    OneTileOneCropStrategy,
+)
+from scriptcraft.layers.layer_1_competition.level_1_impl.level_kaggriculture.layer_2_strategy.level_0.maxxer.melon_maxxer import (
+    MelonMaxxerStrategy,
+)
+from scriptcraft.layers.layer_1_competition.level_1_impl.level_kaggriculture.layer_2_strategy.level_0.meta.meta_milk import (
+    MetaMilkStrategy,
+)
+from scriptcraft.layers.layer_1_competition.level_1_impl.level_kaggriculture.layer_2_strategy.level_0.meta.meta_wool import (
+    MetaWoolStrategy,
+)
+from scriptcraft.layers.layer_1_competition.level_1_impl.level_kaggriculture.layer_2_strategy.level_0.basic.buy_once import (
+    BuyOnceStrategy,
+)
+
+
+# Simple strategies: instantiated without parameters
+STRATEGIES = {
+    "wheat": WheatStrategy,
+    "carrot": CarrotStrategy,
+    "tomato": TomatoStrategy,
+    "strawberry": StrawberryStrategy,
+    "melon": MelonStrategy,
+    "melon_maxxer": MelonMaxxerStrategy,
+    "meta_milk": MetaMilkStrategy,
+    "meta_wool": MetaWoolStrategy,
+    "buy_once": BuyOnceStrategy,
+}
+
+DEFAULT_STRATEGY = "wheat"
+
+
+def available_strategies() -> tuple[str, ...]:
+    """
+    Return the names of all registered strategies.
+
+    Includes both simple and parametrized strategy patterns:
+      - Simple: "wheat", "melon_maxxer", etc.
+      - Parametrized: "single_tile:WHEAT", "single_tile:MELON", etc.
+    """
+    simple = tuple(STRATEGIES.keys())
+
+    # Parametrized single_tile strategies for each crop
+    parametrized = tuple(f"single_tile:{crop.name}" for crop in CropType)
+
+    return simple + parametrized
+
+
+def create_strategy(name: str):
+    """
+    Create a new strategy instance by registered name.
+
+    Supports two patterns:
+      1. Simple: "wheat" → WheatStrategy()
+      2. Parametrized: "single_tile:WHEAT" → SingleTileStrategy(CropType.WHEAT)
+
+    Args:
+        name: Strategy name, optionally with parameter (format: "name" or "name:PARAM")
+
+    Returns:
+        Strategy instance
+
+    Raises:
+        KeyError: If the strategy name is not registered.
+    """
+
+    # Check if this is a parametrized strategy (contains ':')
+    if ":" in name:
+        strategy_base, strategy_param = name.split(":", 1)
+
+        if strategy_base == "single_tile":
+            try:
+                crop_type = CropType[strategy_param]
+                return OneTileOneCropStrategy(crop_type)
+            except KeyError as exc:
+                available_crops = ", ".join(c.name for c in CropType)
+                raise KeyError(
+                    f"Unknown crop '{strategy_param}' for single_tile strategy. "
+                    f"Available crops: {available_crops}"
+                ) from exc
+        else:
+            raise KeyError(
+                f"Unknown parametrized strategy '{strategy_base}'. "
+                f"Only 'single_tile' supports parameters."
+            )
+
+    # Simple strategy lookup
+    if name not in STRATEGIES:
+        available = ", ".join(available_strategies())
+        raise KeyError(
+            f"Unknown Kaggriculture strategy '{name}'. "
+            f"Available strategies: {available}"
+        )
+
+    strategy_class = STRATEGIES[name]
+    return strategy_class()
+
+
+def create_default_strategy():
+    """Create the currently configured default strategy."""
+    return create_strategy(DEFAULT_STRATEGY)
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: layer_3_agents/level_1
+====================================================================================================
+
+FILE: __init__.py
+----------------------------------------------------------------------------------------------------
+
+
+----------------------------------------------------------------------------------------------------
+
+FILE: agent.py
+----------------------------------------------------------------------------------------------------
+"""
+Generic Kaggriculture Layer 3 agent adapter.
+
+This module provides the Kaggle-compatible agent entry point and delegates
+decision-making to a strategy selected from the Layer 3 strategy registry.
+"""
+
+from scriptcraft.layers.layer_1_competition.level_1_impl.level_kaggriculture.layer_3_agents.level_0.registry import (
+    create_default_strategy,
+    create_strategy,
+)
+
+
+strategy = create_default_strategy()
+
+
+def agent(obs: dict) -> dict:
+    """Kaggriculture entry point using the configured strategy."""
+    return strategy.decide(obs)
+
+
+def make_agent(strategy_name: str):
+    """
+    Create a Kaggriculture agent backed by a named strategy.
+
+    This is primarily useful for local testing and strategy comparison.
+    """
+
+    selected_strategy = create_strategy(strategy_name)
+
+    def configured_agent(obs: dict) -> dict:
+        return selected_strategy.decide(obs)
+
+    return configured_agent
+
+----------------------------------------------------------------------------------------------------
+
 PACKAGE: layer_tests
 ====================================================================================================
+
+FILE: __init__.py
+----------------------------------------------------------------------------------------------------
+
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: layer_tests/level_0
+====================================================================================================
+
+FILE: __init__.py
+----------------------------------------------------------------------------------------------------
+
+
+----------------------------------------------------------------------------------------------------
+
+FILE: build_submission.py
+----------------------------------------------------------------------------------------------------
+#!/usr/bin/env python3
+"""
+Build a Kaggriculture submission archive.
+
+The Kaggriculture strategy registry is the single source of truth for
+strategy identity and selection.
+
+The submission does not contain one agent adapter per strategy. Instead,
+the generated Kaggle entrypoint uses the generic Layer 3 agent adapter:
+
+    make_agent("<registered-strategy-name>")
+
+This keeps local testing, strategy selection, and submission building
+aligned around the same registry.
+
+Usage:
+
+    python build_submission.py
+    python build_submission.py --strategy wheat
+    python build_submission.py --strategy melon_maxxer
+    python build_submission.py --list-strategies
+    python build_submission.py --dry-run
+    python build_submission.py --strategy wheat --keep-staging
+"""
+
+
+# ============================================================================
+# IMPORTS
+# ============================================================================
+
+import argparse
+import ast
+import shutil
+import sys
+import tarfile
+import tempfile
+
+from pathlib import Path
+
+
+# ============================================================================
+# PATHS
+# ============================================================================
+
+SCRIPT_PATH = Path(__file__).resolve()
+
+LAYER_TESTS_DIR = SCRIPT_PATH.parent
+
+KAGGRICULTURE_DIR = LAYER_TESTS_DIR.parent.parent
+
+
+PYTHON_PACKAGE_DIR: Path | None = None
+
+for candidate in KAGGRICULTURE_DIR.parents:
+    if (candidate / "scriptcraft").is_dir():
+        PYTHON_PACKAGE_DIR = candidate
+        break
+
+
+if PYTHON_PACKAGE_DIR is None:
+    raise RuntimeError(
+        "Could not locate the python-package directory containing "
+        "'scriptcraft'."
+    )
+
+
+SCRIPTCRAFT_DIR = PYTHON_PACKAGE_DIR / "scriptcraft"
+
+KAGGRICULTURE_RELATIVE = KAGGRICULTURE_DIR.relative_to(
+    SCRIPTCRAFT_DIR
+)
+
+WORKSPACE_DIR = PYTHON_PACKAGE_DIR.parents[2]
+
+OUTPUT_DIR = WORKSPACE_DIR / "workspace" / "output"
+
+SUBMISSION_SUBDIR = OUTPUT_DIR / "kaggriculture"
+
+
+# ============================================================================
+# REGISTRY
+#
+# IMPORTANT:
+# The registry is the canonical source of strategy names.
+# Do not duplicate strategy names in this build script.
+# ============================================================================
+
+REGISTRY_MODULE = (
+    "scriptcraft.layers.layer_1_competition.level_1_impl."
+    "level_kaggriculture.layer_3_agents.level_0.registry"
+)
+
+
+# ============================================================================
+# GENERIC AGENT ADAPTER
+#
+# This is the canonical Layer 3 adapter that converts a registered strategy
+# into a Kaggle-compatible agent.
+# ============================================================================
+
+AGENT_MODULE = (
+    "scriptcraft.layers.layer_1_competition.level_1_impl."
+    "level_kaggriculture.layer_3_agents.level_1.agent"
+)
+
+
+# ============================================================================
+# SUBMISSION EXCLUSIONS
+# ============================================================================
+
+EXCLUDED_NAMES = {
+    "__pycache__",
+    ".pytest_cache",
+    ".mypy_cache",
+    ".ruff_cache",
+    ".git",
+    ".idea",
+    ".vscode",
+    ".venv",
+    "venv",
+    "env",
+    "node_modules",
+    ".DS_Store",
+}
+
+
+EXCLUDED_SUFFIXES = {
+    ".pyc",
+    ".pyo",
+}
+
+
+EXCLUDED_FILES = {
+    "build_submission.py",
+}
+
+
+EXCLUDED_DIR_NAMES = {
+    "layer_tests",
+    "tests",
+}
+
+
+# ============================================================================
+# OUTPUT
+# ============================================================================
+
+def log(message: str) -> None:
+    """Print a build message."""
+
+    print(f"[build] {message}")
+
+
+def fail(message: str) -> None:
+    """Abort the build with a clear error."""
+
+    print(
+        f"[build] ERROR: {message}",
+        file=sys.stderr,
+    )
+
+    raise SystemExit(1)
+
+
+# ============================================================================
+# REGISTRY HELPERS
+# ============================================================================
+
+def load_registry():
+    """
+    Load the canonical Kaggriculture strategy registry.
+
+    The import occurs here rather than maintaining a second copy of the
+    registry in this build script.
+    """
+
+    try:
+        from scriptcraft.layers.layer_1_competition.level_1_impl.level_kaggriculture.layer_3_agents.level_0.registry import (
+            DEFAULT_STRATEGY,
+            available_strategies,
+        )
+
+    except ImportError as exc:
+        fail(
+            "Could not import the Kaggriculture strategy registry.\n\n"
+            f"Expected registry module:\n"
+            f"    {REGISTRY_MODULE}\n\n"
+            f"Import error:\n"
+            f"    {exc}"
+        )
+
+    return DEFAULT_STRATEGY, available_strategies
+
+
+def get_available_strategies() -> tuple[str, ...]:
+    """Return all strategy names from the canonical registry."""
+
+    _, available_strategies = load_registry()
+
+    strategies = tuple(available_strategies())
+
+    if not strategies:
+        fail(
+            "The Kaggriculture strategy registry contains no strategies."
+        )
+
+    return strategies
+
+
+def get_default_strategy() -> str:
+    """Return the default strategy from the canonical registry."""
+
+    default_strategy, _ = load_registry()
+
+    return default_strategy
+
+
+def validate_strategy(strategy_name: str) -> None:
+    """
+    Validate that a strategy exists in the canonical registry.
+    """
+
+    available = get_available_strategies()
+
+    if strategy_name not in available:
+
+        formatted = "\n".join(
+            f"    {name}"
+            for name in available
+        )
+
+        fail(
+            f"Unknown Kaggriculture strategy '{strategy_name}'.\n\n"
+            f"Registered strategies:\n"
+            f"{formatted}\n\n"
+            f"Build with:\n"
+            f"    python build_submission.py --strategy <name>"
+        )
+
+
+def list_strategies() -> None:
+    """Print registered strategies and the registry default."""
+
+    default_strategy = get_default_strategy()
+
+    strategies = get_available_strategies()
+
+    print()
+    print("Available Kaggriculture strategies:")
+
+    for strategy in strategies:
+
+        marker = " <- default" if strategy == default_strategy else ""
+
+        print(
+            f"  {strategy}{marker}"
+        )
+
+    print()
+
+
+# ============================================================================
+# FILE FILTERING
+# ============================================================================
+
+def should_exclude(path: Path) -> bool:
+    """Determine whether a path should be excluded from the submission."""
+
+    if path.name in EXCLUDED_NAMES:
+        return True
+
+    if path.name in EXCLUDED_DIR_NAMES:
+        return True
+
+    if path.name in EXCLUDED_FILES:
+        return True
+
+    if path.suffix.lower() in EXCLUDED_SUFFIXES:
+        return True
+
+    return False
+
+
+def copy_filtered_tree(
+    source: Path,
+    destination: Path,
+) -> list[Path]:
+    """
+    Copy source recursively while excluding development/test artifacts.
+    """
+
+    copied: list[Path] = []
+
+    for path in source.rglob("*"):
+
+        relative = path.relative_to(source)
+
+        if any(
+            part in EXCLUDED_NAMES
+            for part in relative.parts
+        ):
+            continue
+
+        if any(
+            part in EXCLUDED_DIR_NAMES
+            for part in relative.parts
+        ):
+            continue
+
+        if path.is_file():
+
+            if should_exclude(path):
+                continue
+
+            target = destination / relative
+
+            target.parent.mkdir(
+                parents=True,
+                exist_ok=True,
+            )
+
+            shutil.copy2(
+                path,
+                target,
+            )
+
+            copied.append(target)
+
+    return copied
+
+
+# ============================================================================
+# PYTHON VALIDATION
+# ============================================================================
+
+def validate_python_syntax(root: Path) -> None:
+    """
+    Compile every Python source file without executing it.
+    """
+
+    log("Checking Python syntax...")
+
+    files = [
+        path
+        for path in root.rglob("*.py")
+        if not should_exclude(path)
+        and not any(
+            part in EXCLUDED_DIR_NAMES
+            for part in path.relative_to(root).parts
+        )
+    ]
+
+    if not files:
+        fail(
+            "No Python files were found in the Kaggriculture package."
+        )
+
+    errors: list[str] = []
+
+    for path in files:
+
+        try:
+
+            source = path.read_text(
+                encoding="utf-8"
+            )
+
+            compile(
+                source,
+                str(path),
+                "exec",
+            )
+
+        except SyntaxError as exc:
+
+            errors.append(
+                f"{path}: "
+                f"line {exc.lineno}: "
+                f"{exc.msg}"
+            )
+
+    if errors:
+
+        print()
+
+        for error in errors:
+            print(
+                f"    {error}",
+                file=sys.stderr,
+            )
+
+        print()
+
+        fail(
+            "Python syntax validation failed for "
+            f"{len(errors)} file(s)."
+        )
+
+    log(
+        f"Syntax OK ({len(files)} Python files checked)."
+    )
+
+
+def inspect_absolute_scriptcraft_imports(
+    package_root: Path,
+) -> set[str]:
+    """
+    Inspect Kaggriculture source files for absolute imports beginning
+    with 'scriptcraft'.
+    """
+
+    imports: set[str] = set()
+
+    for python_file in [
+        path
+        for path in package_root.rglob("*.py")
+        if not should_exclude(path)
+    ]:
+
+        try:
+
+            source = python_file.read_text(
+                encoding="utf-8"
+            )
+
+            tree = ast.parse(
+                source,
+                filename=str(python_file),
+            )
+
+        except (
+            UnicodeDecodeError,
+            SyntaxError,
+        ):
+            continue
+
+        for node in ast.walk(tree):
+
+            if isinstance(node, ast.Import):
+
+                for alias in node.names:
+
+                    if (
+                        alias.name == "scriptcraft"
+                        or alias.name.startswith(
+                            "scriptcraft."
+                        )
+                    ):
+                        imports.add(alias.name)
+
+            elif isinstance(node, ast.ImportFrom):
+
+                if node.level != 0:
+                    continue
+
+                if not node.module:
+                    continue
+
+                if (
+                    node.module == "scriptcraft"
+                    or node.module.startswith(
+                        "scriptcraft."
+                    )
+                ):
+                    imports.add(node.module)
+
+    return imports
+
+
+# ============================================================================
+# SUBMISSION ENTRYPOINT
+# ============================================================================
+
+def create_root_main(
+    staging_dir: Path,
+    strategy_name: str,
+) -> None:
+    """
+    Generate the root-level Kaggle main.py.
+
+    The generated entrypoint delegates strategy construction to the
+    canonical Layer 3 generic agent adapter.
+
+    This intentionally does NOT import a strategy implementation directly.
+    """
+
+    wrapper = f'''"""
+Kaggriculture Kaggle submission entrypoint.
+
+Strategy:
+    {strategy_name}
+
+Generated by:
+    build_submission.py
+
+The strategy is resolved through the canonical Kaggriculture registry.
+"""
+
+from {AGENT_MODULE} import make_agent
+
+
+agent = make_agent("{strategy_name}")
+
+
+__all__ = ["agent"]
+'''
+
+    target = staging_dir / "main.py"
+
+    target.write_text(
+        wrapper,
+        encoding="utf-8",
+    )
+
+    log(
+        "Generated main.py "
+        f"for registered strategy '{strategy_name}'."
+    )
+
+
+def validate_generated_main(
+    staging_dir: Path,
+) -> None:
+    """
+    Verify that the generated main.py can be parsed.
+    """
+
+    main_py = staging_dir / "main.py"
+
+    if not main_py.is_file():
+        fail(
+            "Generated main.py not found in staging directory."
+        )
+
+    log("Validating generated main.py...")
+
+    try:
+
+        source = main_py.read_text(
+            encoding="utf-8"
+        )
+
+        compile(
+            source,
+            str(main_py),
+            "exec",
+        )
+
+    except SyntaxError as exc:
+
+        fail(
+            "Syntax error in generated main.py:\n"
+            f"  {exc}"
+        )
+
+    log("main.py validation passed.")
+
+
+# ============================================================================
+# ARCHIVE VALIDATION
+# ============================================================================
+
+def validate_archive(
+    archive_path: Path,
+) -> None:
+    """Validate the final tar.gz archive."""
+
+    log("Validating submission archive...")
+
+    with tarfile.open(
+        archive_path,
+        "r:gz",
+    ) as archive:
+
+        names = archive.getnames()
+
+    normalized = {
+        name.rstrip("/")
+        for name in names
+    }
+
+    if "main.py" not in normalized:
+
+        fail(
+            "Submission archive does not contain "
+            "main.py at its root."
+        )
+
+    forbidden_fragments = (
+        "/layer_tests/",
+        "/tests/",
+        "__pycache__/",
+        ".pytest_cache/",
+    )
+
+    bad_entries = [
+        name
+        for name in names
+        if any(
+            fragment in f"/{name}/"
+            for fragment in forbidden_fragments
+        )
+    ]
+
+    if bad_entries:
+
+        print(
+            "[build] WARNING: archive contains "
+            "development/test paths:",
+            file=sys.stderr,
+        )
+
+        for name in bad_entries:
+            print(
+                f"    {name}",
+                file=sys.stderr,
+            )
+
+    log(
+        f"Archive OK: {archive_path}"
+    )
+
+
+# ============================================================================
+# ARCHIVE CREATION
+# ============================================================================
+
+def create_archive(
+    staging_dir: Path,
+    output_path: Path,
+) -> None:
+    """Create the final gzip-compressed tar archive."""
+
+    output_path.parent.mkdir(
+        parents=True,
+        exist_ok=True,
+    )
+
+    if output_path.exists():
+        output_path.unlink()
+
+    log(
+        f"Creating archive: {output_path}"
+    )
+
+    with tarfile.open(
+        output_path,
+        mode="w:gz",
+    ) as archive:
+
+        for path in sorted(
+            staging_dir.rglob("*")
+        ):
+
+            if path.is_file():
+
+                archive.add(
+                    path,
+                    arcname=path.relative_to(
+                        staging_dir
+                    ),
+                    recursive=False,
+                )
+
+
+# ============================================================================
+# BUILD
+# ============================================================================
+
+def build(
+    strategy_name: str,
+    output_path: Path,
+    keep_staging: bool,
+    dry_run: bool,
+) -> None:
+    """
+    Execute the complete submission build.
+    """
+
+    log(
+        "Starting Kaggriculture submission build."
+    )
+
+    print()
+
+    log(
+        f"Strategy: {strategy_name}"
+    )
+
+    log(
+        f"Output: {output_path}"
+    )
+
+    print()
+
+    # ------------------------------------------------------------------------
+    # Validate strategy against registry.
+    # ------------------------------------------------------------------------
+
+    validate_strategy(
+        strategy_name
+    )
+
+    log(
+        "Strategy registry validation passed."
+    )
+
+    # ------------------------------------------------------------------------
+    # Validate source package.
+    # ------------------------------------------------------------------------
+
+    validate_python_syntax(
+        KAGGRICULTURE_DIR
+    )
+
+    # ------------------------------------------------------------------------
+    # Inspect imports.
+    # ------------------------------------------------------------------------
+
+    scriptcraft_imports = (
+        inspect_absolute_scriptcraft_imports(
+            KAGGRICULTURE_DIR
+        )
+    )
+
+    if scriptcraft_imports:
+
+        log(
+            "Detected ScriptCraft imports:"
+        )
+
+        for module in sorted(
+            scriptcraft_imports
+        ):
+            log(
+                f"    {module}"
+            )
+
+    # ------------------------------------------------------------------------
+    # Dry run.
+    # ------------------------------------------------------------------------
+
+    if dry_run:
+
+        print()
+
+        log(
+            "DRY RUN: no archive was created."
+        )
+
+        return
+
+    # ------------------------------------------------------------------------
+    # Create temporary staging directory.
+    # ------------------------------------------------------------------------
+
+    staging_parent = Path(
+        tempfile.mkdtemp(
+            prefix="kaggriculture_submission_",
+            dir=str(WORKSPACE_DIR),
+        )
+    )
+
+    staging_dir = (
+        staging_parent / "submission"
+    )
+
+    staging_dir.mkdir(
+        parents=True,
+        exist_ok=True,
+    )
+
+    try:
+
+        # --------------------------------------------------------------------
+        # Copy Kaggriculture package.
+        # --------------------------------------------------------------------
+
+        destination_scriptcraft = (
+            staging_dir / "scriptcraft"
+        )
+
+        destination_kaggriculture = (
+            destination_scriptcraft
+            / KAGGRICULTURE_RELATIVE
+        )
+
+        destination_kaggriculture.parent.mkdir(
+            parents=True,
+            exist_ok=True,
+        )
+
+        # Instead of copy_filtered_tree, explicitly copy the production layers
+        production_layers = ["layer_0_reality", "layer_2_strategy", "layer_3_agents"]
+
+        for layer_name in production_layers:
+            src_layer = KAGGRICULTURE_DIR / layer_name
+            dst_layer = destination_kaggriculture / layer_name
+            
+            if src_layer.is_dir():
+                log(f"Copying {layer_name}...")
+                shutil.copytree(
+                    src_layer,
+                    dst_layer,
+                    ignore=shutil.ignore_patterns(
+                        "__pycache__",
+                        "*.pyc",
+                        ".pytest_cache",
+                    ),
+                )
+            else:
+                fail(f"Production layer not found: {src_layer}")
+
+        copied_files = [
+            f for f in destination_kaggriculture.rglob("*.py")
+        ]
+
+        log(f"Copied {len(copied_files)} Python files from production layers.")
+
+        # --------------------------------------------------------------------
+        # Preserve required __init__.py files above Kaggriculture.
+        # --------------------------------------------------------------------
+
+        current_source = SCRIPTCRAFT_DIR
+
+        current_destination = (
+            destination_scriptcraft
+        )
+
+        if (
+            current_source / "__init__.py"
+        ).is_file():
+
+            shutil.copy2(
+                current_source / "__init__.py",
+                current_destination
+                / "__init__.py",
+            )
+
+        for part in (
+            KAGGRICULTURE_RELATIVE.parts[:-1]
+        ):
+
+            current_source = (
+                current_source / part
+            )
+
+            current_destination = (
+                current_destination / part
+            )
+
+            current_destination.mkdir(
+                parents=True,
+                exist_ok=True,
+            )
+
+            init_file = (
+                current_source
+                / "__init__.py"
+            )
+
+            if init_file.is_file():
+
+                shutil.copy2(
+                    init_file,
+                    current_destination
+                    / "__init__.py",
+                )
+
+        # --------------------------------------------------------------------
+        # Generate root Kaggle entrypoint.
+        # --------------------------------------------------------------------
+
+        create_root_main(
+            staging_dir=staging_dir,
+            strategy_name=strategy_name,
+        )
+
+        # --------------------------------------------------------------------
+        # Show submission contents.
+        # --------------------------------------------------------------------
+
+        print()
+
+        log(
+            "Submission contents:"
+        )
+
+        submission_files = sorted(
+            path.relative_to(
+                staging_dir
+            )
+            for path in staging_dir.rglob("*")
+            if path.is_file()
+        )
+
+        for path in submission_files[:20]:
+
+            print(
+                f"    {path}"
+            )
+
+        if len(submission_files) > 20:
+
+            print(
+                "    ... and "
+                f"{len(submission_files) - 20} "
+                "more files"
+            )
+
+        print()
+
+        # --------------------------------------------------------------------
+        # Validate generated entrypoint.
+        # --------------------------------------------------------------------
+
+        validate_generated_main(
+            staging_dir
+        )
+
+        print()
+
+        # --------------------------------------------------------------------
+        # Create archive.
+        # --------------------------------------------------------------------
+
+        create_archive(
+            staging_dir=staging_dir,
+            output_path=output_path,
+        )
+
+        # --------------------------------------------------------------------
+        # Validate archive.
+        # --------------------------------------------------------------------
+
+        validate_archive(
+            output_path
+        )
+
+        # --------------------------------------------------------------------
+        # Check archive size.
+        # --------------------------------------------------------------------
+
+        size_bytes = (
+            output_path.stat().st_size
+        )
+
+        size_mib = (
+            size_bytes
+            / (1024 * 1024)
+        )
+
+        print()
+
+        log(
+            "Submission size: "
+            f"{size_bytes:,} bytes "
+            f"({size_mib:.2f} MiB)"
+        )
+
+        if size_mib >= 100:
+
+            fail(
+                "Submission exceeds "
+                "Kaggle's 100 MiB limit."
+            )
+
+        # --------------------------------------------------------------------
+        # Success.
+        # --------------------------------------------------------------------
+
+        print()
+
+        log(
+            "BUILD SUCCESSFUL"
+        )
+
+        log(
+            f"Strategy: {strategy_name}"
+        )
+
+        log(
+            f"Submission: {output_path}"
+        )
+
+        print()
+
+        print(
+            "Next steps:"
+        )
+
+        print()
+
+        print(
+            "  1. Verify archive contents:"
+        )
+
+        print(
+            f"     tar -tzf {output_path} | head -20"
+        )
+
+        print()
+
+        print(
+            "  2. Submit to Kaggle:"
+        )
+
+        print(
+            f'     kaggle competitions submit '
+            f'kaggriculture -f "{output_path}" '
+            f'-m "{strategy_name} submission"'
+        )
+
+        print()
+
+        print(
+            "  3. Check submission status:"
+        )
+
+        print(
+            "     kaggle competitions submissions "
+            "kaggriculture"
+        )
+
+        print()
+
+        # --------------------------------------------------------------------
+        # Preserve staging if requested.
+        # --------------------------------------------------------------------
+
+        if keep_staging:
+
+            persistent_staging = (
+                SUBMISSION_SUBDIR
+                / "submission_staging"
+            )
+
+            if persistent_staging.exists():
+
+                shutil.rmtree(
+                    persistent_staging
+                )
+
+            shutil.copytree(
+                staging_dir,
+                persistent_staging,
+            )
+
+            log(
+                "Staging directory preserved at:"
+            )
+
+            log(
+                f"    {persistent_staging}"
+            )
+
+    finally:
+
+        shutil.rmtree(
+            staging_parent,
+            ignore_errors=True,
+        )
+
+
+# ============================================================================
+# CLI
+# ============================================================================
+
+def parse_args() -> argparse.Namespace:
+    """Parse command-line arguments."""
+
+    parser = argparse.ArgumentParser(
+        description=(
+            "Build a self-contained Kaggriculture "
+            "Kaggle submission using the strategy registry."
+        )
+    )
+
+    parser.add_argument(
+        "--strategy",
+        metavar="NAME",
+        default=None,
+        help=(
+            "Registered strategy to submit. "
+            "Defaults to the registry's DEFAULT_STRATEGY."
+        ),
+    )
+
+    parser.add_argument(
+        "--list-strategies",
+        action="store_true",
+        help=(
+            "List registered strategies and exit."
+        ),
+    )
+
+    parser.add_argument(
+        "--output",
+        metavar="FILE",
+        type=Path,
+        default=None,
+        help=(
+            "Output tar.gz path. "
+            f"Default: "
+            f"{SUBMISSION_SUBDIR}/submission.tar.gz"
+        ),
+    )
+
+    parser.add_argument(
+        "--keep-staging",
+        action="store_true",
+        help=(
+            "Keep a copy of the staged submission "
+            "in output/kaggriculture/submission_staging/"
+        ),
+    )
+
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help=(
+            "Validate the strategy and package "
+            "without creating an archive."
+        ),
+    )
+
+    return parser.parse_args()
+
+
+# ============================================================================
+# MAIN
+# ============================================================================
+
+def main() -> None:
+    """CLI entrypoint."""
+
+    args = parse_args()
+
+    # ------------------------------------------------------------------------
+    # List registry.
+    # ------------------------------------------------------------------------
+
+    if args.list_strategies:
+
+        list_strategies()
+
+        return
+
+    # ------------------------------------------------------------------------
+    # Resolve strategy from registry.
+    # ------------------------------------------------------------------------
+
+    if args.strategy is None:
+
+        strategy_name = (
+            get_default_strategy()
+        )
+
+    else:
+
+        strategy_name = args.strategy
+
+    # ------------------------------------------------------------------------
+    # Validate strategy before doing any build work.
+    # ------------------------------------------------------------------------
+
+    validate_strategy(
+        strategy_name
+    )
+
+    # ------------------------------------------------------------------------
+    # Resolve output.
+    # ------------------------------------------------------------------------
+
+    if args.output is None:
+
+        output_path = (
+            SUBMISSION_SUBDIR
+            / "submission.tar.gz"
+        )
+
+    else:
+
+        output_path = args.output
+
+        if not output_path.is_absolute():
+
+            output_path = (
+                WORKSPACE_DIR
+                / output_path
+            )
+
+    # ------------------------------------------------------------------------
+    # Build.
+    # ------------------------------------------------------------------------
+
+    build(
+        strategy_name=strategy_name,
+        output_path=output_path,
+        keep_staging=args.keep_staging,
+        dry_run=args.dry_run,
+    )
+
+
+# ============================================================================
+# ENTRYPOINT
+# ============================================================================
+
+if __name__ == "__main__":
+    main()
+
+----------------------------------------------------------------------------------------------------
+
+FILE: local_test1.py
+----------------------------------------------------------------------------------------------------
+"""
+Kaggriculture local strategy test runner.
+
+Examples:
+
+    python test_agent.py
+    python test_agent.py wheat
+    python test_agent.py melon_maxxer
+    python test_agent.py --list
+    python test_agent.py meta_milk --opponent random
+"""
+
+import argparse
+import json
+
+from kaggle_environments import make
+
+from scriptcraft.layers.layer_1_competition.level_1_impl.level_kaggriculture.layer_3_agents.level_0.registry import (
+    DEFAULT_STRATEGY,
+    available_strategies,
+)
+from scriptcraft.layers.layer_1_competition.level_1_impl.level_kaggriculture.layer_3_agents.level_1.agent import (
+    make_agent,
+)
+
+
+EPISODE_STEPS = 720
+
+
+def parse_args() -> argparse.Namespace:
+    """Parse local test runner arguments."""
+
+    parser = argparse.ArgumentParser(
+        description="Run a Kaggriculture strategy locally.",
+    )
+
+    parser.add_argument(
+        "strategy",
+        nargs="?",
+        default=DEFAULT_STRATEGY,
+        help="Strategy to test.",
+    )
+
+    parser.add_argument(
+        "--opponent",
+        default="random",
+        help="Opponent agent to run against.",
+    )
+
+    parser.add_argument(
+        "--steps",
+        type=int,
+        default=EPISODE_STEPS,
+        help="Number of episode steps.",
+    )
+
+    parser.add_argument(
+        "--replay",
+        default="replay.json",
+        help="Path for the generated replay JSON.",
+    )
+
+    parser.add_argument(
+        "--list",
+        action="store_true",
+        dest="list_strategies",
+        help="List registered strategies and exit.",
+    )
+
+    return parser.parse_args()
+
+
+def print_strategies() -> None:
+    """Print all registered strategy names."""
+
+    print("Available strategies:")
+
+    for name in available_strategies():
+        print(f"  - {name}")
+
+
+def run_agent(
+    strategy_name: str,
+    opponent: str,
+    episode_steps: int,
+    replay_path: str,
+) -> None:
+    """Run a selected strategy against the selected opponent."""
+
+    agent = make_agent(strategy_name)
+
+    print(f"Strategy: {strategy_name}")
+    print(f"Opponent: {opponent}")
+    print(f"Episode steps: {episode_steps}")
+    print()
+
+    env = make(
+        "kaggriculture",
+        configuration={"episodeSteps": episode_steps},
+        debug=False,
+    )
+
+    env.run([agent, opponent])
+
+    final = env.steps[-1]
+
+    print("Final results:")
+
+    for i, state in enumerate(final):
+        print(
+            f"  Player {i}: "
+            f"reward={state.reward}, "
+            f"status={state.status}",
+        )
+
+    env.render(
+        mode="ipython",
+        width=1200,
+        height=800,
+    )
+
+    with open(replay_path, "w", encoding="utf-8") as f:
+        json.dump(env.toJSON(), f)
+
+    print()
+    print(f"Replay written to: {replay_path}")
+
+
+def main() -> None:
+    """Run the local strategy test."""
+
+    args = parse_args()
+
+    if args.list_strategies:
+        print_strategies()
+        return
+
+    available = set(available_strategies())
+
+    if args.strategy not in available:
+        print(f"Unknown strategy: {args.strategy}")
+        print()
+        print_strategies()
+        raise SystemExit(2)
+
+    run_agent(
+        strategy_name=args.strategy,
+        opponent=args.opponent,
+        episode_steps=args.steps,
+        replay_path=args.replay,
+    )
+
+
+if __name__ == "__main__":
+    main()
+
+----------------------------------------------------------------------------------------------------
+
+FILE: single_game.py
+----------------------------------------------------------------------------------------------------
+"""
+Kaggriculture single-game test primitive.
+
+Runs one strategy against one opponent and returns the resulting
+Kaggle environment. Higher-level test runners can use this primitive
+to perform local games, batches, comparisons, or regression tests.
+"""
+
+import json
+
+from pathlib import Path
+from typing import Any
+
+from kaggle_environments import make
+
+from scriptcraft.layers.layer_1_competition.level_1_impl.level_kaggriculture.layer_3_agents.level_0.registry import (
+    DEFAULT_STRATEGY,
+)
+from scriptcraft.layers.layer_1_competition.level_1_impl.level_kaggriculture.layer_3_agents.level_1.agent import (
+    make_agent,
+)
+
+
+EPISODE_STEPS = 720
+
+
+def run_game(
+    strategy_name: str = DEFAULT_STRATEGY,
+    opponent: str = "self",
+    episode_steps: int = EPISODE_STEPS,
+) -> Any:
+    """
+    Run one Kaggriculture game.
+
+    Args:
+        strategy_name: Registered strategy to run.
+        opponent: Kaggriculture opponent agent.
+        episode_steps: Number of steps in the episode.
+
+    Returns:
+        The completed Kaggle environment.
+    """
+
+
+    agent = make_agent(strategy_name)
+
+    if opponent == "self":
+        opponent_agent = make_agent(strategy_name)
+    else:
+        opponent_agent = opponent
+
+    env = make(
+        "kaggriculture",
+        configuration={"episodeSteps": episode_steps},
+        debug=False,
+    )
+
+    env.run([agent, opponent_agent])
+
+    return env
+
+
+def save_replay(env: Any, path: str | Path) -> None:
+    """Save a completed game as a Kaggle replay JSON file."""
+
+    with Path(path).open("w", encoding="utf-8") as file:
+        json.dump(env.toJSON(), file)
+
+
+def print_results(env: Any) -> None:
+    """Print the final results of a completed game."""
+
+    final = env.steps[-1]
+
+    for i, state in enumerate(final):
+        print(
+            f"Player {i}: "
+            f"reward={state.reward}, "
+            f"status={state.status}",
+        )
+
+
+def render_game(
+    env: Any,
+    width: int = 1200,
+    height: int = 800,
+) -> None:
+    """Render a completed game."""
+
+    env.render(
+        mode="ipython",
+        width=width,
+        height=height,
+    )
+
+----------------------------------------------------------------------------------------------------
 
 FILE: test_layer_0_reality_gaps.py
 ----------------------------------------------------------------------------------------------------
 """
-Targeted tests for the confirmed gaps closed in this implementation pass.
+Layer 0 Reality contract tests for Kaggriculture.
 
-Covers:
-- FARM_HAND_COST_MULT configuration constant
-- INITIAL_CONSECUTIVE_UNWATERED / INITIAL_CONSECUTIVE_UNFED constants
-- Immutability of CROPS, ANIMALS, MARKET, SHOP_DEMAND
-- initial_consecutive_unwatered_days()
-- initial_consecutive_unfed_days()
-- required_structure()
-- DIG rules
-- Board-size validation consistency
-- Farm-hand Fibonacci, cost, spawn selection
-- shop_unlocks_on_day()
-- shop_demand() accessor
-- sell_price() / buy_price() curve selection
+These tests verify that layer_0_reality accurately represents the
+competition's documented rules and canonical definitions.
+
+The purpose of this suite is not to test implementation details or
+future strategy behavior. It establishes a regression boundary around
+the competition reality that higher layers are allowed to depend upon.
+
+Coverage includes:
+
+- canonical actions and vocabulary
+- immutable crop definitions and crop catalog
+- immutable animal definitions and animal catalog
+- immutable market definitions and shop catalog
+- competition configuration constants
+- time rules
+- farm geometry and land rules
+- shed access
+- DIG legality
+- weed spawning conditions
+- watering/feeding failure thresholds
+- animal-to-structure compatibility
+- animal care bonus
+- animal production timing and yield
+- crop production timing and watering/fertilizer behavior
+- crop decay
+- farm-hand hiring cost
+- farm-hand spawn selection
+- town shop unlock timing and demand
+- market price curves and buy/sell semantics
+
+These tests intentionally do not instantiate an engine, mutate game state,
+or test strategy.
 """
 
-import pytest
 from types import MappingProxyType
 
-# ── level_0 definitions ────────────────────────────────────────────────────
-from layer_0_reality.level_0.definitions.game import (
-    FARM_HAND_COST_MULT,
-    INITIAL_CONSECUTIVE_UNWATERED,
-    INITIAL_CONSECUTIVE_UNFED,
-)
-from layer_0_reality.level_0.definitions.crops import CROPS, CropType
-from layer_0_reality.level_0.definitions.objects import ObjectType
+import pytest
 
-# ── level_1 definitions ────────────────────────────────────────────────────
-from layer_0_reality.level_1.definitions.animals import (
-    ANIMALS,
+# ============================================================================
+# Level 0 definitions
+# ============================================================================
+
+from ..layer_0_reality.level_0.definitions.actions import (
+    FarmAction,
+    MarketAction,
+)
+
+from ..layer_0_reality.level_0.definitions.crops import (
+    CropDefinition,
+    CropType,
+    YieldType,
+)
+
+from ..layer_0_reality.level_0.definitions.game import (
+    ANIMAL_CARE_BONUS_INCREMENT,
+    ANIMAL_FERTILIZER_PER_DAY,
+    BOARD_SIZE,
+    CROP_DECAY_INTERVAL_TURNS,
+    DAYS_PER_SEASON,
+    EPISODE_STEPS,
+    FARM_HAND_COST_MULT,
+    FERTILIZER_DURATION_DAYS,
+    INITIAL_CONSECUTIVE_UNFED,
+    INITIAL_CONSECUTIVE_UNWATERED,
+    LAND_QUADRANT_COUNT,
+    LAND_QUADRANT_SIZE,
+    LAND_PURCHASE_COSTS,
+    MAX_CONSECUTIVE_UNFED_DAYS,
+    MAX_CONSECUTIVE_UNWATERED_DAYS,
+    MAX_TOWN_SHOP_INSTANCES,
+    PRICE_FLOOR,
+    SHED_CAPACITY,
+    STARTING_MONEY,
+    TOWN_CENTER_SELL_INTERVAL,
+    TOWN_SHOP_SELL_INTERVAL,
+    TOWN_SHOP_UNLOCK_INTERVAL,
+    TURNS_PER_DAY,
+    WEED_SPAWN_CHANCE,
+)
+
+from ..layer_0_reality.level_0.definitions.market import (
+    MarketDefinition,
+    PriceShape,
+)
+
+from ..layer_0_reality.level_0.definitions.objects import (
+    ObjectType,
+)
+
+from ..layer_0_reality.level_0.definitions.shops import (
+    TownShopType,
+)
+
+# ============================================================================
+# Level 1 definitions
+# ============================================================================
+
+from ..layer_0_reality.level_1.definitions.animals import (
+    AnimalDefinition,
     AnimalType,
     StructureType,
 )
-from layer_0_reality.level_1.definitions.market import MARKET
-from layer_0_reality.level_1.definitions.town import SHOP_DEMAND, TownShopType
 
-# ── level_1 rules ─────────────────────────────────────────────────────────
-from layer_0_reality.level_1.rules.crops import initial_consecutive_unwatered_days
-from layer_0_reality.level_1.rules.animals import (
+from ..layer_0_reality.level_1.definitions.crop_catalog import (
+    CROPS,
+    crop_definition,
+)
+
+from ..layer_0_reality.level_1.definitions.market_catalog import (
+    MARKET,
+)
+
+from ..layer_0_reality.level_1.definitions.shop_catalog import (
+    SHOP_DEMAND,
+)
+
+# ============================================================================
+# Level 1 rules
+# ============================================================================
+
+from ..layer_0_reality.level_1.rules.animal_care import (
+    animal_fails_after,
+    care_bonus_accrual,
+)
+
+from ..layer_0_reality.level_1.rules.animal_initial_state import (
     initial_consecutive_unfed_days,
+)
+
+from ..layer_0_reality.level_1.rules.animal_structure import (
     required_structure,
 )
-from layer_0_reality.level_1.rules.farming import (
-    can_dig_plant,
-    can_dig_weed,
+
+from ..layer_0_reality.level_1.rules.crop_initial_state import (
+    initial_consecutive_unwatered_days,
+)
+
+from ..layer_0_reality.level_1.rules.farm_conditions import (
+    can_spawn_weed,
+    weed_spawn_chance,
+)
+
+from ..layer_0_reality.level_1.rules.farm_geometry import (
+    all_land_unlocked,
+    initial_unlocked_quadrants,
+    is_shed_access_tile,
+    is_tile_unlocked,
+    next_land_purchase_cost,
+    quadrant_bounds,
+    quadrant_for_position,
+    quadrant_size,
+    quadrant_tiles,
+    total_board_tiles,
+    valid_board_position,
+    Quadrant,
+)
+
+from ..layer_0_reality.level_1.rules.farm_hands import (
+    farm_hand_cost,
+    fibonacci,
+)
+
+from ..layer_0_reality.level_1.rules.farm_hand_spawning import (
+    select_spawn_tile,
+    spawn_candidates_in_preference_order,
+)
+
+from ..layer_0_reality.level_1.rules.farming import (
     can_dig_empty_structure,
     can_dig_occupied_structure,
-    quadrant_size,
-    total_board_tiles,
+    can_dig_plant,
+    can_dig_weed,
     shed_access_tiles,
 )
-from layer_0_reality.level_1.rules.farm_hands import (
-    fibonacci,
-    farm_hand_cost,
-    hires_reset_each_day,
-    hired_hands_are_daily,
-    spawn_candidates_in_preference_order,
-    select_spawn_tile,
-    spawn_may_land_on_locked_tile,
+
+from ..layer_0_reality.level_1.rules.time import (
+    day_from_step,
+    is_end_of_day,
+    is_end_of_season,
+    season_days,
+    turn_in_day,
 )
-from layer_0_reality.level_1.rules.town import (
-    shop_unlocks_on_day,
+
+from ..layer_0_reality.level_1.rules.shop import (
     shop_demand,
+    shop_unlocks_on_day,
 )
 
-# ── level_2 rules ─────────────────────────────────────────────────────────
-from layer_0_reality.level_2.rules.market import sell_price, buy_price
+# ============================================================================
+# Level 2 rules
+# ============================================================================
+
+from ..layer_0_reality.level_2.rules.animal_production import (
+    animal_production_yield,
+    production_count,
+    production_yield_with_care,
+    produces_on_day,
+)
+
+from ..layer_0_reality.level_2.rules.crop_production import (
+    bonus_end_day,
+    bonus_start_day,
+    first_yield_day,
+    is_one_time_crop,
+    is_ongoing_crop,
+    max_yield,
+    one_time_bonus_applies,
+    one_time_bonus_end_day,
+    one_time_bonus_start_day,
+    one_time_watering_bonus,
+    one_time_yield,
+    ongoing_production_count,
+    ongoing_production_yield,
+    production_interval,
+    produces_on_day as crop_produces_on_day,
+)
+
+from ..layer_0_reality.level_2.rules.crop_decay import (
+    becomes_weed,
+    decay_reduction,
+    decay_start_day,
+    decayed_yield,
+    is_decaying,
+    one_time_decay_start_day,
+    ongoing_decay_start_day,
+)
+
+from ..layer_0_reality.level_2.rules.market import (
+    buy_price,
+    can_buy_product,
+    can_sell_product,
+    market_price,
+    price_shape_value,
+    sell_price,
+)
+
+from ..layer_0_reality.level_2.definitions.market_accessors import (
+    initial_market_inventory,
+)
+
+# ============================================================================
+# Canonical configuration
+# ============================================================================
 
 
-# ===========================================================================
-# Configuration constants
-# ===========================================================================
+class TestGameConfiguration:
+    """Pin the competition's documented default configuration."""
 
-class TestGameConstants:
-    def test_farm_hand_cost_mult_default(self):
+    def test_episode_timing(self):
+        assert TURNS_PER_DAY == 24
+        assert DAYS_PER_SEASON == 30
+        assert EPISODE_STEPS == 720
+        assert EPISODE_STEPS == TURNS_PER_DAY * DAYS_PER_SEASON
+
+    def test_board_configuration(self):
+        assert BOARD_SIZE == 10
+        assert LAND_QUADRANT_COUNT == 4
+        assert LAND_QUADRANT_SIZE == 5
+        assert LAND_QUADRANT_SIZE * 2 == BOARD_SIZE
+
+    def test_economy_configuration(self):
+        assert STARTING_MONEY == 3000
+        assert SHED_CAPACITY == 100
+        assert initial_market_inventory(ObjectType.WHEAT) == 10_000
+        assert PRICE_FLOOR == 1
+
+    def test_land_configuration(self):
+        assert LAND_PURCHASE_COSTS == (1000, 2000, 4000)
+
+    def test_failure_configuration(self):
+        assert INITIAL_CONSECUTIVE_UNWATERED == 1
+        assert INITIAL_CONSECUTIVE_UNFED == 0
+        assert MAX_CONSECUTIVE_UNWATERED_DAYS == 2
+        assert MAX_CONSECUTIVE_UNFED_DAYS == 2
+
+    def test_fertilizer_configuration(self):
+        assert FERTILIZER_DURATION_DAYS == 3
+        assert ANIMAL_FERTILIZER_PER_DAY == 1
+
+    def test_decay_configuration(self):
+        assert CROP_DECAY_INTERVAL_TURNS == 2
+
+    def test_farm_hand_configuration(self):
         assert FARM_HAND_COST_MULT == 1
 
-    def test_initial_consecutive_unwatered(self):
-        assert INITIAL_CONSECUTIVE_UNWATERED == 1
+    def test_town_configuration(self):
+        assert TOWN_SHOP_UNLOCK_INTERVAL == 3
+        assert TOWN_SHOP_SELL_INTERVAL == 4
+        assert TOWN_CENTER_SELL_INTERVAL == 24
+        assert MAX_TOWN_SHOP_INSTANCES == 8
 
-    def test_initial_consecutive_unfed(self):
-        assert INITIAL_CONSECUTIVE_UNFED == 0
+    def test_weed_configuration(self):
+        assert WEED_SPAWN_CHANCE == pytest.approx(0.005)
+
+    def test_animal_care_configuration(self):
+        assert ANIMAL_CARE_BONUS_INCREMENT == 1
 
 
-# ===========================================================================
-# Immutability
-# ===========================================================================
+# ============================================================================
+# Canonical vocabulary
+# ============================================================================
 
-class TestImmutability:
-    def test_crops_is_mapping_proxy(self):
+
+class TestCanonicalVocabulary:
+    """Ensure the complete competition vocabulary exists."""
+
+    def test_crop_types(self):
+        assert set(CropType) == {
+            CropType.WHEAT,
+            CropType.CARROT,
+            CropType.TOMATO,
+            CropType.STRAWBERRY,
+            CropType.MELON,
+        }
+
+    def test_animal_types(self):
+        assert set(AnimalType) == {
+            AnimalType.GOOSE,
+            AnimalType.COW,
+            AnimalType.SHEEP,
+        }
+
+    def test_object_types(self):
+        assert set(ObjectType) == {
+            ObjectType.WHEAT,
+            ObjectType.CARROT,
+            ObjectType.TOMATO,
+            ObjectType.STRAWBERRY,
+            ObjectType.MELON,
+            ObjectType.EGG,
+            ObjectType.MILK,
+            ObjectType.WOOL,
+            ObjectType.FERTILIZER,
+        }
+
+    def test_shop_types(self):
+        assert len(tuple(TownShopType)) == 8
+
+    def test_farm_actions_are_defined(self):
+        assert FarmAction.NORTH.value == "NORTH"
+        assert FarmAction.SOUTH.value == "SOUTH"
+        assert FarmAction.EAST.value == "EAST"
+        assert FarmAction.WEST.value == "WEST"
+        assert FarmAction.PLANT.value == "PLANT"
+        assert FarmAction.WATER.value == "WATER"
+        assert FarmAction.HARVEST.value == "HARVEST"
+        assert FarmAction.FEED.value == "FEED"
+        assert FarmAction.CARE.value == "CARE"
+        assert FarmAction.DIG.value == "DIG"
+        assert FarmAction.PASS.value == "PASS"
+
+    def test_market_actions_are_defined(self):
+        assert MarketAction.BUY_SEED.value == "BUY_SEED"
+        assert MarketAction.BUY_ANIMAL.value == "BUY_ANIMAL"
+        assert MarketAction.BUY_PRODUCT.value == "BUY_PRODUCT"
+        assert MarketAction.SELL.value == "SELL"
+        assert MarketAction.HIRE.value == "HIRE"
+        assert MarketAction.BUY_LAND.value == "BUY_LAND"
+
+
+# ============================================================================
+# Crop definitions
+# ============================================================================
+
+
+class TestCropDefinitions:
+    """Verify every crop's canonical definition."""
+
+    def test_all_crop_types_have_definitions(self):
+        assert set(CROPS) == set(CropType)
+
+    @pytest.mark.parametrize("crop", list(CropType))
+    def test_definition_is_immutable(self, crop):
+        definition = crop_definition(crop)
+
+        assert isinstance(definition, CropDefinition)
+
+        with pytest.raises((AttributeError, TypeError)):
+            definition.seed_cost = 999  # type: ignore[misc]
+
+    def test_catalog_is_immutable(self):
         assert isinstance(CROPS, MappingProxyType)
 
-    def test_crops_cannot_be_written(self):
         with pytest.raises(TypeError):
-            CROPS[CropType.WHEAT] = None   # type: ignore[index]
+            CROPS[CropType.WHEAT] = None  # type: ignore[index]
 
-    def test_crop_definition_is_frozen(self):
+    @pytest.mark.parametrize(
+        "crop,seed_cost,first,max_time,yield_cap",
+        [
+            (CropType.WHEAT, 10, 2, 4, 6),
+            (CropType.CARROT, 20, 2, 3, 4),
+            (CropType.TOMATO, 50, 8, 11, 4),
+            (CropType.STRAWBERRY, 100, 10, 16, 4),
+            (CropType.MELON, 80, 10, 10, 6),
+        ],
+    )
+    def test_crop_values(
+        self,
+        crop,
+        seed_cost,
+        first,
+        max_time,
+        yield_cap,
+    ):
+        definition = crop_definition(crop)
+
+        assert definition.seed_cost == seed_cost
+        assert definition.time_to_first_yield == first
+        assert definition.time_to_max_yield == max_time
+        assert definition.max_yield == yield_cap
+        assert definition.action_cost == 1
+
+    def test_one_time_crop_types(self):
+        assert is_one_time_crop(CropType.WHEAT)
+        assert is_one_time_crop(CropType.CARROT)
+        assert is_one_time_crop(CropType.MELON)
+
+    def test_ongoing_crop_types(self):
+        assert is_ongoing_crop(CropType.TOMATO)
+        assert is_ongoing_crop(CropType.STRAWBERRY)
+
+    def test_production_intervals(self):
+        assert production_interval(CropType.TOMATO) == 1
+        assert production_interval(CropType.STRAWBERRY) == 2
+        assert production_interval(CropType.WHEAT) == 0
+        assert production_interval(CropType.CARROT) == 0
+        assert production_interval(CropType.MELON) == 0
+
+    def test_bonus_windows(self):
+        assert (
+            bonus_start_day(CropType.WHEAT),
+            bonus_end_day(CropType.WHEAT),
+        ) == (2, 4)
+
+        assert (
+            bonus_start_day(CropType.CARROT),
+            bonus_end_day(CropType.CARROT),
+        ) == (2, 3)
+
+        assert (
+            bonus_start_day(CropType.TOMATO),
+            bonus_end_day(CropType.TOMATO),
+        ) == (8, 11)
+
+        assert (
+            bonus_start_day(CropType.STRAWBERRY),
+            bonus_end_day(CropType.STRAWBERRY),
+        ) == (10, 16)
+
+        assert (
+            bonus_start_day(CropType.MELON),
+            bonus_end_day(CropType.MELON),
+        ) == (6, 12)
+
+
+# ============================================================================
+# Animal definitions
+# ============================================================================
+
+
+class TestAnimalDefinitions:
+    def test_all_animals_have_definitions(self):
+        from layer_0_reality.level_2.definitions.animal_catalog import ANIMALS
+
+        assert set(ANIMALS) == set(AnimalType)
+
+    @pytest.mark.parametrize("animal", list(AnimalType))
+    def test_definition_is_immutable(self, animal):
+        from layer_0_reality.level_2.definitions.animal_catalog import animal_definition
+
+        definition = animal_definition(animal)
+
+        assert isinstance(definition, AnimalDefinition)
+
         with pytest.raises((AttributeError, TypeError)):
-            CROPS[CropType.WHEAT].seed_cost = 0  # type: ignore[misc]
+            definition.purchase_cost = 999  # type: ignore[misc]
 
-    def test_animals_is_mapping_proxy(self):
-        assert isinstance(ANIMALS, MappingProxyType)
+    @pytest.mark.parametrize(
+        "animal,cost,product,first,interval,max_held",
+        [
+            (AnimalType.GOOSE, 300, ObjectType.EGG, 4, 1, 4),
+            (AnimalType.COW, 400, ObjectType.MILK, 8, 2, 6),
+            (AnimalType.SHEEP, 500, ObjectType.WOOL, 6, 3, 6),
+        ],
+    )
+    def test_animal_values(
+        self,
+        animal,
+        cost,
+        product,
+        first,
+        interval,
+        max_held,
+    ):
+        from layer_0_reality.level_2.definitions.animal_catalog import animal_definition
 
-    def test_animals_cannot_be_written(self):
-        with pytest.raises(TypeError):
-            ANIMALS[AnimalType.GOOSE] = None   # type: ignore[index]
+        definition = animal_definition(animal)
 
-    def test_animal_definition_is_frozen(self):
-        with pytest.raises((AttributeError, TypeError)):
-            ANIMALS[AnimalType.GOOSE].purchase_cost = 0  # type: ignore[misc]
+        assert definition.purchase_cost == cost
+        assert definition.product is product
+        assert definition.time_to_first_yield == first
+        assert definition.production_interval == interval
+        assert definition.max_held == max_held
+        assert definition.action_cost == 1
 
-    def test_market_is_mapping_proxy(self):
+
+# ============================================================================
+# Market definitions
+# ============================================================================
+
+
+class TestMarketDefinitions:
+    def test_market_is_immutable(self):
         assert isinstance(MARKET, MappingProxyType)
 
-    def test_market_cannot_be_written(self):
         with pytest.raises(TypeError):
-            MARKET[ObjectType.WHEAT] = None   # type: ignore[index]
+            MARKET[ObjectType.WHEAT] = None  # type: ignore[index]
 
-    def test_market_definition_is_frozen(self):
-        with pytest.raises((AttributeError, TypeError)):
-            MARKET[ObjectType.WHEAT].base_price = 0  # type: ignore[misc]
+    @pytest.mark.parametrize("product", list(ObjectType))
+    def test_every_product_has_market_definition(self, product):
+        assert product in MARKET
 
-    def test_shop_demand_is_mapping_proxy(self):
+        definition = MARKET[product]
+        assert isinstance(definition, MarketDefinition)
+
+    def test_every_market_definition_is_immutable(self):
+        for definition in MARKET.values():
+            with pytest.raises((AttributeError, TypeError)):
+                definition.base_price = 999  # type: ignore[misc]
+
+    @pytest.mark.parametrize(
+        "product,base_price,anchor",
+        [
+            (ObjectType.WHEAT, 25, 400),
+            (ObjectType.CARROT, 35, 450),
+            (ObjectType.TOMATO, 60, 200),
+            (ObjectType.STRAWBERRY, 120, 100),
+            (ObjectType.MELON, 250, 300),
+            (ObjectType.EGG, 50, 332),
+            (ObjectType.MILK, 160, 122),
+            (ObjectType.WOOL, 200, 105),
+            (ObjectType.FERTILIZER, 100, 200),
+        ],
+    )
+    def test_market_values(self, product, base_price, anchor):
+        definition = MARKET[product]
+
+        assert definition.base_price == base_price
+        assert definition.initial_inventory == INITIAL_MARKET_INVENTORY
+        assert definition.anchor_throughput == anchor
+
+    def test_all_price_shapes_exist(self):
+        assert set(PriceShape) == {
+            PriceShape.LINEAR,
+            PriceShape.SQUARE,
+            PriceShape.SQRT,
+            PriceShape.LOG,
+            PriceShape.LOG10,
+        }
+
+
+# ============================================================================
+# Shop catalog
+# ============================================================================
+
+
+class TestShopCatalog:
+    def test_shop_catalog_is_immutable(self):
         assert isinstance(SHOP_DEMAND, MappingProxyType)
 
-    def test_shop_demand_cannot_be_written(self):
         with pytest.raises(TypeError):
-            SHOP_DEMAND[TownShopType.BAKERY] = {}   # type: ignore[index]
+            SHOP_DEMAND[TownShopType.BAKERY] = {}  # type: ignore[index]
 
-    def test_shop_demand_inner_is_mapping_proxy(self):
-        """Inner demand dicts are also immutable."""
-        assert isinstance(SHOP_DEMAND[TownShopType.BAKERY], MappingProxyType)
+    def test_inner_shop_demands_are_immutable(self):
+        for demand in SHOP_DEMAND.values():
+            assert isinstance(demand, MappingProxyType)
 
-    def test_shop_demand_inner_cannot_be_written(self):
-        with pytest.raises(TypeError):
-            SHOP_DEMAND[TownShopType.BAKERY][ObjectType.EGG] = 99   # type: ignore[index]
+    def test_all_shop_types_have_demand(self):
+        assert set(SHOP_DEMAND) == set(TownShopType)
+
+    @pytest.mark.parametrize(
+        "shop,expected",
+        [
+            (
+                TownShopType.BAKERY,
+                {ObjectType.EGG: 1, ObjectType.WHEAT: 1},
+            ),
+            (
+                TownShopType.PIZZA_SHOP,
+                {
+                    ObjectType.MILK: 1,
+                    ObjectType.TOMATO: 1,
+                    ObjectType.WHEAT: 1,
+                },
+            ),
+            (
+                TownShopType.BRUNCH_SPOT,
+                {
+                    ObjectType.EGG: 1,
+                    ObjectType.WHEAT: 1,
+                    ObjectType.STRAWBERRY: 1,
+                },
+            ),
+            (
+                TownShopType.YARN_STORE,
+                {ObjectType.WOOL: 2},
+            ),
+            (
+                TownShopType.ICE_CREAM_SHOP,
+                {
+                    ObjectType.STRAWBERRY: 1,
+                    ObjectType.MILK: 1,
+                    ObjectType.WHEAT: 1,
+                },
+            ),
+            (
+                TownShopType.PET_CAFE,
+                {ObjectType.CARROT: 2},
+            ),
+            (
+                TownShopType.SMOOTHIE_SHOP,
+                {
+                    ObjectType.STRAWBERRY: 1,
+                    ObjectType.MILK: 1,
+                },
+            ),
+            (
+                TownShopType.FARMERS_MARKET,
+                {
+                    ObjectType.WHEAT: 1,
+                    ObjectType.CARROT: 1,
+                    ObjectType.TOMATO: 1,
+                    ObjectType.STRAWBERRY: 1,
+                },
+            ),
+        ],
+    )
+    def test_shop_demand_catalog(self, shop, expected):
+        assert dict(SHOP_DEMAND[shop]) == expected
 
 
-# ===========================================================================
-# Initial crop state
-# ===========================================================================
+# ============================================================================
+# Time rules
+# ============================================================================
 
-class TestInitialCropState:
-    def test_initial_consecutive_unwatered_days(self):
+
+class TestTimeRules:
+    def test_day_from_step(self):
+        assert day_from_step(0) == 0
+        assert day_from_step(23) == 0
+        assert day_from_step(24) == 1
+        assert day_from_step(47) == 1
+        assert day_from_step(719) == 29
+
+    def test_turn_in_day(self):
+        assert turn_in_day(0) == 0
+        assert turn_in_day(23) == 23
+        assert turn_in_day(24) == 0
+        assert turn_in_day(719) == 23
+
+    def test_end_of_day(self):
+        assert is_end_of_day(22) is False
+        assert is_end_of_day(23) is True
+        assert is_end_of_day(24) is False
+        assert is_end_of_day(47) is True
+
+    def test_end_of_season(self):
+        assert is_end_of_season(718) is False
+        assert is_end_of_season(719) is True
+
+    def test_season_days(self):
+        assert season_days() == 30
+
+    @pytest.mark.parametrize("function", [
+        day_from_step,
+        turn_in_day,
+        is_end_of_day,
+    ])
+    def test_time_rules_reject_negative_steps(self, function):
+        with pytest.raises(ValueError):
+            function(-1)
+
+    def test_rejects_invalid_turn_configuration(self):
+        with pytest.raises(ValueError):
+            day_from_step(0, 0)
+
+        with pytest.raises(ValueError):
+            turn_in_day(0, 0)
+
+        with pytest.raises(ValueError):
+            is_end_of_day(0, 0)
+
+    def test_rejects_invalid_episode_configuration(self):
+        with pytest.raises(ValueError):
+            is_end_of_season(0, 0)
+
+
+# ============================================================================
+# Farm geometry and land
+# ============================================================================
+
+
+class TestFarmGeometry:
+    def test_quadrant_size(self):
+        assert quadrant_size() == 5
+        assert quadrant_size(8) == 4
+        assert quadrant_size(12) == 6
+
+    @pytest.mark.parametrize("size", [0, -1, 9, 11])
+    def test_invalid_quadrant_size(self, size):
+        with pytest.raises(ValueError):
+            quadrant_size(size)
+
+    def test_total_board_tiles(self):
+        assert total_board_tiles() == 100
+        assert total_board_tiles(8) == 64
+
+    @pytest.mark.parametrize("size", [0, -1])
+    def test_invalid_total_board_size(self, size):
+        with pytest.raises(ValueError):
+            total_board_tiles(size)
+
+    def test_quadrant_tiles(self):
+        assert quadrant_tiles() == 25
+        assert quadrant_tiles(8) == 16
+
+    def test_quadrant_bounds(self):
+        assert quadrant_bounds(Quadrant.NW) == (0, 0, 5, 5)
+        assert quadrant_bounds(Quadrant.NE) == (5, 0, 10, 5)
+        assert quadrant_bounds(Quadrant.SW) == (0, 5, 5, 10)
+        assert quadrant_bounds(Quadrant.SE) == (5, 5, 10, 10)
+
+    @pytest.mark.parametrize(
+        "position,quadrant",
+        [
+            ((0, 0), Quadrant.NW),
+            ((4, 4), Quadrant.NW),
+            ((5, 0), Quadrant.NE),
+            ((9, 4), Quadrant.NE),
+            ((0, 5), Quadrant.SW),
+            ((4, 9), Quadrant.SW),
+            ((5, 5), Quadrant.SE),
+            ((9, 9), Quadrant.SE),
+        ],
+    )
+    def test_quadrant_for_position(self, position, quadrant):
+        assert quadrant_for_position(*position) is quadrant
+
+    @pytest.mark.parametrize(
+        "position",
+        [
+            (-1, 0),
+            (0, -1),
+            (10, 0),
+            (0, 10),
+        ],
+    )
+    def test_invalid_positions(self, position):
+        assert valid_board_position(*position) is False
+
+        with pytest.raises(ValueError):
+            quadrant_for_position(*position)
+
+    def test_initial_land(self):
+        assert initial_unlocked_quadrants() == frozenset({Quadrant.NW})
+
+    def test_tile_unlock_state(self):
+        assert is_tile_unlocked(0, 0, {Quadrant.NW})
+        assert not is_tile_unlocked(5, 0, {Quadrant.NW})
+
+    def test_land_purchase_costs(self):
+        assert next_land_purchase_cost(1) == 1000
+        assert next_land_purchase_cost(2) == 2000
+        assert next_land_purchase_cost(3) == 4000
+        assert next_land_purchase_cost(4) is None
+
+    def test_land_purchase_requires_one_unlocked_quadrant(self):
+        with pytest.raises(ValueError):
+            next_land_purchase_cost(0)
+
+    def test_all_land_unlocked(self):
+        assert not all_land_unlocked(3)
+        assert all_land_unlocked(4)
+        assert all_land_unlocked(5)
+
+
+# ============================================================================
+# Shed
+# ============================================================================
+
+
+class TestShedGeometry:
+    def test_shed_access_tiles(self):
+        assert shed_access_tiles() == (
+            (4, 4),
+            (5, 4),
+            (4, 5),
+            (5, 5),
+        )
+
+    def test_shed_access_order_is_nwse(self):
+        tiles = shed_access_tiles()
+
+        assert tiles[0] == (4, 4)
+        assert tiles[1] == (5, 4)
+        assert tiles[2] == (4, 5)
+        assert tiles[3] == (5, 5)
+
+    def test_shed_access_tiles_scale_with_board(self):
+        assert shed_access_tiles(8) == (
+            (3, 3),
+            (4, 3),
+            (3, 4),
+            (4, 4),
+        )
+
+    def test_is_shed_access_tile(self):
+        assert is_shed_access_tile(4, 4)
+        assert is_shed_access_tile(5, 4)
+        assert not is_shed_access_tile(0, 0)
+
+
+# ============================================================================
+# Farm conditions
+# ============================================================================
+
+
+class TestFarmConditions:
+    def test_weed_spawn_chance(self):
+        assert weed_spawn_chance() == pytest.approx(0.005)
+
+    @pytest.mark.parametrize(
+        "empty,unlocked,expected",
+        [
+            (True, True, True),
+            (True, False, False),
+            (False, True, False),
+            (False, False, False),
+        ],
+    )
+    def test_can_spawn_weed(self, empty, unlocked, expected):
+        assert can_spawn_weed(
+            tile_is_empty=empty,
+            tile_is_unlocked=unlocked,
+        ) is expected
+
+
+# ============================================================================
+# Initial crop and animal state
+# ============================================================================
+
+
+class TestInitialConditions:
+    def test_new_crop_starts_one_day_unwatered(self):
         assert initial_consecutive_unwatered_days() == 1
 
-    def test_matches_game_constant(self):
-        assert initial_consecutive_unwatered_days() == INITIAL_CONSECUTIVE_UNWATERED
-
-
-# ===========================================================================
-# Initial animal state
-# ===========================================================================
-
-class TestInitialAnimalState:
-    def test_initial_consecutive_unfed_days(self):
+    def test_new_animal_starts_fully_fed_condition(self):
         assert initial_consecutive_unfed_days() == 0
 
-    def test_matches_game_constant(self):
-        assert initial_consecutive_unfed_days() == INITIAL_CONSECUTIVE_UNFED
+
+# ============================================================================
+# DIG rules
+# ============================================================================
 
 
-# ===========================================================================
-# Animal → structure compatibility
-# ===========================================================================
+class TestDIGRules:
+    def test_plant_can_be_dug(self):
+        assert can_dig_plant() is True
 
-class TestRequiredStructure:
+    def test_weed_can_be_dug(self):
+        assert can_dig_weed() is True
+
+    def test_empty_structure_can_be_dug(self):
+        assert can_dig_empty_structure() is True
+
+    def test_occupied_structure_cannot_be_dug(self):
+        assert can_dig_occupied_structure() is False
+
+
+# ============================================================================
+# Animal structure compatibility
+# ============================================================================
+
+
+class TestAnimalStructures:
     def test_goose_requires_coop(self):
         assert required_structure(AnimalType.GOOSE) is StructureType.COOP
 
@@ -2345,397 +5588,874 @@ class TestRequiredStructure:
     def test_sheep_requires_pasture(self):
         assert required_structure(AnimalType.SHEEP) is StructureType.PASTURE
 
-    def test_all_animals_have_a_required_structure(self):
-        for animal in AnimalType:
-            result = required_structure(animal)
-            assert isinstance(result, StructureType)
+    @pytest.mark.parametrize("animal", list(AnimalType))
+    def test_every_animal_has_structure(self, animal):
+        assert isinstance(required_structure(animal), StructureType)
 
 
-# ===========================================================================
-# DIG rules
-# ===========================================================================
-
-class TestDIGRules:
-    def test_can_dig_plant(self):
-        assert can_dig_plant() is True
-
-    def test_can_dig_weed(self):
-        assert can_dig_weed() is True
-
-    def test_can_dig_empty_structure(self):
-        assert can_dig_empty_structure() is True
-
-    def test_cannot_dig_occupied_structure(self):
-        assert can_dig_occupied_structure() is False
+# ============================================================================
+# Animal care and failure
+# ============================================================================
 
 
-# ===========================================================================
-# Board-size validation consistency
-# ===========================================================================
+class TestAnimalCare:
+    @pytest.mark.parametrize(
+        "fed,cared,expected",
+        [
+            (False, False, 0),
+            (False, True, 0),
+            (True, False, 0),
+            (True, True, 1),
+        ],
+    )
+    def test_care_bonus_accrual(self, fed, cared, expected):
+        assert care_bonus_accrual(
+            fed_today=fed,
+            cared_today=cared,
+        ) == expected
 
-class TestBoardValidation:
-    # quadrant_size
-    def test_quadrant_size_default(self):
-        assert quadrant_size() == 5
+    @pytest.mark.parametrize(
+        "consecutive_unfed,expected",
+        [
+            (0, False),
+            (1, False),
+            (2, True),
+            (3, True),
+        ],
+    )
+    def test_animal_failure_threshold(self, consecutive_unfed, expected):
+        assert (
+            animal_fails_after(consecutive_unfed)
+            is expected
+        )
 
-    def test_quadrant_size_rejects_zero(self):
+
+# ============================================================================
+# Animal production
+# ============================================================================
+
+
+class TestAnimalProduction:
+    @pytest.mark.parametrize(
+        "animal,first,interval",
+        [
+            (AnimalType.GOOSE, 4, 1),
+            (AnimalType.COW, 8, 2),
+            (AnimalType.SHEEP, 6, 3),
+        ],
+    )
+    def test_first_production_day(self, animal, first, interval):
+        assert produces_on_day(animal, first - 1) is False
+        assert produces_on_day(animal, first) is True
+
+    def test_goose_produces_daily_after_first_yield(self):
+        assert produces_on_day(AnimalType.GOOSE, 4)
+        assert produces_on_day(AnimalType.GOOSE, 5)
+        assert produces_on_day(AnimalType.GOOSE, 6)
+
+    def test_cow_produces_every_two_days(self):
+        assert produces_on_day(AnimalType.COW, 8)
+        assert not produces_on_day(AnimalType.COW, 9)
+        assert produces_on_day(AnimalType.COW, 10)
+        assert not produces_on_day(AnimalType.COW, 11)
+
+    def test_sheep_produces_every_three_days(self):
+        assert produces_on_day(AnimalType.SHEEP, 6)
+        assert not produces_on_day(AnimalType.SHEEP, 7)
+        assert not produces_on_day(AnimalType.SHEEP, 8)
+        assert produces_on_day(AnimalType.SHEEP, 9)
+
+    def test_negative_age_never_produces(self):
+        assert produces_on_day(AnimalType.GOOSE, -1) is False
+
+    def test_production_count(self):
+        assert production_count(AnimalType.GOOSE, 3) == 0
+        assert production_count(AnimalType.GOOSE, 4) == 1
+        assert production_count(AnimalType.GOOSE, 6) == 3
+
+        assert production_count(AnimalType.COW, 7) == 0
+        assert production_count(AnimalType.COW, 8) == 1
+        assert production_count(AnimalType.COW, 12) == 3
+
+    def test_production_yield_base(self):
+        assert production_yield_with_care(
+            fed_today=False,
+            pending_care_bonus=5,
+        ) == 1
+
+    def test_production_yield_with_care(self):
+        assert production_yield_with_care(
+            fed_today=True,
+            pending_care_bonus=0,
+        ) == 1
+
+        assert production_yield_with_care(
+            fed_today=True,
+            pending_care_bonus=2,
+        ) == 3
+
+    def test_negative_care_bonus_rejected(self):
         with pytest.raises(ValueError):
-            quadrant_size(0)
+            production_yield_with_care(
+                fed_today=True,
+                pending_care_bonus=-1,
+            )
 
-    def test_quadrant_size_rejects_negative(self):
+    def test_actual_production_respects_held_cap(self):
+        assert animal_production_yield(
+            AnimalType.GOOSE,
+            4,
+            fed_today=True,
+            pending_care_bonus=2,
+            current_held_yield=3,
+        ) == 1
+
+        assert animal_production_yield(
+            AnimalType.GOOSE,
+            4,
+            fed_today=True,
+            pending_care_bonus=2,
+            current_held_yield=4,
+        ) == 0
+
+    def test_actual_production_zero_on_non_production_day(self):
+        assert animal_production_yield(
+            AnimalType.COW,
+            9,
+            fed_today=True,
+            pending_care_bonus=2,
+        ) == 0
+
+    def test_actual_production_rejects_negative_held_yield(self):
         with pytest.raises(ValueError):
-            quadrant_size(-1)
+            animal_production_yield(
+                AnimalType.GOOSE,
+                4,
+                fed_today=True,
+                pending_care_bonus=0,
+                current_held_yield=-1,
+            )
 
-    def test_quadrant_size_rejects_odd(self):
+
+# ============================================================================
+# Crop production
+# ============================================================================
+
+
+class TestCropProduction:
+    def test_one_time_and_ongoing_categories(self):
+        assert is_one_time_crop(CropType.WHEAT)
+        assert is_one_time_crop(CropType.CARROT)
+        assert is_one_time_crop(CropType.MELON)
+
+        assert is_ongoing_crop(CropType.TOMATO)
+        assert is_ongoing_crop(CropType.STRAWBERRY)
+
+    def test_first_yield_days(self):
+        assert first_yield_day(CropType.WHEAT) == 2
+        assert first_yield_day(CropType.CARROT) == 2
+        assert first_yield_day(CropType.TOMATO) == 8
+        assert first_yield_day(CropType.STRAWBERRY) == 10
+        assert first_yield_day(CropType.MELON) == 10
+
+    def test_one_time_bonus_windows(self):
+        assert one_time_bonus_start_day(CropType.WHEAT) == 2
+        assert one_time_bonus_end_day(CropType.WHEAT) == 4
+
+        assert one_time_bonus_start_day(CropType.CARROT) == 2
+        assert one_time_bonus_end_day(CropType.CARROT) == 3
+
+        assert one_time_bonus_start_day(CropType.MELON) == 6
+        assert one_time_bonus_end_day(CropType.MELON) == 12
+
+    def test_ongoing_crop_bonus_accessors_return_negative_one(self):
+        assert one_time_bonus_start_day(CropType.TOMATO) == -1
+        assert one_time_bonus_end_day(CropType.TOMATO) == -1
+        assert one_time_bonus_start_day(CropType.STRAWBERRY) == -1
+        assert one_time_bonus_end_day(CropType.STRAWBERRY) == -1
+
+    def test_one_time_bonus_window_is_inclusive(self):
+        assert one_time_bonus_applies(CropType.WHEAT, 2)
+        assert one_time_bonus_applies(CropType.WHEAT, 4)
+        assert not one_time_bonus_applies(CropType.WHEAT, 1)
+        assert not one_time_bonus_applies(CropType.WHEAT, 5)
+
+    def test_ongoing_crop_does_not_use_one_time_bonus(self):
+        assert not one_time_bonus_applies(CropType.TOMATO, 8)
+
+    def test_one_time_watering_bonus(self):
+        assert one_time_watering_bonus(
+            CropType.WHEAT,
+            2,
+            watered=False,
+            fertilizer_active=False,
+        ) == 0
+
+        assert one_time_watering_bonus(
+            CropType.WHEAT,
+            2,
+            watered=True,
+            fertilizer_active=False,
+        ) == 1
+
+        assert one_time_watering_bonus(
+            CropType.WHEAT,
+            2,
+            watered=True,
+            fertilizer_active=True,
+        ) == 2
+
+    def test_one_time_yield_without_fertilizer(self):
+        assert one_time_yield(
+            CropType.WHEAT,
+            watered_days=0,
+        ) == 1
+
+        assert one_time_yield(
+            CropType.WHEAT,
+            watered_days=4,
+        ) == 5
+
+    def test_one_time_yield_with_fertilized_watering(self):
+        assert one_time_yield(
+            CropType.WHEAT,
+            watered_days=4,
+            fertilized_watered_days=2,
+        ) == 6
+
+    def test_one_time_yield_is_capped(self):
+        assert one_time_yield(
+            CropType.WHEAT,
+            watered_days=100,
+            fertilized_watered_days=100,
+        ) == 6
+
+    def test_one_time_yield_rejects_invalid_counts(self):
         with pytest.raises(ValueError):
-            quadrant_size(9)
+            one_time_yield(
+                CropType.WHEAT,
+                watered_days=-1,
+            )
 
-    def test_quadrant_size_accepts_even(self):
-        assert quadrant_size(8) == 4
-        assert quadrant_size(12) == 6
-
-    # total_board_tiles
-    def test_total_tiles_default(self):
-        assert total_board_tiles() == 100
-
-    def test_total_tiles_rejects_zero(self):
         with pytest.raises(ValueError):
-            total_board_tiles(0)
+            one_time_yield(
+                CropType.WHEAT,
+                watered_days=1,
+                fertilized_watered_days=2,
+            )
 
-    def test_total_tiles_rejects_negative(self):
-        with pytest.raises(ValueError):
-            total_board_tiles(-1)
+    def test_one_time_yield_is_not_defined_for_ongoing_crop(self):
+        assert one_time_yield(
+            CropType.TOMATO,
+            watered_days=10,
+        ) == 0
 
-    # shed_access_tiles
-    def test_shed_tiles_default(self):
-        tiles = shed_access_tiles()
-        assert set(tiles) == {(4, 4), (5, 4), (4, 5), (5, 5)}
-        assert len(tiles) == 4
+    def test_tomato_production_schedule(self):
+        assert crop_produces_on_day(CropType.TOMATO, 7) is False
+        assert crop_produces_on_day(CropType.TOMATO, 8) is True
+        assert crop_produces_on_day(CropType.TOMATO, 9) is True
+        assert crop_produces_on_day(CropType.TOMATO, 11) is True
+        assert crop_produces_on_day(CropType.TOMATO, 12) is False
 
-    def test_shed_tiles_nwse_order(self):
-        """First tile is NW, then NE, SW, SE."""
-        tiles = shed_access_tiles()
-        assert tiles[0] == (4, 4)   # NW
-        assert tiles[1] == (5, 4)   # NE
-        assert tiles[2] == (4, 5)   # SW
-        assert tiles[3] == (5, 5)   # SE
+    def test_strawberry_production_schedule(self):
+        assert crop_produces_on_day(CropType.STRAWBERRY, 9) is False
+        assert crop_produces_on_day(CropType.STRAWBERRY, 10) is True
+        assert crop_produces_on_day(CropType.STRAWBERRY, 11) is False
+        assert crop_produces_on_day(CropType.STRAWBERRY, 12) is True
+        assert crop_produces_on_day(CropType.STRAWBERRY, 14) is True
+        assert crop_produces_on_day(CropType.STRAWBERRY, 16) is True
+        assert crop_produces_on_day(CropType.STRAWBERRY, 18) is False
 
-    def test_shed_tiles_rejects_odd_board_size(self):
-        with pytest.raises(ValueError):
-            shed_access_tiles(9)
+    def test_ongoing_production_count(self):
+        assert ongoing_production_count(CropType.TOMATO, 7) == 0
+        assert ongoing_production_count(CropType.TOMATO, 8) == 1
+        assert ongoing_production_count(CropType.TOMATO, 11) == 4
+        assert ongoing_production_count(CropType.TOMATO, 12) == 4
 
-    def test_shed_tiles_rejects_zero_board_size(self):
-        with pytest.raises(ValueError):
-            shed_access_tiles(0)
+        assert ongoing_production_count(CropType.STRAWBERRY, 10) == 1
+        assert ongoing_production_count(CropType.STRAWBERRY, 16) == 4
+        assert ongoing_production_count(CropType.STRAWBERRY, 18) == 4
+
+    def test_ongoing_production_yield(self):
+        assert ongoing_production_yield(
+            CropType.TOMATO,
+            8,
+            watered=False,
+            fertilizer_active=False,
+        ) == 1
+
+        assert ongoing_production_yield(
+            CropType.TOMATO,
+            8,
+            watered=True,
+            fertilizer_active=True,
+        ) == 2
+
+    def test_ongoing_yield_respects_held_cap(self):
+        assert ongoing_production_yield(
+            CropType.TOMATO,
+            8,
+            watered=True,
+            fertilizer_active=True,
+            current_held_yield=3,
+        ) == 1
+
+        assert ongoing_production_yield(
+            CropType.TOMATO,
+            8,
+            watered=True,
+            fertilizer_active=True,
+            current_held_yield=4,
+        ) == 0
 
 
-# ===========================================================================
-# Farm-hand hiring
-# ===========================================================================
+# ============================================================================
+# Crop decay
+# ============================================================================
 
-class TestFibonacci:
-    @pytest.mark.parametrize("n,expected", [
-        (1, 1), (2, 1), (3, 2), (4, 3), (5, 5), (6, 8), (7, 13), (8, 21),
-    ])
-    def test_fibonacci_values(self, n, expected):
-        assert fibonacci(n) == expected
 
-    def test_fibonacci_rejects_zero(self):
+class TestCropDecay:
+    def test_one_time_decay_start(self):
+        assert one_time_decay_start_day(CropType.WHEAT) == 5
+        assert one_time_decay_start_day(CropType.CARROT) == 4
+        assert one_time_decay_start_day(CropType.MELON) == 11
+
+    def test_ongoing_decay_start(self):
+        # Tomato: production at 8,9,10,11; decay starts at 12.
+        assert ongoing_decay_start_day(CropType.TOMATO) == 12
+
+        # Strawberry: production at 10,12,14,16; decay starts at 17.
+        assert ongoing_decay_start_day(CropType.STRAWBERRY) == 17
+
+    def test_decay_start_type_selection(self):
+        assert decay_start_day(CropType.WHEAT) == 5
+        assert decay_start_day(CropType.TOMATO) == 12
+
+    def test_is_decaying(self):
+        assert not is_decaying(CropType.WHEAT, 4)
+        assert is_decaying(CropType.WHEAT, 5)
+
+        assert not is_decaying(CropType.TOMATO, 11)
+        assert is_decaying(CropType.TOMATO, 12)
+
+    @pytest.mark.parametrize(
+        "turns,lost",
+        [
+            (0, 0),
+            (1, 0),
+            (2, 1),
+            (3, 1),
+            (4, 2),
+            (5, 2),
+            (6, 3),
+        ],
+    )
+    def test_decay_reduction(self, turns, lost):
+        assert decay_reduction(
+            turns_since_decay_start=turns,
+        ) == lost
+
+    def test_negative_decay_elapsed_time_has_no_reduction(self):
+        assert decay_reduction(
+            turns_since_decay_start=-1,
+        ) == 0
+
+    def test_decayed_yield_cannot_be_negative(self):
+        assert decayed_yield(
+            2,
+            turns_since_decay_start=100,
+        ) == 0
+
+        assert decayed_yield(
+            5,
+            turns_since_decay_start=4,
+        ) == 3
+
+    def test_becomes_weed_at_zero_yield(self):
+        assert becomes_weed(0)
+        assert becomes_weed(-1)
+        assert not becomes_weed(1)
+
+
+# ============================================================================
+# Farm-hand hiring and spawning
+# ============================================================================
+
+
+class TestFarmHands:
+    def test_fibonacci_sequence(self):
+        assert [
+            fibonacci(n)
+            for n in range(1, 9)
+        ] == [1, 1, 2, 3, 5, 8, 13, 21]
+
+    def test_fibonacci_rejects_zero_and_negative(self):
         with pytest.raises(ValueError):
             fibonacci(0)
 
-    def test_fibonacci_rejects_negative(self):
         with pytest.raises(ValueError):
             fibonacci(-1)
 
+    def test_farm_hand_cost_sequence(self):
+        assert [
+            farm_hand_cost(hires_today=n)
+            for n in range(6)
+        ] == [1, 1, 2, 3, 5, 8]
 
-class TestFarmHandCost:
-    @pytest.mark.parametrize("hires_today,expected", [
-        (0, 1),   # fib(1) = 1
-        (1, 1),   # fib(2) = 1
-        (2, 2),   # fib(3) = 2
-        (3, 3),   # fib(4) = 3
-        (4, 5),   # fib(5) = 5
-        (5, 8),   # fib(6) = 8
-    ])
-    def test_cost_default_multiplier(self, hires_today, expected):
-        assert farm_hand_cost(hires_today) == expected
+    def test_farm_hand_cost_respects_multiplier(self):
+        assert farm_hand_cost(
+            hires_today=0,
+            farm_hand_cost_mult=3,
+        ) == 3
 
-    def test_cost_with_custom_multiplier(self):
-        # 3rd hire: fib(3) = 2; mult = 3 → cost = 6
-        assert farm_hand_cost(2, farm_hand_cost_mult=3) == 6
+        assert farm_hand_cost(
+            hires_today=4,
+            farm_hand_cost_mult=3,
+        ) == 15
 
-    def test_cost_with_zero_multiplier(self):
-        assert farm_hand_cost(4, farm_hand_cost_mult=0) == 0
-
-    def test_cost_rejects_negative_hires_today(self):
+    def test_farm_hand_cost_rejects_negative_hires(self):
         with pytest.raises(ValueError):
-            farm_hand_cost(-1)
+            farm_hand_cost(hires_today=-1)
 
-    def test_cost_rejects_negative_multiplier(self):
+    def test_farm_hand_cost_rejects_negative_multiplier(self):
         with pytest.raises(ValueError):
-            farm_hand_cost(0, farm_hand_cost_mult=-1)
+            farm_hand_cost(
+                hires_today=0,
+                farm_hand_cost_mult=-1,
+            )
 
+    def test_spawn_candidates_are_nwse(self):
+        assert spawn_candidates_in_preference_order(10) == (
+            (4, 4),
+            (5, 4),
+            (4, 5),
+            (5, 5),
+        )
 
-class TestFarmHandLifecycle:
-    def test_hires_reset_each_day(self):
-        assert hires_reset_each_day() is True
+    def test_spawn_candidates_scale_with_board(self):
+        assert spawn_candidates_in_preference_order(8) == (
+            (3, 3),
+            (4, 3),
+            (3, 4),
+            (4, 4),
+        )
 
-    def test_hired_hands_are_daily(self):
-        assert hired_hands_are_daily() is True
+    def test_first_free_spawn_tile_wins(self):
+        candidates = (
+            (4, 4),
+            (5, 4),
+            (4, 5),
+            (5, 5),
+        )
 
-    def test_can_spawn_on_locked_tile(self):
-        assert spawn_may_land_on_locked_tile() is True
+        occupancy = {
+            (4, 4): 1,
+            (5, 4): 1,
+            (4, 5): 0,
+            (5, 5): 0,
+        }
 
+        assert select_spawn_tile(candidates, occupancy) == (4, 5)
 
-class TestSpawnCandidates:
-    def test_nwse_order_default_board(self):
-        candidates = spawn_candidates_in_preference_order(10)
-        assert candidates == ((4, 4), (5, 4), (4, 5), (5, 5))
+    def test_least_occupied_tile_wins_when_all_are_occupied(self):
+        candidates = (
+            (4, 4),
+            (5, 4),
+            (4, 5),
+            (5, 5),
+        )
 
-    def test_matches_shed_access_tiles(self):
-        """Spawn candidates are exactly the shed access positions."""
-        candidates = spawn_candidates_in_preference_order(10)
-        assert set(candidates) == set(shed_access_tiles(10))
+        occupancy = {
+            (4, 4): 3,
+            (5, 4): 1,
+            (4, 5): 2,
+            (5, 5): 1,
+        }
 
+        assert select_spawn_tile(candidates, occupancy) == (5, 4)
 
-class TestSelectSpawnTile:
-    def test_selects_first_free_tile(self):
-        candidates = ((4, 4), (5, 4), (4, 5), (5, 5))
-        occupancy = {(4, 4): 1, (5, 4): 0}
-        result = select_spawn_tile(candidates, occupancy)
-        assert result == (5, 4)
+    def test_spawn_ties_preserve_nwse_order(self):
+        candidates = (
+            (4, 4),
+            (5, 4),
+            (4, 5),
+            (5, 5),
+        )
 
-    def test_selects_nw_when_all_free(self):
-        candidates = ((4, 4), (5, 4), (4, 5), (5, 5))
-        result = select_spawn_tile(candidates, {})
-        assert result == (4, 4)
+        occupancy = {
+            (4, 4): 2,
+            (5, 4): 1,
+            (4, 5): 3,
+            (5, 5): 1,
+        }
 
-    def test_selects_least_occupied_when_none_free(self):
-        candidates = ((4, 4), (5, 4), (4, 5), (5, 5))
-        occupancy = {(4, 4): 3, (5, 4): 1, (4, 5): 2, (5, 5): 1}
-        # (5,4) and (5,5) are tied at 1; NWSE order → (5,4) wins
-        result = select_spawn_tile(candidates, occupancy)
-        assert result == (5, 4)
+        assert select_spawn_tile(candidates, occupancy) == (5, 4)
 
-    def test_missing_tile_in_occupancy_treated_as_zero(self):
-        candidates = ((4, 4), (5, 4), (4, 5), (5, 5))
-        occupancy = {(4, 4): 2}   # (5,4) and beyond not in dict → 0
-        result = select_spawn_tile(candidates, occupancy)
-        assert result == (5, 4)   # first free
+    def test_missing_occupancy_is_zero(self):
+        candidates = (
+            (4, 4),
+            (5, 4),
+            (4, 5),
+            (5, 5),
+        )
 
-    def test_rejects_empty_candidates(self):
+        assert select_spawn_tile(
+            candidates,
+            {(4, 4): 2},
+        ) == (5, 4)
+
+    def test_empty_candidates_rejected(self):
         with pytest.raises(ValueError):
             select_spawn_tile((), {})
 
 
-# ===========================================================================
-# Town unlock timing and demand
-# ===========================================================================
+# ============================================================================
+# Town rules
+# ============================================================================
 
-class TestShopUnlockTiming:
-    @pytest.mark.parametrize("day,expected", [
-        (0, False),
-        (1, False),
-        (2, False),
-        (3, True),
-        (4, False),
-        (5, False),
-        (6, True),
-        (9, True),
-        (24, True),   # 8th unlock in default 30-day season
-        (27, True),   # beyond 8th — engine caps at 8; reality says timing
-    ])
-    def test_shop_unlocks_on_day(self, day, expected):
+
+class TestTownRules:
+    @pytest.mark.parametrize(
+        "day,expected",
+        [
+            (0, False),
+            (1, False),
+            (2, False),
+            (3, True),
+            (4, False),
+            (5, False),
+            (6, True),
+            (9, True),
+            (24, True),
+            (27, True),
+        ],
+    )
+    def test_shop_unlock_schedule(self, day, expected):
         assert shop_unlocks_on_day(day) is expected
 
-    def test_rejects_negative_day(self):
+    def test_negative_shop_day_rejected(self):
         with pytest.raises(ValueError):
             shop_unlocks_on_day(-1)
 
-    def test_eight_unlocks_in_thirty_day_season(self):
-        """With interval 3, exactly 8 unlock days fall within days 1-29."""
-        unlock_days = [d for d in range(30) if shop_unlocks_on_day(d)]
-        assert len(unlock_days) == 9   # days 3,6,9,12,15,18,21,24,27
-        # engine caps at 8 instances; reality exposes timing only
+    def test_shop_demand_accessor_returns_copy(self):
+        demand = shop_demand(TownShopType.BAKERY)
+
+        demand[ObjectType.WHEAT] = 999
+
+        assert shop_demand(
+            TownShopType.BAKERY
+        )[ObjectType.WHEAT] == 1
+
+    @pytest.mark.parametrize("shop", list(TownShopType))
+    def test_every_shop_has_nonempty_demand(self, shop):
+        demand = shop_demand(shop)
+
+        assert demand
+        assert all(
+            isinstance(product, ObjectType)
+            for product in demand
+        )
+        assert all(
+            isinstance(quantity, int) and quantity > 0
+            for quantity in demand.values()
+        )
+
+    def test_unknown_shop_is_rejected(self):
+        with pytest.raises(ValueError):
+            shop_demand("NOT_A_SHOP")  # type: ignore[arg-type]
 
 
-class TestShopDemand:
-    def test_bakery_demand(self):
-        d = shop_demand(TownShopType.BAKERY)
-        assert d[ObjectType.EGG] == 1
-        assert d[ObjectType.WHEAT] == 1
-
-    def test_yarn_store_doubled_demand(self):
-        d = shop_demand(TownShopType.YARN_STORE)
-        assert d[ObjectType.WOOL] == 2
-
-    def test_pet_cafe_doubled_demand(self):
-        d = shop_demand(TownShopType.PET_CAFE)
-        assert d[ObjectType.CARROT] == 2
-
-    def test_farmers_market_demand(self):
-        d = shop_demand(TownShopType.FARMERS_MARKET)
-        assert set(d.keys()) == {
-            ObjectType.WHEAT,
-            ObjectType.CARROT,
-            ObjectType.TOMATO,
-            ObjectType.STRAWBERRY,
-        }
-
-    def test_accessor_returns_plain_dict_copy(self):
-        """Caller can modify the returned dict without affecting canonical data."""
-        d = shop_demand(TownShopType.BAKERY)
-        d[ObjectType.WHEAT] = 999
-        d2 = shop_demand(TownShopType.BAKERY)
-        assert d2[ObjectType.WHEAT] == 1
-
-    def test_all_shop_types_covered(self):
-        for shop in TownShopType:
-            d = shop_demand(shop)
-            assert len(d) > 0
-
-    def test_rejects_unknown_shop_type(self):
-        with pytest.raises((ValueError, KeyError)):
-            shop_demand("NOT_A_SHOP")   # type: ignore[arg-type]
+# ============================================================================
+# Market rules
+# ============================================================================
 
 
-# ===========================================================================
-# Market sell_price / buy_price
-# ===========================================================================
+class TestMarketRules:
+    def test_price_shape_values(self):
+        assert price_shape_value(PriceShape.LINEAR, 10) == 10
+        assert price_shape_value(PriceShape.SQUARE, 10) == 100
+        assert price_shape_value(PriceShape.SQRT, 9) == pytest.approx(3)
+        assert price_shape_value(PriceShape.LOG, 0) == pytest.approx(0)
+        assert price_shape_value(PriceShape.LOG10, 0) == pytest.approx(0)
 
-class TestMarketConvenienceAPI:
-    """
-    Tests the sell_price / buy_price wrappers against the README price table.
+    def test_price_shape_value_rejects_negative_distance(self):
+        with pytest.raises(ValueError):
+            price_shape_value(PriceShape.LINEAR, -1)
 
-    Documented spot prices (I0 = 10 000, T = anchor_throughput):
-        Wheat  : base=25, P(I0-T)=45, P(I0+T)=20, P(I0+2T)=19
-        Carrot : base=35, P(I0-T)=42, P(I0+T)=10, P(I0+2T)=1
-        Tomato : base=60, P(I0-T)=84, P(I0+T)=24, P(I0+2T)=9
-        Straw  : base=120,P(I0-T)=204,P(I0+T)=1,  P(I0+2T)=1
-        Melon  : base=250,P(I0-T)=300,P(I0+T)=1,  P(I0+2T)=1
-        Egg    : base=50, P(I0-T)=70, P(I0+T)=40, P(I0+2T)=39
-        Milk   : base=160,P(I0-T)=256,P(I0+T)=1,  P(I0+2T)=1
-        Wool   : base=200,P(I0-T)=240,P(I0+T)=1,  P(I0+2T)=1
-        Fert   : base=100,P(I0-T)=140,P(I0+T)=60, P(I0+2T)=20
-    """
+    @pytest.mark.parametrize(
+        "product,expected",
+        [
+            (ObjectType.WHEAT, 25),
+            (ObjectType.CARROT, 35),
+            (ObjectType.TOMATO, 60),
+            (ObjectType.STRAWBERRY, 120),
+            (ObjectType.MELON, 250),
+            (ObjectType.EGG, 50),
+            (ObjectType.MILK, 160),
+            (ObjectType.WOOL, 200),
+            (ObjectType.FERTILIZER, 100),
+        ],
+    )
+    def test_equilibrium_price_equals_base_price(self, product, expected):
+        assert sell_price(product, 10_000) == expected
 
-    @pytest.mark.parametrize("product,expected_base", [
-        (ObjectType.WHEAT,       25),
-        (ObjectType.CARROT,      35),
-        (ObjectType.TOMATO,      60),
-        (ObjectType.STRAWBERRY, 120),
-        (ObjectType.MELON,      250),
-        (ObjectType.EGG,         50),
-        (ObjectType.MILK,       160),
-        (ObjectType.WOOL,       200),
-        (ObjectType.FERTILIZER, 100),
-    ])
-    def test_sell_price_at_equilibrium(self, product, expected_base):
-        assert sell_price(product, 10_000) == expected_base
-
-    @pytest.mark.parametrize("product,expected_base", [
-        (ObjectType.WHEAT,       25),
-        (ObjectType.CARROT,      35),
-        (ObjectType.TOMATO,      60),
-    ])
-    def test_buy_price_at_equilibrium(self, product, expected_base):
-        assert buy_price(product, 10_000) == expected_base
-
-    # Wheat spot checks
-    def test_wheat_scarcity(self):
+    def test_wheat_scarcity_curve(self):
         assert sell_price(ObjectType.WHEAT, 9_600) == 45
 
-    def test_wheat_glut_t(self):
+    def test_wheat_glut_curve(self):
         assert sell_price(ObjectType.WHEAT, 10_400) == 20
 
-    def test_wheat_glut_2t(self):
+    def test_wheat_far_glut_respects_floor(self):
         assert sell_price(ObjectType.WHEAT, 10_800) == 19
 
-    # Carrot
-    def test_carrot_scarcity(self):
+    def test_carrot_scarcity_curve(self):
         assert sell_price(ObjectType.CARROT, 9_550) == 42
 
-    def test_carrot_glut_t(self):
+    def test_carrot_glut_curve(self):
         assert sell_price(ObjectType.CARROT, 10_450) == 10
 
-    def test_carrot_glut_2t(self):
+    def test_carrot_far_glut_respects_floor(self):
         assert sell_price(ObjectType.CARROT, 10_900) == 1
 
-    # Tomato
-    def test_tomato_scarcity(self):
-        assert sell_price(ObjectType.TOMATO, 9_800) == 84
+    def test_market_price_floor(self):
+        assert market_price(
+            base_price=10,
+            initial_inventory=100,
+            inventory=1000,
+            anchor_throughput=10,
+            shape=PriceShape.LINEAR,
+            target=1.0,
+        ) == PRICE_FLOOR
 
-    def test_tomato_glut_t(self):
-        assert sell_price(ObjectType.TOMATO, 10_200) == 24
+    def test_market_price_rejects_invalid_base_price(self):
+        with pytest.raises(ValueError):
+            market_price(
+                base_price=-1,
+                initial_inventory=100,
+                inventory=100,
+                anchor_throughput=10,
+                shape=PriceShape.LINEAR,
+                target=1.0,
+            )
 
-    def test_tomato_glut_2t(self):
-        assert sell_price(ObjectType.TOMATO, 10_400) == 9
+    def test_market_price_rejects_invalid_anchor(self):
+        with pytest.raises(ValueError):
+            market_price(
+                base_price=10,
+                initial_inventory=100,
+                inventory=90,
+                anchor_throughput=0,
+                shape=PriceShape.LINEAR,
+                target=1.0,
+            )
 
-    # Strawberry – premium crash
-    def test_strawberry_scarcity(self):
-        assert sell_price(ObjectType.STRAWBERRY, 9_900) == 204
+    def test_market_price_rejects_negative_target(self):
+        with pytest.raises(ValueError):
+            market_price(
+                base_price=10,
+                initial_inventory=100,
+                inventory=90,
+                anchor_throughput=10,
+                shape=PriceShape.LINEAR,
+                target=-1,
+            )
 
-    def test_strawberry_glut_t(self):
-        assert sell_price(ObjectType.STRAWBERRY, 10_100) == 1
+    def test_buyable_products_match_competition(self):
+        assert can_buy_product(ObjectType.WHEAT)
+        assert can_buy_product(ObjectType.FERTILIZER)
 
-    # Melon – premium crash
-    def test_melon_scarcity(self):
-        assert sell_price(ObjectType.MELON, 9_700) == 300
+        for product in ObjectType:
+            if product not in {
+                ObjectType.WHEAT,
+                ObjectType.FERTILIZER,
+            }:
+                assert not can_buy_product(product)
 
-    def test_melon_glut_t(self):
-        assert sell_price(ObjectType.MELON, 10_300) == 1
+    @pytest.mark.parametrize("product", list(ObjectType))
+    def test_all_products_can_be_sold(self, product):
+        assert can_sell_product(product)
 
-    # Egg
-    def test_egg_scarcity(self):
-        assert sell_price(ObjectType.EGG, 9_668) == 70
+    def test_buy_price_uses_post_buy_inventory(self):
+        inventory_before_buy = 9_999
 
-    def test_egg_glut_t(self):
-        assert sell_price(ObjectType.EGG, 10_332) == 40
+        assert buy_price(
+            ObjectType.WHEAT,
+            inventory_before_buy,
+        ) == sell_price(
+            ObjectType.WHEAT,
+            inventory_before_buy,
+        )
 
-    def test_egg_glut_2t(self):
-        assert sell_price(ObjectType.EGG, 10_664) == 39
+    def test_sell_price_uses_pre_sell_inventory(self):
+        inventory_before_sell = 10_001
 
-    # Milk – premium crash
-    def test_milk_scarcity(self):
-        assert sell_price(ObjectType.MILK, 9_878) == 256
+        assert sell_price(
+            ObjectType.WHEAT,
+            inventory_before_sell,
+        ) == market_price(
+            base_price=25,
+            initial_inventory=10_000,
+            inventory=10_001,
+            anchor_throughput=400,
+            shape=PriceShape.LOG,
+            target=0.20,
+        )
 
-    def test_milk_glut_t(self):
-        assert sell_price(ObjectType.MILK, 10_122) == 1
 
-    # Wool – premium crash
-    def test_wool_scarcity(self):
-        assert sell_price(ObjectType.WOOL, 9_895) == 240
+# ============================================================================
+# Cross-definition consistency
+# ============================================================================
 
-    def test_wool_glut_t(self):
-        assert sell_price(ObjectType.WOOL, 10_105) == 1
 
-    # Fertilizer
-    def test_fertilizer_scarcity(self):
-        assert sell_price(ObjectType.FERTILIZER, 9_800) == 140
+class TestCrossDefinitionConsistency:
+    """
+    These tests catch drift between separate canonical vocabularies.
 
-    def test_fertilizer_glut_t(self):
-        assert sell_price(ObjectType.FERTILIZER, 10_200) == 60
+    They are especially important because layer_0_reality intentionally
+    separates vocabulary from catalogs and rules.
+    """
 
-    def test_fertilizer_glut_2t(self):
-        assert sell_price(ObjectType.FERTILIZER, 10_400) == 20
+    def test_every_crop_is_a_market_product(self):
+        for crop in CropType:
+            product = ObjectType[crop.name]
+            assert product in MARKET
 
-    # Quote-semantics contract
-    def test_buy_sell_same_inventory_same_price(self):
-        """
-        Immediate buy then sell at unchanged inventory nets zero.
+    def test_every_animal_product_is_a_market_product(self):
+        from layer_0_reality.level_2.definitions.animal_catalog import (
+            animal_definition,
+        )
 
-        The sell price is quoted at pre-sell inventory; the buy price at
-        post-buy inventory.  With the same inventory value the prices must
-        agree.
-        """
-        inv = 10_000
-        assert buy_price(ObjectType.WHEAT, inv) == sell_price(ObjectType.WHEAT, inv)
+        for animal in AnimalType:
+            assert animal_definition(animal).product in MARKET
 
-    def test_price_floor_enforced(self):
-        """No price drops below 1 regardless of glut size."""
-        assert sell_price(ObjectType.STRAWBERRY, 1_000_000) == 1
-        assert sell_price(ObjectType.MELON, 1_000_000) == 1
+    def test_shop_demand_only_references_market_products(self):
+        for demand in SHOP_DEMAND.values():
+            for product in demand:
+                assert product in MARKET
+
+    def test_crop_catalog_and_crop_vocabulary_have_same_members(self):
+        assert set(CROPS) == set(CropType)
+
+    def test_animal_catalog_and_animal_vocabulary_have_same_members(self):
+        from layer_0_reality.level_2.definitions.animal_catalog import ANIMALS
+
+        assert set(ANIMALS) == set(AnimalType)
+
+    def test_market_catalog_covers_every_object(self):
+        assert set(MARKET) == set(ObjectType)
+
+----------------------------------------------------------------------------------------------------
+
+PACKAGE: layer_tests/level_1
+====================================================================================================
+
+FILE: __init__.py
+----------------------------------------------------------------------------------------------------
+
+
+----------------------------------------------------------------------------------------------------
+
+FILE: local_test.py
+----------------------------------------------------------------------------------------------------
+import argparse
+
+from scriptcraft.layers.layer_1_competition.level_1_impl.level_kaggriculture.layer_3_agents.level_0.registry import (
+    DEFAULT_STRATEGY,
+    available_strategies,
+)
+from scriptcraft.layers.layer_1_competition.level_1_impl.level_kaggriculture.layer_tests.level_0.single_game import (
+    print_results,
+    render_game,
+    run_game,
+    save_replay,
+)
+
+
+def parse_args() -> argparse.Namespace:
+    """Parse local test runner arguments."""
+
+    parser = argparse.ArgumentParser(
+        description="Run a Kaggriculture strategy locally.",
+    )
+
+    parser.add_argument(
+        "strategy",
+        nargs="?",
+        default=DEFAULT_STRATEGY,
+        help="Strategy to test.",
+    )
+
+    parser.add_argument(
+        "--opponent",
+        default="random",
+        help="Opponent agent to run against.",
+    )
+
+    parser.add_argument(
+        "--steps",
+        type=int,
+        default=720,
+        help="Number of episode steps.",
+    )
+
+    parser.add_argument(
+        "--replay",
+        default="replay.json",
+        help="Path for the generated replay JSON.",
+    )
+
+    parser.add_argument(
+        "--list",
+        action="store_true",
+        dest="list_strategies",
+        help="List registered strategies and exit.",
+    )
+
+    return parser.parse_args()
+
+
+def main() -> None:
+    """Run the local single-game test."""
+
+    args = parse_args()
+
+    if args.list_strategies:
+        print("Available strategies:")
+        for name in available_strategies():
+            print(f"  - {name}")
+        return
+
+    if args.strategy not in available_strategies():
+        print(f"Unknown strategy: {args.strategy}")
+        print()
+        print("Available strategies:")
+        for name in available_strategies():
+            print(f"  - {name}")
+        raise SystemExit(2)
+
+    print(f"Strategy: {args.strategy}")
+    print(f"Opponent: {args.opponent}")
+    print(f"Episode steps: {args.steps}")
+    print()
+
+    env = run_game(
+        strategy_name=args.strategy,
+        opponent=args.opponent,
+        episode_steps=args.steps,
+    )
+
+    print("Final results:")
+    print_results(env)
+
+    render_game(env)
+    save_replay(env, args.replay)
+
+    print()
+    print(f"Replay written to: {args.replay}")
+
+
+if __name__ == "__main__":
+    main()
 
 ----------------------------------------------------------------------------------------------------
 

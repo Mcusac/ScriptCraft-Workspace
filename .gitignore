@@ -73,6 +73,11 @@ output/
 /analyze_responsibilities.py
 /final_analysis.py
 
+
+# venv
+.venv/
+!.venv/scripts/
+
 # =========================
 # SUBMODULES / IMPLEMENTATIONS
 # Let nested projects control themselves
