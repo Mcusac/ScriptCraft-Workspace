@@ -1,6 +1,7 @@
 #!/bin/bash
 
-WORKSPACE_ROOT="$(pwd)"
+WORKSPACE_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$WORKSPACE_ROOT" || exit 1
 
 push_repo() {
 local REPO="$1"
