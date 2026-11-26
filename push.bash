@@ -1,4 +1,4 @@
-#!/bin/bash
+2#!/bin/bash
 
 WORKSPACE_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$WORKSPACE_ROOT" || exit 1
